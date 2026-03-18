@@ -1,13 +1,15 @@
 import os
-from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).parent.parent
-load_dotenv(dotenv_path=BASE_DIR / ".env")
-os.makedirs(BASE_DIR / "sessions", exist_ok=True)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
+SESSIONS_DIR = os.path.join(BASE_DIR, "..", "sessions")
+
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, "..", ".env"))
+os.makedirs(SESSIONS_DIR, exist_ok=True)
 
 app = FastAPI(title="セルフコーチングAPI")
 
@@ -26,4 +28,4 @@ app.include_router(session.router, prefix="/api")
 app.include_router(coach.router, prefix="/api")
 
 # フロントエンドをルートで配信（html=True で / → index.html を自動配信）
-app.mount("/", StaticFiles(directory=str(BASE_DIR / "frontend"), html=True), name="frontend")
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
