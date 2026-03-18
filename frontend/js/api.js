@@ -4,6 +4,14 @@
 
 const API_BASE = '';  // 同一オリジンで配信するため空文字
 
+function getApiHeaders(extra) {
+  return {
+    'Content-Type': 'application/json',
+    'X-API-Key': window.APP_SECRET_KEY || '',
+    ...extra,
+  };
+}
+
 const api = {
   /**
    * GET リクエスト
@@ -11,7 +19,7 @@ const api = {
   async get(path) {
     const res = await fetch(API_BASE + path, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getApiHeaders(),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: res.statusText }));
@@ -26,7 +34,7 @@ const api = {
   async post(path, body) {
     const res = await fetch(API_BASE + path, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getApiHeaders(),
       body: JSON.stringify(body),
     });
     if (!res.ok) {
@@ -42,7 +50,7 @@ const api = {
   async delete(path) {
     const res = await fetch(API_BASE + path, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getApiHeaders(),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: res.statusText }));
