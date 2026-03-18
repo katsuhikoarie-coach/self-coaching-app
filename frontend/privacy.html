@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プライバシーポリシー - AIコーチングアプリ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .privacy-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .privacy-header {
+      margin-bottom: 2rem;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: #5c8a6e;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .privacy-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 0.5rem 0;
+    }
+    .last-updated {
+      color: #777;
+      font-size: 0.88rem;
+    }
+    .privacy-section {
+      margin-bottom: 3rem;
+    }
+    .privacy-section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      border-bottom: 2px solid #5c8a6e;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .privacy-section p {
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin: 0 0 0.75rem 0;
+    }
+    .privacy-section p:last-child {
+      margin-bottom: 0;
+    }
+    .privacy-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .privacy-list li {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .privacy-list li::before {
+      content: "•";
+      color: #5c8a6e;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+    .info-box {
+      background: #f8faf9;
+      border: 1px solid #d4e6da;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .info-box p {
+      margin: 0 0 0.75rem 0;
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .info-box p:last-child {
+      margin-bottom: 0;
+    }
+    .contact-box {
+      background: #f8faf9;
+      border: 1px solid #d4e6da;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .contact-box p {
+      margin: 0;
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="privacy-container">
+    <div class="privacy-header">
+      <a href="index.html" class="back-link">← トップに戻る</a>
+      <h1>プライバシーポリシー</h1>
+      <div class="last-updated">最終更新日: 2026年3月</div>
+    </div>
+
+    <!-- セクション1: 収集する情報 -->
+    <section class="privacy-section">
+      <h2>収集する情報</h2>
+      <div class="info-box">
+        <p>本アプリが収集・保存する情報は以下のとおりです。</p>
+        <ul class="privacy-list">
+          <li>セッション中の会話内容（AIコーチとのやり取り）。サーバーに一時的に保存されます。</li>
+        </ul>
+        <p style="margin-top: 0.75rem;">以下の情報は<strong>収集しません</strong>。</p>
+        <ul class="privacy-list">
+          <li>氏名・メールアドレス・電話番号などの個人識別情報</li>
+          <li>位置情報・デバイス情報などの端末固有情報</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- セクション2: 外部送信される情報 -->
+    <section class="privacy-section">
+      <h2>外部送信される情報</h2>
+      <div class="info-box">
+        <p>AIの応答を生成するため、ユーザーが入力したメッセージはAnthropicのAPIサーバーに送信されます。送信されたデータにはAnthropicのプライバシーポリシーが適用されます。</p>
+        <p>APIキーはサーバーサイドで管理されており、フロントエンド（ブラウザ側）には公開されません。</p>
+      </div>
+    </section>
+
+    <!-- セクション3: データの削除方法 -->
+    <section class="privacy-section">
+      <h2>データの削除方法</h2>
+      <ul class="privacy-list">
+        <li>チャット画面の「履歴を削除」ボタンをクリックすることで、サーバーに保存されたセッション履歴を削除できます。</li>
+        <li>ブラウザのlocalStorageに保存されたセッションIDは、お使いのブラウザの設定（サイトデータの削除）から削除できます。</li>
+      </ul>
+    </section>
+
+    <!-- セクション4: お問い合わせ -->
+    <section class="privacy-section">
+      <h2>お問い合わせ</h2>
+      <div class="contact-box">
+        <p>本アプリのプライバシーに関するご質問・ご意見は、GitHubのissueよりお知らせください。</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+# 環境変数・機密情報
+.env
+sessions/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# OS
+.DS_Store
+
+# Claude Code設定
+.claude/
+
+# このリポジトリに含めない既存プロジェクト・作業ファイル
+ari-coach/
+coach_02/
+coach_03/
+yamano_*/
+find_*.py
+gen_*.py
+list_*.py
+proc_*.py
+search_*.py
+upload_*.py
+*.txt
+*.png
+*.jpg
+*.jpeg
+*.gif
+node_modules/

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>使い方 - AIコーチングアプリ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .howto-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .howto-header {
+      margin-bottom: 2rem;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: #5c8a6e;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .howto-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0;
+    }
+    .howto-section {
+      margin-bottom: 3rem;
+    }
+    .howto-section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      border-bottom: 2px solid #5c8a6e;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .coach-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .coach-card {
+      background: #f8faf9;
+      border: 1px solid #d4e6da;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .coach-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #2e6b4e;
+      margin: 0 0 0.5rem 0;
+    }
+    .coach-card p {
+      margin: 0;
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .phase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .phase-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .phase-badge {
+      background: #5c8a6e;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+    .phase-text {
+      color: #333;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .phase-text strong {
+      color: #1a1a1a;
+    }
+    .crisis-box {
+      background: #fff8f0;
+      border: 1px solid #f0c070;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .crisis-box p {
+      margin: 0 0 0.75rem 0;
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .crisis-box p:last-child {
+      margin-bottom: 0;
+    }
+    .hotline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0 0 0;
+    }
+    .hotline-list li {
+      padding: 0.35rem 0;
+      font-size: 0.95rem;
+      color: #333;
+    }
+    .hotline-list li strong {
+      color: #1a1a1a;
+    }
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .faq-item {
+      border-bottom: 1px solid #e0e8e4;
+      padding-bottom: 1.25rem;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .faq-q {
+      font-weight: 700;
+      color: #2e6b4e;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+    .faq-q::before {
+      content: "Q. ";
+    }
+    .faq-a {
+      color: #444;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding-left: 1.2rem;
+    }
+    .faq-a::before {
+      content: "A. ";
+      font-weight: 700;
+      color: #5c8a6e;
+      margin-left: -1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="howto-container">
+    <div class="howto-header">
+      <a href="index.html" class="back-link">← トップに戻る</a>
+      <h1>使い方</h1>
+    </div>
+
+    <!-- セクション1: このアプリでできること -->
+    <section class="howto-section">
+      <h2>このアプリでできること</h2>
+      <div class="coach-list">
+        <div class="coach-card">
+          <h3>ナラティブコーチ ―「自分の物語を、書き直す」</h3>
+          <p>問題を「あなた自身」から切り離して外在化し、これまでの物語を新しい視点から書き換えるアプローチです。自分を縛っている思い込みに気づき、別の可能性を見つけていきます。</p>
+        </div>
+        <div class="coach-card">
+          <h3>GROWコーチ ―「目標を決めて、動き出す」</h3>
+          <p>GROWフレームワークやWOOPの手法を使い、目標の明確化から具体的な行動計画の立案まで段階的にサポートします。「何をしたいか」がはっきりしている方に向いています。</p>
+        </div>
+        <div class="coach-card">
+          <h3>ポジションチェンジコーチ ―「視点を変えると、見えてくる」</h3>
+          <p>自分・相手・第三者の3つの視点と、過去・現在・未来のタイムラインを使って状況を多角的に捉え直します。対人関係や行き詰まりを感じているときに効果的です。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- セクション2: セッションの流れ -->
+    <section class="howto-section">
+      <h2>セッションの流れ</h2>
+      <div class="phase-list">
+        <div class="phase-item">
+          <span class="phase-badge">Phase 0</span>
+          <div class="phase-text"><strong>セットアップ</strong> ― 今日話したいテーマや悩みを決めます。</div>
+        </div>
+        <div class="phase-item">
+          <span class="phase-badge">Phase 1</span>
+          <div class="phase-text"><strong>現実の受容</strong> ― 今の状況や感情を整理し、ありのままを受け取ります。</div>
+        </div>
+        <div class="phase-item">
+          <span class="phase-badge">Phase 2</span>
+          <div class="phase-text"><strong>理想の物語</strong> ― 問題が解決したときの自分や状況を具体的に描きます。</div>
+        </div>
+        <div class="phase-item">
+          <span class="phase-badge">Phase 3</span>
+          <div class="phase-text"><strong>内なる声との対話</strong> ― 「でも…」「どうせ…」といった抵抗感や不安を丁寧に探ります。</div>
+        </div>
+        <div class="phase-item">
+          <span class="phase-badge">Phase 4</span>
+          <div class="phase-text"><strong>障害の特定</strong> ― 前に進むことを妨げているものを見つけ、向き合います。</div>
+        </div>
+        <div class="phase-item">
+          <span class="phase-badge">Phase 5</span>
+          <div class="phase-text"><strong>物語の統合</strong> ― セッションを通じた気づきや学びをまとめます。</div>
+        </div>
+        <div class="phase-item">
+          <span class="phase-badge">Phase 6</span>
+          <div class="phase-text"><strong>行動へのコミットメント</strong> ― 明日からできる具体的な一歩を決めます。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- セクション3: 危機介入について -->
+    <section class="howto-section">
+      <h2>危機介入について</h2>
+      <div class="crisis-box">
+        <p>このアプリはAIによるコーチングツールです。<strong>精神科・心療内科等の医療サービスの代替にはなりません。</strong>AIコーチには専門家としての判断能力がなく、緊急時に適切な対応を取れない場合があります。</p>
+        <p>希死念慮（死にたい・消えたいという気持ち）がある方や、今すぐ助けが必要な方は、速やかに専門家・相談窓口にお電話ください。</p>
+        <ul class="hotline-list">
+          <li><strong>いのちの電話（無料）</strong>: 0120-783-556</li>
+          <li><strong>よりそいホットライン（24時間）</strong>: 0120-279-338</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- セクション4: よくある質問 -->
+    <section class="howto-section">
+      <h2>よくある質問</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q">会話内容はどこに保存されますか？</div>
+          <div class="faq-a">セッション履歴はサーバーに一時保存されます。また、AIの応答生成のためにAnthropicのAPIサーバーにメッセージが送信されます。詳しくは<a href="privacy.html">プライバシーポリシー</a>をご覧ください。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">コーチはいつでも変えられますか？</div>
+          <div class="faq-a">はい。チャット画面の「コーチを変える」ボタンをクリックすると、いつでもコーチ選択画面に戻ることができます。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">履歴を消すには？</div>
+          <div class="faq-a">チャット画面の「履歴を削除」ボタンから現在のセッション履歴を削除できます。</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

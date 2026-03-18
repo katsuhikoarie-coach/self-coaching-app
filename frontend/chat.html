@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コーチとの対話 | セルフコーチング</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="chat-header">
+    <span id="coach-name" class="coach-name"></span>
+    <a href="index.html" class="btn btn-secondary">コーチを変える</a>
+  </header>
+
+  <!-- フェーズバー -->
+  <nav id="phase-bar" class="phase-bar">
+    <div class="phase-item" data-phase="0">Phase 0</div>
+    <div class="phase-item" data-phase="1">Phase 1</div>
+    <div class="phase-item" data-phase="2">Phase 2</div>
+    <div class="phase-item" data-phase="3">Phase 3</div>
+    <div class="phase-item" data-phase="4">Phase 4</div>
+    <div class="phase-item" data-phase="5">Phase 5</div>
+    <div class="phase-item" data-phase="6">Phase 6</div>
+  </nav>
+
+  <!-- 危機介入バナー -->
+  <div id="crisis-banner" class="crisis-banner" style="display:none;">
+    <div class="crisis-content">
+      <h2>&#x26A0;&#xFE0F; 今すぐサポートを受けてください</h2>
+      <p>あなたの状況を深刻に受け止めています。一人で抱え込まず、専門の相談窓口にご連絡ください。</p>
+      <ul class="crisis-contacts">
+        <li>
+          <strong>いのちの電話</strong><br>
+          0120-783-556（無料・24時間）
+        </li>
+        <li>
+          <strong>よりそいホットライン</strong><br>
+          0120-279-338（無料・24時間）
+        </li>
+        <li>
+          <strong>こころの健康相談統一ダイヤル</strong><br>
+          0570-064-556
+        </li>
+        <li>
+          <strong>救急・警察</strong><br>
+          119（救急）/ 110（警察）
+        </li>
+      </ul>
+      <button id="crisis-close-btn" class="btn btn-secondary">チャットに戻る</button>
+    </div>
+  </div>
+
+  <!-- メッセージエリア -->
+  <main id="messages" class="messages-area"></main>
+
+  <!-- 入力エリア -->
+  <div class="input-area">
+    <textarea
+      id="user-input"
+      class="user-input"
+      placeholder="メッセージを入力..."
+      rows="3"
+    ></textarea>
+    <button id="send-btn" class="btn btn-primary">送信</button>
+  </div>
+
+  <!-- フッターボタン -->
+  <footer class="chat-footer">
+    <button id="end-btn" class="btn btn-outline">セッションを終える</button>
+    <button id="delete-btn" class="btn btn-danger-outline">履歴を削除</button>
+  </footer>
+
+  <!-- サマリーモーダル -->
+  <div id="summary-modal" class="modal" style="display:none;">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-content">
+      <h2 class="modal-title">セッションのサマリー</h2>
+
+      <div class="summary-item">
+        <h3 class="summary-label">&#x1F3AF; テーマ</h3>
+        <p id="summary-theme" class="summary-text"></p>
+      </div>
+
+      <div class="summary-item">
+        <h3 class="summary-label">&#x1F4A1; 気づき</h3>
+        <p id="summary-insight" class="summary-text"></p>
+      </div>
+
+      <div class="summary-item">
+        <h3 class="summary-label">&#x1F9E9; 障害</h3>
+        <p id="summary-obstacle" class="summary-text"></p>
+      </div>
+
+      <div class="summary-item">
+        <h3 class="summary-label">&#x1F4CB; アクション</h3>
+        <p id="summary-action" class="summary-text"></p>
+      </div>
+
+      <div class="summary-item">
+        <h3 class="summary-label">&#x2B50; 強み</h3>
+        <p id="summary-strength" class="summary-text"></p>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modal-close-btn" class="btn btn-primary">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>
