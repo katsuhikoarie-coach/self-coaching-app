@@ -3,7 +3,7 @@ services:
     name: self-coaching-app
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && sh start.sh
+    startCommand: cd backend && bash start.sh
     envVars:
       - key: GEMINI_API_KEY
         sync: false
