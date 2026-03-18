@@ -1,7 +1,10 @@
+import logging
 from google import genai
 from google.genai import types
 import os
 import json
+
+logger = logging.getLogger(__name__)
 
 
 def generate_summary(messages: list, coach_id: str) -> dict:
@@ -41,6 +44,15 @@ def generate_summary(messages: list, coach_id: str) -> dict:
             model="gemini-2.5-flash",
             contents=user_message,
             config=config,
+        )
+
+        # トークン使用量をログ出力
+        usage = response.usage_metadata
+        input_tokens = getattr(usage, "prompt_token_count", 0) or 0
+        output_tokens = getattr(usage, "candidates_token_count", 0) or 0
+        logger.info(
+            "summary tokens | coach=%s input=%d output=%d total=%d",
+            coach_id, input_tokens, output_tokens, input_tokens + output_tokens,
         )
 
         response_text = response.text.strip()

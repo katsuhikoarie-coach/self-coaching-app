@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from google import genai
@@ -6,6 +7,9 @@ import os
 
 from services.crisis_detector import detect_crisis
 from services.coach_loader import load_coach_prompt
+from routers.session import save_message_to_session
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -40,6 +44,8 @@ class ChatResponse(BaseModel):
     reply: str
     is_crisis: bool
     phase: str
+    input_tokens: int = 0
+    output_tokens: int = 0
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -61,7 +67,6 @@ async def chat(request: ChatRequest):
 
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
-        # 会話履歴を Gemini の形式に変換（role: user/model）
         history = []
         for msg in request.messages:
             role = "model" if msg["role"] == "assistant" else "user"
@@ -80,6 +85,34 @@ async def chat(request: ChatRequest):
 
         reply_text = response.text
 
+        # トークン使用量を取得・ログ出力
+        usage = response.usage_metadata
+        input_tokens = getattr(usage, "prompt_token_count", 0) or 0
+        output_tokens = getattr(usage, "candidates_token_count", 0) or 0
+        logger.info(
+            "chat tokens | session=%s coach=%s input=%d output=%d total=%d",
+            request.session_id, request.coach_id,
+            input_tokens, output_tokens, input_tokens + output_tokens,
+        )
+
+        # ユーザーメッセージと返答をトークン情報付きでセッションに保存
+        save_message_to_session(
+            session_id=request.session_id,
+            role="user",
+            content=request.user_message,
+            coach_id=request.coach_id,
+            input_tokens=input_tokens,
+            output_tokens=0,
+        )
+        save_message_to_session(
+            session_id=request.session_id,
+            role="assistant",
+            content=reply_text,
+            coach_id=request.coach_id,
+            input_tokens=0,
+            output_tokens=output_tokens,
+        )
+
         phase = "unknown"
         for word in reply_text.split():
             if word.startswith("phase_"):
@@ -90,6 +123,8 @@ async def chat(request: ChatRequest):
             reply=reply_text,
             is_crisis=False,
             phase=phase,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
         )
 
     except HTTPException:
