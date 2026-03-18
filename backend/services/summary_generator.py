@@ -16,23 +16,24 @@ def generate_summary(messages: list, coach_id: str) -> dict:
     try:
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
-        system_instruction = """あなたはコーチングセッションのサマリーを作成する専門家です。
-会話履歴を分析し、必ず以下のJSON形式のみで返答してください。
-他の文字は一切含めないでください。
+        messages_json = json.dumps(messages, ensure_ascii=False, indent=2)
+        user_message = f"""以下はコーチングセッションの会話履歴です。
+この会話の内容だけを元に、以下の5項目を日本語で具体的に生成してください。
+会話に出てきた具体的なキーワードや言葉をそのまま使うこと。
+汎用的な表現は使わないこと。
 
-{
-  "theme": "今日のテーマ（一文）",
-  "insight": "見えてきた本音（一文）",
-  "obstacle": "主な障害（一文）",
-  "action": "コミットメントした行動（一文）",
-  "strength": "発見した強み（一文）"
-}"""
+{messages_json}
 
-        messages_json = json.dumps(messages, ensure_ascii=False)
-        user_message = f"以下のコーチングセッション（コーチ: {coach_id}）のサマリーを作成してください。\n\n{messages_json}"
+以下のJSON形式のみで返してください（他の文字は不要）：
+{{
+  "theme": "今日話したメインテーマを一言で",
+  "insight": "会話の中で見えてきた本音や気づき",
+  "obstacle": "話の中で出てきた障害や懸念",
+  "action": "コミットメントした具体的な行動",
+  "strength": "会話から見えたクライアントの強み"
+}}"""
 
         config = types.GenerateContentConfig(
-            system_instruction=system_instruction,
             max_output_tokens=1024,
         )
 
