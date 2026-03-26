@@ -1,4 +1,5 @@
 import logging
+import re
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from google import genai
@@ -84,6 +85,9 @@ async def chat(request: ChatRequest):
         )
 
         reply_text = response.text
+
+        # 「PHASE:」で始まる行をユーザー返答から除去する
+        reply_text = re.sub(r'^PHASE:[^\n]*\n?', '', reply_text, flags=re.MULTILINE).strip()
 
         # トークン使用量を取得・ログ出力
         usage = response.usage_metadata
