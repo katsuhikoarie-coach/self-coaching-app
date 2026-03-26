@@ -57,7 +57,7 @@ function updateCardHighlights() {
 
 /**
  * コーチカードの初期化
- * 「このコーチと話す」ボタンクリックで selected を排他的に付与
+ * 「このコーチと話す」ボタンクリックで直接チャット画面へ遷移
  */
 function initCoachCards() {
   const selectButtons = document.querySelectorAll('.btn-select');
@@ -65,32 +65,13 @@ function initCoachCards() {
   selectButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const coachId = btn.dataset.coachId;
-      selectCoach(coachId);
+      window.location.href = 'chat.html?coach=' + coachId;
     });
   });
 }
 
 /**
- * 指定したコーチIDのカードを selected 状態にする（他は解除）
- * @param {string} coachId
- */
-function selectCoach(coachId) {
-  // 全カードの selected を除去
-  document.querySelectorAll('.coach-card').forEach((card) => {
-    card.classList.remove('selected');
-  });
-
-  // 対象カードに selected を付与
-  const targetCard = document.getElementById('card-' + coachId);
-  if (targetCard) {
-    targetCard.classList.add('selected');
-  }
-
-  selectedCoachId = coachId;
-}
-
-/**
- * 「セッションを始める」ボタンの初期化
+ * 「セッションを始める」ボタンの初期化（後方互換のため残す）
  */
 function initStartButton() {
   const startBtn = document.getElementById('start-btn');
