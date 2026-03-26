@@ -24,11 +24,8 @@ const WELCOME_MESSAGES = {
 const params = new URLSearchParams(window.location.search);
 const coachId = params.get('coach') || 'narrative';
 
-let sessionId = localStorage.getItem('coaching_session_id');
-if (!sessionId) {
-  sessionId = generateUUID();
-  localStorage.setItem('coaching_session_id', sessionId);
-}
+let sessionId = generateUUID();
+localStorage.setItem('coaching_session_id', sessionId);
 
 let messages = [];
 

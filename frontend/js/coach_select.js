@@ -65,6 +65,7 @@ function initCoachCards() {
   selectButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const coachId = btn.dataset.coachId;
+      localStorage.removeItem('coaching_session_id');
       window.location.href = 'chat.html?coach=' + coachId;
     });
   });
