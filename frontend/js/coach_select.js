@@ -8,6 +8,13 @@
 // 選択中のコーチID（null = 未選択）
 let selectedCoachId = null;
 
+// BFCache対策: 戻るボタンで復元されたときは強制リロード
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   initMoodChips();
   initCoachCards();

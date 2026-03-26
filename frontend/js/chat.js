@@ -201,6 +201,15 @@ modalOverlay.addEventListener('click', () => {
   summaryModal.style.display = 'none';
 });
 
+// ── BFCache対策 ───────────────────────────────────────────
+// ブラウザの戻る/進むでキャッシュから復元されたときは強制リロードして
+// 古いsessionId・messagesが使われないようにする
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
+
 // ── 初期化 ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   coachNameEl.textContent = COACH_NAMES[coachId] || COACH_NAMES['narrative'];
