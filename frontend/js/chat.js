@@ -28,6 +28,8 @@ let sessionId = generateUUID();
 localStorage.setItem('coaching_session_id', sessionId);
 
 let messages = [];
+let positionSwitching = false;
+let countdownEl = null;
 
 // ── DOM参照 ───────────────────────────────────────────────
 const coachNameEl    = document.getElementById('coach-name');
@@ -44,8 +46,64 @@ const modalCloseBtn  = document.getElementById('modal-close-btn');
 
 // ── ユーティリティ ────────────────────────────────────────
 function setLoading(isLoading) {
+  if (positionSwitching && !isLoading) return;
   sendBtn.disabled = isLoading;
   sendBtn.textContent = isLoading ? '送信中...' : '送信';
+}
+
+function disableInput() {
+  positionSwitching = true;
+  userInputEl.disabled = true;
+  sendBtn.disabled = true;
+}
+
+function enableInput() {
+  positionSwitching = false;
+  userInputEl.disabled = false;
+  sendBtn.disabled = false;
+  sendBtn.textContent = '送信';
+}
+
+function appendSystemMessage(text) {
+  const el = document.createElement('div');
+  el.classList.add('system-message');
+  el.textContent = text;
+  messagesEl.appendChild(el);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return el;
+}
+
+function updateCountdown(count) {
+  if (!countdownEl) {
+    countdownEl = appendSystemMessage('— ' + count + ' —');
+  } else {
+    countdownEl.textContent = '— ' + count + ' —';
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+}
+
+function showPositionSwitch(callback) {
+  disableInput();
+  countdownEl = null;
+  appendSystemMessage('自分の立場から一旦距離をおいて');
+  let count = 10;
+  updateCountdown(count);
+  count--;
+  const timer = setInterval(() => {
+    if (count >= 0) {
+      updateCountdown(count);
+      count--;
+    } else {
+      clearInterval(timer);
+      countdownEl = null;
+      appendSystemMessage('相手の立場に立ってみて');
+      setTimeout(() => {
+        appendSystemMessage('相手の立場に立ったら、質問に答えてください');
+        enableInput();
+        if (callback) callback();
+      }, 3000);
+    }
+  }, 1000);
 }
 
 function appendMessage(role, text) {
@@ -106,6 +164,18 @@ async function sendMessage() {
 
       if (response.phase !== undefined && response.phase !== 'unknown') {
         updatePhaseBar(response.phase);
+      }
+
+      // ポジションチェンジコーチ：スケーリング8点以上で演出
+      if (coachId === 'position') {
+        const scoreMatch = userMessage.match(/([89]|10)\s*点/);
+        const hadScalingQuestion = messages
+          .filter(m => m.role === 'assistant')
+          .slice(0, -1)
+          .some(m => m.content.includes('何点くらい言えた'));
+        if (scoreMatch && hadScalingQuestion) {
+          showPositionSwitch(() => {});
+        }
       }
     }
 
