@@ -57,7 +57,7 @@ function updateCardHighlights() {
 
 /**
  * コーチカードの初期化
- * 「このコーチと話す」ボタンクリックで直接チャット画面へ遷移
+ * カード全体または「このコーチと話す」ボタンクリックで直接チャット画面へ遷移
  */
 function initCoachCards() {
   const selectButtons = document.querySelectorAll('.btn-select');
@@ -67,6 +67,16 @@ function initCoachCards() {
       const coachId = btn.dataset.coachId;
       localStorage.removeItem('coaching_session_id');
       window.location.href = 'chat.html?coach=' + coachId;
+    });
+  });
+
+  // カード枠全体をクリック可能にする（ボタン本体クリックは二重発火しない）
+  const cards = document.querySelectorAll('.coach-card');
+  cards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-select')) return;
+      const btn = card.querySelector('.btn-select');
+      if (btn) btn.click();
     });
   });
 }
