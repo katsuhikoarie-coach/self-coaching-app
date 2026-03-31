@@ -18,7 +18,7 @@ GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 GMAIL_USER     = os.environ["GMAIL_USER"]       # 送信元アドレス（例: yourname@gmail.com）
 GMAIL_APP_PASS = os.environ["GMAIL_APP_PASS"]   # Gmail App Password
 MAIL_TO        = os.environ.get("MAIL_TO", "katsuhiko.arie@gmail.com")
-MODEL          = "gemini-1.5-flash"
+MODEL          = "gemini-2.5-flash"
 
 THEMES = [
     ("AIの最新情報",                     "AIや生成AI、大規模言語モデルに関する最新ニュースや研究成果を日本語で要点を3〜5点、箇条書きでまとめてください。今日の日付を考慮して直近の情報を重視してください。"),
