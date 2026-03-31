@@ -1,6 +1,6 @@
 """
 毎朝自動情報収集スクリプト
-- Gemini 2.0 Flash + Google Search grounding で各テーマを調査
+- Gemini 2.5 Flash + Google Search grounding で各テーマを調査
 - Gmail App Password でメール送信
 """
 
