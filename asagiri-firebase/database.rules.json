@@ -1,0 +1,19 @@
+{
+  "rules": {
+    ".read":  "auth != null && (auth.token.email == 'katsuhiko.arie@gmail.com' || auth.token.email == 'ya.asagiriten@gmail.com')",
+    ".write": "auth != null && (auth.token.email == 'katsuhiko.arie@gmail.com' || auth.token.email == 'ya.asagiriten@gmail.com')",
+
+    "sales": {
+      ".indexOn": ["d", "ym", "cid"]
+    },
+    "customers": {
+      ".indexOn": ["name", "kana"]
+    },
+    "products": {
+      ".indexOn": ["genre", "disc"]
+    },
+    "stock": {
+      ".indexOn": ["qty"]
+    }
+  }
+}

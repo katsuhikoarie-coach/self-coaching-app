@@ -1,0 +1,61 @@
+クロコへの引き継ぎプロンプト
+
+FC実績途中報告システムの続きを引き継いでください。
+環境
+
+URL：https://yamano.asagiriyamano.jp
+ローカル：C:\Users\User\Documents\claudeCode\yamano_kanri
+サーバー：CORESERVER / FTPホスト：asagiri.s168.coreserver.jp / ユーザー：asagiri
+アップロード先：/public_html/yamano.asagiriyamano.jp/
+DB：asagiri_kanri / ユーザー：asagiri / ホスト：localhost / 文字コード：UTF-8
+PHP：7.4
+WinSCPでアップロードします
+
+完成済み
+
+Googleログイン（OAuth2.0）動作確認済み
+DBテーブル：users、targets、fc_reports 作成済み
+ファイル構成：index.php / top.php / upload.php / confirm.php / list.php / ranking.php / db.php / config.php / logout.php / auth/callback.php
+Google Cloud Vision API によるOCR実装済み（APIキー：AIzaSyDVSyBsIupQGlWQY6v7VZ1PxeDRnwmra_o）
+トップページに3メニュー：FC実績途中報告・実績一覧CSV・ランキング集計
+
+現在の問題
+OCRテキストは正しく取得できている（下記参照）が、confirm.phpの入力欄にデータが反映されない。セッションの受け渡しが失敗している。
+実際のOCRテキスト例
+販社・エリア 朝霧ヤ21 代理店名 三村すず
+順位 コード ポイント名 実績
+1位 47291 三木とも 38,800.-
+2位 48160 三才西田 25,600.-
+3位 48350 はまもとあやな 25600-
+4位 45459 成瀬恵 12800-
+5位 48350 三木智香 12800.-
+修正方針
+セッションではなくPOSTでconfirm.phpにデータを渡す方式に変更してください。
+upload.phpでOCR・parseOCRText()実行後、結果をhidden inputに入れたフォームを自動submitしてconfirm.phpに渡す。confirm.phpはPOSTで受け取る。
+fc_reportsテーブルのカラム
+id / user_id / hansa_area / dairitenname / month / rank / agency_code / point_name / sales_amount / source_image / ocr_raw_text / created_at / updated_at
+次にやること
+
+upload.php と confirm.php をPOST方式に修正
+confirm.phpで販社エリア・代理店名・月度・各順位のコード・ポイント名・実績が正しく表示されることを確認
+保存してWinSCPでアップロード
+
+upload.php の parseOCRText() をデバッグしてください。
+OCR生テキストは各項目が別々の行に分かれて取得されています：
+販社・エリア
+朝霧ヤ21
+代理店名
+三村すず
+順位
+コード
+ポイント名
+1位 47291 三木とも 実績 38,800.-
+2位 48160 三才西田 25,600.-
+現在のコードは同一行に「販社・エリア 朝霧ヤ21」がある前提で書かれていると思います。別行になっている場合に対応してください。
+修正方針：
+
+「販社・エリア」という行の次の行を hansa_area として取得
+「代理店名」という行の次の行を dairitenname として取得
+「1位」?「8位」で始まる行からコード・ポイント名・実績を抽出
+
+保存後WinSCPでアップロードします。

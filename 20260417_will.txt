@@ -1,0 +1,298 @@
+DB名・ユーザー:asagiri_will
+パスワード:YOt0rUBDmYtX8M
+
+will.asagiriyamano.jp
+
+# 新規代理店セットアップ
+
+## 引き継ぎ情報
+- サーバー: CORESERVER.JP（s168.coreserver.jp）
+- 管理ID: asagiri
+- FTPホスト: asagiri.s168.coreserver.jp
+- ベーステンプレート: public_html/sales.asagiriyamano.jp/
+- 朝霧店DBの構成を参考にすること
+
+## 新規代理店情報
+- 店舗名: 山野愛子どろんこ美容 クレスティサロンWiLL
+- 店舗コード: will
+- サブドメイン: demo-will.asagiriyamano.jp
+- アップロード先: public_html/demo-will.asagiriyamano.jp/
+- DB名: asagiri_will
+- DBユーザー: asagiri_will
+- DBパスワード: （在りさんが直接入力）
+- FTPパスワード: （在りさんが直接入力）
+- 顧客データ: なし（空から開始）
+- Googleアカウント: katsuhiko.arie@gmail.com（暫定・後で変更可）
+
+## やってほしいこと
+
+### STEP 1：ファイルの準備
+public_html/sales.asagiriyamano.jp/ の全ファイルをコピーして
+以下を変更してください。
+
+index.html の変更箇所：
+- 店舗名「朝霧店」→「クレスティサロンWiLL」
+- ALLOWED_EMAILS に katsuhiko.arie@gmail.com のみ設定
+- APIのエンドポイントURLを
+  https://demo-will.asagiriyamano.jp/api/ に変更
+
+config/db.php の変更箇所：
+- DB名: asagiri_will
+- DBユーザー: asagiri_will
+- DBパスワード: （在りさんから受け取る）
+
+### STEP 2：商品マスタの準備
+朝霧店のproductsデータと同じ商品マスタを使用します。
+asagiri_salesのproductsテーブルからSQLでコピーする
+スクリプトを作成してください。
+
+消費税8%対象コードは共通：
+0329,0330,0670,1659,2646,3025,3304,
+6224,6225,6226,6228,6250,6251,6252,6253,6254,
+6278,6282,6288,6289,6291,6292,
+6303,6304,6305,6306,6307,6308,630u,
+6311,6312,6313,6314,6315,6316,6317,631u,
+6323,6325,6329,6335,6336,6337,6515,
+7628,7629,7630,
+Y001,Y002,Y007,Y008,Y059,Y067,Y068,Y085,
+Y628,Y629,Y633,Y635,Y636,
+Z025,Z601,z101,z102,ｚ101,ｚ102
+
+### STEP 3：FTPアップロード
+完成したファイルを
+public_html/demo-will.asagiriyamano.jp/
+にアップロードしてください。
+
+### STEP 4：DBセットアップ用SQLの準備
+以下のSQLファイルを作成してください。
+- setup_will.sql（テーブル作成）
+- import_products_will.sql（商品マスタコピー）
+
+在りさんがphpMyAdminで実行できるように
+手順も合わせて案内してください。
+
+### STEP 5：サブドメイン設定の案内
+demo-will.asagiriyamano.jp を
+コアサーバーのサイト設定に追加する手順を
+案内してください。
+
+### STEP 6：Firebase認証ドメインの追加
+以下のURLをFirebase認証の承認済みドメインに
+追加する手順を案内してください。
+demo-will.asagiriyamano.jp
+
+## 完了報告フォーマット
+店舗名: クレスティサロンWiLL
+URL: https://demo-will.asagiriyamano.jp
+DB名: asagiri_will
+ログイン: katsuhiko.arie@gmail.com
+商品マスタ: 共通CSV（1364件）
+顧客データ: 空（新規入力から）
+残作業: （あれば）
+
+
+asagiri_will のDBが作成されました。
+DBパスワード：YOt0rUBDmYtX8M
+
+次の作業をお願いします。
+
+1. sales.asagiriyamano.jp のファイル一式をFTPで取得して
+   以下3箇所を変更してください。
+
+   index.html：
+   - 店舗名「朝霧店」→「クレスティサロンWiLL」
+   - ALLOWED_EMAILS を katsuhiko.arie@gmail.com のみに設定
+   - APIのエンドポイントURLを
+     https://demo-will.asagiriyamano.jp/api/ に変更
+
+   config/db.php：
+   - DB名: asagiri_will
+   - DBユーザー: asagiri_will
+   - DBパスワード:YOt0rUBDmYtX8M
+
+2. 変更したファイルを
+   public_html/demo-will.asagiriyamano.jp/
+   にFTPアップロードしてください。
+
+3. setup_will.sql と import_products_will.sql を
+   public_html/demo-will.asagiriyamano.jp/
+   にもアップロードしてください。
+
+FTPホスト: asagiri.s168.coreserver.jp
+FTPユーザー: asagiri
+FTPパスワード:YOt0rUBDmYtX8M
+
+
+# クレスティサロンWiLL 本番環境セットアップ
+# 引き継ぎプロンプト
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+# デモ環境の構成（参考）
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+## デモ環境
+- URL: https://demo-will.asagiriyamano.jp
+- DB: asagiri_will
+- ファイル: public_html/demo-will.asagiriyamano.jp/
+- ローカル作業ファイル:
+  C:\Users\User\Downloads\will-setup\
+
+## デモ環境で使用したSQLファイル一覧
+- setup_will.sql（基本テーブル5つ）
+- import_products_will_v2.sql（商品マスタ1364件）
+- add_este_tables.sql（este_menus/este_visits/keep_items）
+- add_stock_tables.sql（stock/stock_inout）
+- add_sales_items.sql（sales_items）
+- add_este_sales_tables.sql（este_sales/este_sales_items）
+
+## デモ環境のテーブル一覧（計11テーブル）
+- customers（顧客マスタ）
+- products（商品マスタ 1364件）
+- sales（売上伝票）
+- sales_items（売上明細）
+- sale_details（売上明細補助）
+- sessions（セッション管理）
+- stock（在庫）
+- stock_inout（入出庫履歴）
+- este_menus（エステコースマスタ）
+- este_visits（エステ来店）
+- keep_items（キープ商品・回数券）
+- este_sales（エステ売上）
+- este_sales_items（エステ売上明細）
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+# 今回の作業：本番環境セットアップ
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+## 本番環境情報
+- 店舗名：山野愛子どろんこ美容 クレスティサロンWiLL
+- 店舗コード：will-pro（または任意のコード）
+- URL：https://will.asagiriyamano.jp
+- DB名：asagiri_will_pro
+- DBユーザー：asagiri_will_pro
+- DBパスワード：（在りさんが直接入力）
+- FTPパスワード：（在りさんが直接入力）
+- ログインGmail：（代理店から取得したGmail）
+
+3
+━━━━━━━━━━━━━━━━━━━━━━━━
+# やってほしいこと（順番通りに実行）
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+## STEP 1：ファイルの準備
+デモ環境のファイルをベースに
+以下を変更してください。
+
+C:\Users\User\Downloads\will-setup\ のファイルを
+C:\Users\User\Downloads\will-pro\ にコピーして
+以下を変更してください。
+
+index.html の変更箇所：
+- ALLOWED_EMAILS に代理店のGmailを追加
+  katsuhiko.arie@gmail.com は必ず残すこと
+- APIのエンドポイントURLを
+  https://will.asagiriyamano.jp/api/ に変更
+
+config/db.php の変更箇所：
+- DB名: asagiri_will_pro
+- DBユーザー: asagiri_will_pro
+- DBパスワード: （在りさんから受け取る）
+
+## STEP 2：FTPアップロード
+以下の構造でアップロードしてください。
+
+public_html/will.asagiriyamano.jp/
+  ├─ index.html
+  ├─ .htaccess
+  ├─ config/
+  │    └─ db.php
+  └─ api/
+       └─（全PHPファイル）
+
+## STEP 3：DBセットアップ用SQLの案内
+在りさんがコアサーバーで
+asagiri_will_pro を作成後に
+以下のSQLを phpMyAdmin で順番に実行する
+手順を案内してください。
+
+実行順序：
+1. setup_will.sql
+2. import_products_will_v2.sql
+3. add_este_tables.sql
+4. add_stock_tables.sql
+5. add_sales_items.sql
+6. add_este_sales_tables.sql
+
+## STEP 4：コアサーバー サイト設定の案内
+以下の手順を在りさんに案内してください。
+
+コアサーバー新コントロールパネル
+https://cp.coreserver.jp にログイン
+→ サイト設定 → サイト設定の新規作成
+→ 以下を入力：
+  ドメイン名: will.asagiriyamano.jp
+  SSL: 無料SSL
+  PHP: php74
+
+## STEP 5：Firebase承認済みドメイン追加の案内
+以下のURLを開いて
+will.asagiriyamano.jp を追加する手順を案内：
+
+https://console.firebase.google.com/project/asagiri-sale/authentication/settings
+→ 承認済みドメイン → ドメインの追加
+→ will.asagiriyamano.jp を入力
+
+## STEP 6：顧客データの移行（ある場合）
+代理店から顧客データ（CSV/Excel）を
+受け取った場合は
+asagiri_will_pro の customers テーブルに
+インポートするスクリプトを作成してください。
+
+顧客データがない場合はスキップ。
+
+## STEP 7：動作確認
+以下を確認してください。
+- https://will.asagiriyamano.jp にアクセスできる
+- 代理店のGmailでGoogleログインできる
+- ダッシュボードが表示される
+- 売上伝票の入力・保存ができる
+- 商品コード入力で商品名が表示される
+- スマホでも正常に表示される
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+# 注意事項
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+- コアサーバーはFastCGI環境のため
+  .htaccess に以下が必要（デモからコピーで対応済み）：
+  SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+- PHPバージョン：php74
+
+- 管理者メール katsuhiko.arie@gmail.com は
+  必ずホワイトリストに残すこと
+
+- デモ環境（demo-will.asagiriyamano.jp）は
+  そのまま残して本番と並行稼働させること
+
+- 商品マスタはヤマノアイコ共通CSVを使用
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+# 完了報告フォーマット
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+完了したら以下の形式で報告してください。
+
+店舗名: クレスティサロンWiLL
+本番URL: https://will.asagiriyamano.jp
+DB名: asagiri_will_pro
+ログインアカウント: （代理店Gmail）
+商品マスタ: 1364件
+顧客データ: 〇〇件 or 空
+動作確認: OK
+残課題: （あれば）
+
+
+- URL（will.asagiriyamano.jp → 実際のURL）
+- DB名（asagiri_will_pro → 実際のDB名）
+- ログインGmail（代理店から取得したGmail）

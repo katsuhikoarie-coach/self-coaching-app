@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 週間使用量</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    padding: 24px 16px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: #111; }
+
+  /* サマリーカード */
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .card-label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+  .card-value { font-size: 1.8rem; font-weight: 700; }
+  .card-sub { font-size: 0.75rem; color: #888; margin-top: 2px; }
+  .highlight { color: #1a73e8; }
+  .card.full { grid-column: 1 / -1; }
+  .budget-main {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+  .budget-item { flex: 1; }
+  .budget-sep {
+    width: 1px;
+    height: 44px;
+    background: #eee;
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .pace-msg {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: none;
+  }
+  .pace-msg.green  { background: #e8f5e9; color: #2e7d32; display: block; }
+  .pace-msg.orange { background: #fff8e1; color: #e65100; display: block; }
+  .pace-msg.red    { background: #ffebee; color: #c62828; display: block; }
+
+  /* バーグラフ */
+  .chart-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+  }
+  .chart-title { font-size: 0.8rem; color: #888; margin-bottom: 12px; font-weight: 600; }
+  .day-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .day-label {
+    width: 28px;
+    font-size: 0.78rem;
+    color: #555;
+    flex-shrink: 0;
+  }
+  .bar-wrap {
+    flex: 1;
+    height: 22px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    position: relative;
+    overflow: visible;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s;
+  }
+  .bar-fill.green  { background: #34a853; }
+  .bar-fill.orange { background: #fbbc04; }
+  .bar-fill.red    { background: #ea4335; }
+  .bar-fill.empty  { background: transparent; }
+  /* 目安ライン */
+  .guide-line {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .bar-pct {
+    font-size: 0.72rem;
+    color: #555;
+    margin-left: 8px;
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .today-mark {
+    font-size: 0.65rem;
+    background: #1a73e8;
+    color: #fff;
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin-left: 4px;
+  }
+
+  /* 入力フォーム */
+  .form-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+  }
+  .form-title { font-size: 0.8rem; color: #888; margin-bottom: 12px; font-weight: 600; }
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .form-row label { font-size: 0.82rem; width: 140px; flex-shrink: 0; }
+  .form-row input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-row input:focus { border-color: #1a73e8; }
+  .form-row .unit { font-size: 0.82rem; color: #888; }
+  .btn-record {
+    width: 100%;
+    padding: 12px;
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s;
+  }
+  .btn-record:hover { background: #1557b0; }
+  .saved-msg {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #34a853;
+    margin-top: 8px;
+    min-height: 18px;
+  }
+
+  /* 今日の記録済み表示 */
+  .today-record {
+    font-size: 0.78rem;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .today-record span { color: #222; font-weight: 600; }
+
+  /* 削除ボタン */
+  .history-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+  }
+  .history-title { font-size: 0.8rem; color: #888; margin-bottom: 10px; font-weight: 600; }
+  .history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.82rem;
+  }
+  .history-row:last-child { border-bottom: none; }
+  .history-date { color: #555; }
+  .history-vals { color: #222; }
+  .btn-del {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0 4px;
+  }
+  .btn-del:hover { color: #ea4335; }
+  .empty-msg { font-size: 0.82rem; color: #bbb; }
+</style>
+</head>
+<body>
+
+<h1>Claude 週間使用量</h1>
+
+<!-- サマリー -->
+<div class="summary">
+  <div class="card">
+    <div class="card-label">今週の使用量</div>
+    <div class="card-value highlight" id="weekly-val">—</div>
+    <div class="card-sub">週間合計 %</div>
+  </div>
+  <div class="card full">
+    <div class="card-label">今週の残り</div>
+    <div class="budget-main">
+      <div class="budget-item">
+        <div class="card-value highlight" id="remaining-val">—</div>
+        <div class="card-sub">残り使用可能</div>
+      </div>
+      <div class="budget-sep"></div>
+      <div class="budget-item">
+        <div class="card-value" id="per-day-val">—</div>
+        <div class="card-sub" id="per-day-sub">1日あたり目安</div>
+      </div>
+    </div>
+    <div class="pace-msg" id="pace-msg"></div>
+  </div>
+</div>
+
+<!-- バーグラフ -->
+<div class="chart-section">
+  <div class="chart-title">水〜火 日別使用量・日曜除く（目安 16.67% / 日）</div>
+  <div id="chart"></div>
+</div>
+
+<!-- 記録フォーム -->
+<div class="form-section">
+  <div class="form-title">今日の記録を入力</div>
+  <div class="today-record" id="today-existing"></div>
+  <div class="form-row">
+    <label>週間使用量</label>
+    <input type="number" id="inp-weekly" min="0" max="100" step="0.1" placeholder="例: 42">
+    <span class="unit">%</span>
+  </div>
+  <button class="btn-record" onclick="record()">記録する</button>
+  <div class="saved-msg" id="saved-msg"></div>
+</div>
+
+<!-- 履歴 -->
+<div class="history-section">
+  <div class="history-title">過去の記録（今週）</div>
+  <div id="history-list"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'claude_usage_log';
+const DAILY_BUDGET = 100 / 6; // 16.666...
+// 週の稼働6日ラベル（水〜火、日曜除く）
+const WEEK_LABELS = ['水', '木', '金', '土', '月', '火'];
+// 火曜起点から各稼働日までの日数オフセット（+1=水, +2=木, +3=金, +4=土, +6=月, +7=火）
+const WEEK_OFFSETS = [1, 2, 3, 4, 6, 7];
+
+// 今日の日付文字列 YYYY-MM-DD（ローカル日時基準）
+function toDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// 直近の火曜16時JST起点の火曜日Dateを返す（時刻は0:00にリセット）
+function getWeekBaseTuesday() {
+  const now = new Date();
+  const day = now.getDay(); // 0=日,1=月,2=火,3=水,4=木,5=金,6=土
+  const hour = now.getHours();
+
+  // 直前の「火曜16時以降」が何日前か
+  let daysBack;
+  if      (day === 2 && hour >= 16) { daysBack = 0; } // 今日が火曜16時以降
+  else if (day === 3)  { daysBack = 1; } // 水
+  else if (day === 4)  { daysBack = 2; } // 木
+  else if (day === 5)  { daysBack = 3; } // 金
+  else if (day === 6)  { daysBack = 4; } // 土
+  else if (day === 0)  { daysBack = 5; } // 日
+  else if (day === 1)  { daysBack = 6; } // 月
+  else                 { daysBack = 7; } // 火曜16時前
+
+  const tue = new Date(now);
+  tue.setDate(now.getDate() - daysBack);
+  tue.setHours(0, 0, 0, 0);
+  return tue;
+}
+
+// 今週の稼働6日（水〜火、日曜除く）をDateの配列で返す
+function getWeekDates() {
+  const tue = getWeekBaseTuesday();
+  return WEEK_OFFSETS.map(off => {
+    const d = new Date(tue);
+    d.setDate(tue.getDate() + off);
+    return d;
+  });
+}
+
+function barColor(pct) {
+  if (pct <= DAILY_BUDGET) return 'green';
+  if (pct <= DAILY_BUDGET * 1.5) return 'orange';
+  return 'red';
+}
+
+function render() {
+  const data = loadData();
+  const today = new Date();
+  const todayStr = toDateStr(today);
+  const weekDates = getWeekDates();
+
+  // 今週の月曜〜今日のデータを収集
+  const todayRecord = data[todayStr];
+
+  // サマリー
+  document.getElementById('weekly-val').textContent =
+    todayRecord ? todayRecord.weekly + '%' : '—';
+
+  // 残り計算（今日が週の何番目かをweekDates配列から特定）
+  const weeklyUsed = todayRecord ? Number(todayRecord.weekly) : null;
+  const todayIdx = weekDates.findIndex(d => toDateStr(d) === todayStr);
+  // todayIdx: 0=水,1=木,2=金,3=土,4=月,5=火、-1=稼働日以外（日曜など）
+  const remainDays = todayIdx >= 0 ? (weekDates.length - 1 - todayIdx) : null;
+
+  // 今日の日別使用量（前日との差分）
+  let todayDayPct = null;
+  if (todayRecord && todayIdx >= 0) {
+    const weeklyVal = Number(todayRecord.weekly);
+    if (todayIdx === 0) {
+      todayDayPct = weeklyVal;
+    } else {
+      const prevRec = data[toDateStr(weekDates[todayIdx - 1])];
+      todayDayPct = prevRec ? Math.max(0, weeklyVal - Number(prevRec.weekly)) : weeklyVal;
+    }
+  }
+
+  const remainingEl = document.getElementById('remaining-val');
+  const perDayEl = document.getElementById('per-day-val');
+  const perDaySubEl = document.getElementById('per-day-sub');
+  const paceMsgEl = document.getElementById('pace-msg');
+  paceMsgEl.className = 'pace-msg';
+  paceMsgEl.textContent = '';
+
+  if (weeklyUsed !== null && remainDays !== null) {
+    const remaining = Math.max(0, 100 - weeklyUsed);
+    remainingEl.textContent = remaining.toFixed(1) + '%';
+
+    if (remainDays > 0) {
+      const perDay = (remaining / remainDays).toFixed(1);
+      perDayEl.textContent = perDay + '%';
+      perDaySubEl.textContent = `残り${remainDays}日の1日あたり目安`;
+    } else {
+      perDayEl.textContent = '—';
+      perDaySubEl.textContent = '今日が最終稼働日（火曜）';
+    }
+
+    // ペースメッセージ
+    if (todayDayPct !== null) {
+      const ratio = todayDayPct / DAILY_BUDGET;
+      let cls, msg;
+      if (ratio <= 1.0) {
+        cls = 'green';
+        msg = `今日は目安内（${todayDayPct.toFixed(1)}%）。この調子で！`;
+      } else if (ratio <= 1.5) {
+        cls = 'orange';
+        msg = `今日は目安の${ratio.toFixed(1)}倍（${todayDayPct.toFixed(1)}%）。少しペースを落としましょう。`;
+      } else {
+        cls = 'red';
+        msg = `今日は目安の${ratio.toFixed(1)}倍（${todayDayPct.toFixed(1)}%）。明日からペースを落としましょう。`;
+      }
+      paceMsgEl.className = `pace-msg ${cls}`;
+      paceMsgEl.textContent = msg;
+    }
+  } else {
+    remainingEl.textContent = '—';
+    perDayEl.textContent = '—';
+    perDaySubEl.textContent = '1日あたり目安';
+  }
+
+  // バーグラフ
+  const chart = document.getElementById('chart');
+  chart.innerHTML = '';
+  const maxPct = 50; // バー100%幅 = 50%使用量とする
+
+  weekDates.forEach((d, i) => {
+    const dStr = toDateStr(d);
+    const isToday = dStr === todayStr;
+    const isPast = d < today && !isToday;
+    const rec = data[dStr];
+    // 各日のバー値：前日との差分（その日の増分）。前日記録なし or 週初めはweekly値をそのまま使う
+    let dayPct = null;
+    if (rec) {
+      const weeklyVal = Number(rec.weekly);
+      if (i === 0) {
+        dayPct = weeklyVal;
+      } else {
+        const prevRec = data[toDateStr(weekDates[i - 1])];
+        dayPct = prevRec
+          ? Math.max(0, weeklyVal - Number(prevRec.weekly))
+          : weeklyVal; // 前日記録なし → 週間累計をそのまま表示
+      }
+    }
+
+    const row = document.createElement('div');
+    row.className = 'day-row';
+
+    const label = document.createElement('div');
+    label.className = 'day-label';
+    label.textContent = WEEK_LABELS[i];
+
+    const barWrap = document.createElement('div');
+    barWrap.className = 'bar-wrap';
+
+    // 目安ライン位置
+    const guidePct = (DAILY_BUDGET / maxPct) * 100;
+    const guideLine = document.createElement('div');
+    guideLine.className = 'guide-line';
+    guideLine.style.left = Math.min(guidePct, 100) + '%';
+    barWrap.appendChild(guideLine);
+
+    const fill = document.createElement('div');
+    fill.className = 'bar-fill';
+    if (dayPct !== null) {
+      const w = Math.min((dayPct / maxPct) * 100, 100);
+      fill.style.width = w + '%';
+      fill.classList.add(barColor(dayPct));
+    } else {
+      fill.style.width = '0%';
+      fill.classList.add('empty');
+    }
+    barWrap.appendChild(fill);
+
+    const pctLabel = document.createElement('div');
+    pctLabel.className = 'bar-pct';
+    pctLabel.textContent = dayPct !== null ? dayPct.toFixed(1) + '%' : (isPast ? '—' : '');
+
+    row.appendChild(label);
+    if (isToday) {
+      const todayBadge = document.createElement('span');
+      todayBadge.className = 'today-mark';
+      todayBadge.textContent = '今日';
+      label.appendChild(todayBadge);
+    }
+    row.appendChild(barWrap);
+    row.appendChild(pctLabel);
+    chart.appendChild(row);
+  });
+
+  // 今日の既存記録表示
+  const existingEl = document.getElementById('today-existing');
+  if (todayRecord) {
+    existingEl.innerHTML =
+      `記録済み：週間 <span>${todayRecord.weekly}%</span>`;
+  } else {
+    existingEl.textContent = '';
+  }
+
+  // 履歴リスト（今週分）
+  const histEl = document.getElementById('history-list');
+  histEl.innerHTML = '';
+  const weekStrs = weekDates.map(toDateStr);
+  const weekData = weekStrs.filter(s => data[s]);
+  if (weekData.length === 0) {
+    histEl.innerHTML = '<div class="empty-msg">まだ記録がありません</div>';
+  } else {
+    weekData.reverse().forEach(dStr => {
+      const r = data[dStr];
+      const row = document.createElement('div');
+      row.className = 'history-row';
+      row.innerHTML = `
+        <span class="history-date">${dStr}</span>
+        <span class="history-vals">週間 ${r.weekly}%</span>
+        <button class="btn-del" onclick="deleteRecord('${dStr}')">✕</button>
+      `;
+      histEl.appendChild(row);
+    });
+  }
+}
+
+function record() {
+  const weekly = document.getElementById('inp-weekly').value.trim();
+  const msg = document.getElementById('saved-msg');
+
+  if (weekly === '') {
+    msg.style.color = '#ea4335';
+    msg.textContent = '値を入力してください';
+    return;
+  }
+  const w = parseFloat(weekly);
+  if (isNaN(w) || w < 0) {
+    msg.style.color = '#ea4335';
+    msg.textContent = '正しい数値を入力してください';
+    return;
+  }
+
+  const data = loadData();
+  const todayStr = toDateStr(new Date());
+  data[todayStr] = { weekly: w };
+  saveData(data);
+
+  document.getElementById('inp-weekly').value = '';
+  msg.style.color = '#34a853';
+  msg.textContent = '記録しました ✓';
+  setTimeout(() => { msg.textContent = ''; }, 2500);
+
+  render();
+}
+
+function deleteRecord(dateStr) {
+  const data = loadData();
+  delete data[dateStr];
+  saveData(data);
+  render();
+}
+
+// Enterキーで記録
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'inp-weekly') {
+    record();
+  }
+});
+
+render();
+</script>
+</body>
+</html>

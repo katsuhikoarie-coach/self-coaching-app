@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ポイント管理 — 朝霧店管理システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f4f6f8;
+    --bg2:     #ffffff;
+    --bg3:     #eef0f3;
+    --border:  #d0d4da;
+    --accent:  #2563b0;
+    --accent2: #1a4f9a;
+    --accent-soft: rgba(37,99,176,0.08);
+    --text:    #1a1c20;
+    --text2:   #4a5060;
+    --text3:   #8a90a0;
+    --red:     #c0392b;
+    --green:   #1a8a50;
+    --radius:  10px;
+    --shadow:  0 2px 12px rgba(0,0,0,0.10);
+    --font-base: 21px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; font-size: var(--font-base); overflow-x: hidden;
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* サイドバー */
+  .sidebar {
+    width: 248px; background: var(--bg2); border-right: 2px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top:0; left:0; bottom:0; z-index:100;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+  }
+  .sidebar-logo {
+    padding: 22px 20px 16px; border-bottom: 2px solid var(--border);
+    background: var(--accent);
+  }
+  .sidebar-logo .store-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
+  .sidebar-logo .store-sub  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .nav { padding: 10px 0; flex: 1; overflow-y: auto; }
+  .nav-section { font-size: 12px; color: var(--text3); letter-spacing: 0.08em; padding: 14px 18px 5px; font-weight: 700; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; color: var(--text2); cursor: pointer;
+    transition: all 0.12s; border-left: 3px solid transparent; font-size: 15px;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--accent); background: var(--accent-soft); }
+  .nav-item.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+  .nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+
+  /* メイン */
+  .main { margin-left: 248px; flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+  .topbar {
+    background: var(--bg2); border-bottom: 2px solid var(--border);
+    padding: 0 28px; height: 62px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top:0; z-index:50;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .topbar-title { font-size: 22px; font-weight: 600; }
+  .topbar-right { font-size: 15px; color: var(--text3); }
+  .content { padding: 28px; }
+
+  /* 残高カード */
+  .balance-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px 32px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .balance-label { font-size: 14px; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
+  .balance-value { font-family: 'DM Mono', monospace; font-size: 52px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .balance-unit  { font-size: 20px; color: var(--text3); font-weight: 400; margin-left: 6px; }
+
+  /* テーブル */
+  .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .table-head {
+    padding: 14px 20px; border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3);
+  }
+  .table-head h3 { font-size: 17px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--bg3); padding: 10px 14px; text-align: left; font-size: 13px; color: var(--text2); font-weight: 700; border-bottom: 1px solid var(--border); }
+  tbody tr { border-top: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: var(--accent-soft); }
+  tbody td { padding: 11px 14px; font-size: 15px; color: var(--text); }
+  tbody td.mono { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text2); }
+
+  /* ステータスバッジ */
+  .status { display: inline-block; border-radius: 4px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
+  .status.done { background: #d4f0e4; color: var(--green); }
+  .status.low  { background: #fde8e8; color: var(--red); }
+
+  /* ボタン */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border-radius: 7px; font-size: 15px;
+    cursor: pointer; border: none; transition: all 0.14s;
+    font-family: 'Noto Sans JP', sans-serif; font-weight: 500;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: #fff; color: var(--text2); border: 2px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: #fde8e8; color: var(--red); border: 1px solid #f5c6c6; }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+
+  /* 入力系 */
+  .selector-bar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+  input[type=text], input[type=number], select, textarea {
+    background: #fff; border: 2px solid var(--border); color: var(--text);
+    padding: 9px 13px; border-radius: 7px; font-size: 15px;
+    font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color 0.14s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+  /* フォーム */
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-group label { font-size: 13px; color: var(--text2); font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; }
+
+  /* モーダル */
+  .modal-overlay {
+    position: fixed; inset:0; background: rgba(0,0,0,0.45);
+    z-index:200; display:none; align-items:center; justify-content:center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    width: 480px; max-width: 96vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    animation: slideUp 0.18s ease;
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-header {
+    padding: 18px 22px 14px; border-bottom: 2px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background: var(--bg3); border-radius: 14px 14px 0 0;
+  }
+  .modal-header h3 { font-size: 18px; font-weight: 600; }
+  .modal-close { cursor:pointer; font-size:20px; background:none; border:none; color:var(--text3); }
+  .modal-close:hover { color: var(--red); }
+  .modal-body { padding: 20px 22px; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+  /* ハンバーガー */
+  .hamburger-btn {
+    display: none; background: none; border: none;
+    font-size: 24px; cursor: pointer;
+    color: var(--text); padding: 6px 10px;
+    border-radius: 6px; line-height: 1; flex-shrink: 0;
+  }
+  .hamburger-btn:hover { background: var(--accent-soft); }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 150;
+  }
+  .sidebar-overlay.open { display: block; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 200; }
+    .sidebar.open { transform: translateX(0); }
+    .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+    .main { margin-left: 0; }
+    .topbar { padding: 0 12px; gap: 8px; }
+    .topbar-title { font-size: 16px; }
+    .content { padding: 14px; }
+    .balance-value { font-size: 38px; }
+    .selector-bar { flex-direction: column; align-items: stretch; }
+    input[type=text], input[type=number], select, textarea { font-size: 16px !important; min-height: 44px; }
+    .btn { min-height: 44px; }
+    .table-wrap { overflow-x: auto; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<!-- ログインオーバーレイ -->
+<div id="login-overlay" style="
+  position:fixed;inset:0;background:#f4f6f8;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;">
+  <div style="text-align:center">
+    <div style="font-size:30px;font-weight:700;color:#2563b0;letter-spacing:.04em;margin-bottom:6px">朝霧店</div>
+    <div style="font-size:13px;color:#8a90a0;letter-spacing:.1em">売上・顧客管理システム</div>
+  </div>
+  <div style="background:#fff;border:2px solid #d0d4da;border-radius:14px;padding:36px 40px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
+    <div style="font-size:16px;font-weight:500;margin-bottom:6px;color:#1a1c20">ログインが必要です</div>
+    <div style="font-size:13px;color:#8a90a0;margin-bottom:28px">Googleアカウントでログインしてください</div>
+    <button onclick="doLogin()" style="
+      width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+      background:#2563b0;color:#fff;border:none;border-radius:8px;
+      padding:12px 20px;font-size:15px;font-weight:500;cursor:pointer;
+      font-family:'Noto Sans JP',sans-serif;transition:background .15s;">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Googleでログイン
+    </button>
+    <div id="login-error" style="color:#c0392b;font-size:13px;margin-top:14px;min-height:18px"></div>
+  </div>
+  <div style="font-size:12px;color:#8a90a0">朝霧店スタッフ専用システム</div>
+</div>
+
+<!-- ローディング -->
+<div id="app-loading" style="
+  position:fixed;inset:0;background:rgba(244,246,248,.9);z-index:8999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  backdrop-filter:blur(4px);">
+  <div style="width:40px;height:40px;border:3px solid #d0d4da;border-top-color:#2563b0;
+    border-radius:50%;animation:spin .8s linear infinite;"></div>
+  <div style="font-size:14px;color:#4a5060">データを読み込み中...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+
+<!-- サイドバー -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="store-name">朝霧店</div>
+    <div class="store-sub">管理システム</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">メニュー</div>
+    <div class="nav-item" onclick="location.href='index.html'"><span class="icon">🏠</span>ホーム</div>
+    <div class="nav-section">売上管理</div>
+    <div class="nav-item" onclick="location.href='index.html?page=sales'"><span class="icon">📋</span>売上伝票一覧</div>
+    <div class="nav-item" onclick="location.href='index.html?page=new-sales'"><span class="icon">✏️</span>売上伝票の入力</div>
+    <div class="nav-item" onclick="location.href='index.html?page=daily'"><span class="icon">📊</span>売上日計表</div>
+    <div class="nav-item" onclick="location.href='index.html?page=monthly'"><span class="icon">📈</span>月次レポート</div>
+    <div class="nav-item" onclick="location.href='index.html?page=quotes'"><span class="icon">📄</span>見積書</div>
+    <div class="nav-section">顧客管理</div>
+    <div class="nav-item" onclick="location.href='index.html?page=customers'"><span class="icon">👥</span>顧客一覧表</div>
+    <div class="nav-item" onclick="location.href='index.html?page=new-customer'"><span class="icon">➕</span>顧客マスタの登録</div>
+    <div class="nav-item" onclick="location.href='index.html?page=unvisited'"><span class="icon">📅</span>今月未来店顧客</div>
+    <div class="nav-item active" onclick="location.href='customer_points.html'"><span class="icon">⭐</span>ポイント管理</div>
+    <div class="nav-section">在庫・商品</div>
+    <div class="nav-item" onclick="location.href='index.html?page=inventory'"><span class="icon">📦</span>在庫管理</div>
+    <div class="nav-item" onclick="location.href='index.html?page=products'"><span class="icon">🗂️</span>商品マスタの登録</div>
+    <div class="nav-item" onclick="location.href='suppliers.html'"><span class="icon">🏭</span>仕入先マスタの登録</div>
+    <div class="nav-item" onclick="location.href='purchase_orders.html'"><span class="icon">📋</span>発注書</div>
+    <div class="nav-item" onclick="location.href='settings_orderer.html'"><span class="icon">⚙️</span>発注者設定</div>
+    <div class="nav-section">エステ</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-sales'"><span class="icon">🧾</span>エステ売上伝票</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-visit'"><span class="icon">💆</span>エステ来店入力</div>
+    <div class="nav-item" onclick="location.href='index.html?page=keep-items'"><span class="icon">💎</span>回数券残高一覧</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-list'"><span class="icon">📋</span>エステ来店一覧</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-menus'"><span class="icon">📝</span>コースマスタ</div>
+  </nav>
+</aside>
+
+<!-- メイン -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;overflow:hidden;min-width:0">
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title">ポイント管理</div>
+    </div>
+    <div class="topbar-right" style="display:flex;gap:16px;align-items:center">
+      <span id="firebase-user" style="font-size:13px;color:var(--text3)"></span>
+      <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="doSignOut()">ログアウト</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- 顧客選択 -->
+    <div class="selector-bar">
+      <label style="font-size:14px;font-weight:600;color:var(--text2);flex-shrink:0">顧客を選択：</label>
+      <select id="cust-select" style="min-width:260px" onchange="onCustomerChange()">
+        <option value="">-- 顧客を選択してください --</option>
+      </select>
+    </div>
+
+    <!-- ポイント情報（選択後に表示） -->
+    <div id="points-section" style="display:none">
+
+      <!-- 残高カード -->
+      <div class="balance-card">
+        <div>
+          <div class="balance-label">現在のポイント残高</div>
+          <div>
+            <span class="balance-value" id="balance-value">0</span>
+            <span class="balance-unit">pt</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="openAddModal()">＋ ポイント追加</button>
+          <button class="btn btn-danger" onclick="openSubtractModal()">－ ポイント削除</button>
+        </div>
+      </div>
+
+      <!-- 履歴テーブル -->
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>ポイント履歴</h3>
+        </div>
+        <table>
+          <thead><tr>
+            <th>日時</th>
+            <th>種別</th>
+            <th style="text-align:right">ポイント</th>
+            <th>理由</th>
+            <th>売上ID</th>
+            <th>操作</th>
+          </tr></thead>
+          <tbody id="pt-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">読み込み中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /#points-section -->
+
+  </div>
+</div>
+</div>
+
+<!-- ── ポイント追加モーダル ── -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>ポイント追加</h3>
+      <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>追加ポイント数 ＊</label>
+        <input type="number" id="add-points" min="1" placeholder="例: 100">
+      </div>
+      <div class="form-group">
+        <label>理由</label>
+        <input type="text" id="add-reason" placeholder="例: キャンペーン特典">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveAdd()">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ポイント削除モーダル ── -->
+<div class="modal-overlay" id="subtract-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>ポイント削除</h3>
+      <button class="modal-close" onclick="closeModal('subtract-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="subtract-balance-info" style="margin-bottom:14px;padding:10px 14px;background:var(--bg3);border-radius:6px;font-size:14px;color:var(--text2)"></div>
+      <div class="form-group">
+        <label>削除ポイント数 ＊</label>
+        <input type="number" id="sub-points" min="1" placeholder="例: 50">
+      </div>
+      <div class="form-group">
+        <label>理由</label>
+        <input type="text" id="sub-reason" placeholder="例: ポイント利用">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('subtract-modal')">キャンセル</button>
+      <button class="btn btn-danger" onclick="saveSubtract()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 取消確認モーダル ── -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <h3>取消の確認</h3>
+      <button class="modal-close" onclick="closeModal('cancel-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:15px;color:var(--text2);line-height:1.7">
+        このポイント履歴を取り消してもよいですか？<br>
+        <span style="font-size:13px;color:var(--text3)">（残高への影響を確認してから削除されます）</span>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('cancel-modal')">キャンセル</button>
+      <button class="btn btn-danger" onclick="execCancel()">取り消す</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Firebase 設定 ──
+const firebaseConfig = {
+  apiKey: "AIzaSyDZtuZa4RvofqIB375zbmPb9X-UwOUTMC0",
+  authDomain: "asagiri-sale.firebaseapp.com",
+  projectId: "asagiri-sale",
+  storageBucket: "asagiri-sale.firebasestorage.app",
+  messagingSenderId: "800075177148",
+  appId: "1:800075177148:web:f343f8daaf31bcc301c4b9"
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+
+const ALLOWED_EMAILS = ['katsuhiko.arie@gmail.com', 'ya.asagiriten@gmail.com'];
+const API_BASE = 'api';
+let _idToken = null;
+let fbUser = null;
+
+async function getToken() {
+  const user = fbAuth.currentUser;
+  if (!user) return null;
+  _idToken = await user.getIdToken(false);
+  return _idToken;
+}
+
+async function apiGet(endpoint) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!res.ok) throw new Error(`APIエラー ${res.status}`);
+  return res.json();
+}
+
+async function apiPost(endpoint, data) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j.error || ''; } catch(e) {}
+    throw new Error(detail || `APIエラー ${res.status}`);
+  }
+  return res.json();
+}
+
+async function apiDelete(endpoint, data) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j.error || ''; } catch(e) {}
+    throw new Error(detail || `APIエラー ${res.status}`);
+  }
+  return res.json();
+}
+
+// ── 認証 ──
+function doLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(e => {
+    document.getElementById('login-error').textContent = 'ログインに失敗しました: ' + e.message;
+  });
+}
+
+function doSignOut() {
+  fbAuth.signOut().then(() => { window.location.href = 'index.html'; });
+}
+
+fbAuth.onAuthStateChanged(async user => {
+  if (!user) { document.getElementById('login-overlay').style.display = 'flex'; return; }
+  if (!ALLOWED_EMAILS.includes(user.email)) {
+    document.getElementById('login-error').textContent = user.email + ' はアクセス権限がありません。';
+    return;
+  }
+  fbUser = user;
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('firebase-user').textContent = user.displayName || user.email;
+  await loadCustomers();
+});
+
+// ── 顧客読み込み ──
+async function loadCustomers() {
+  document.getElementById('app-loading').style.display = 'flex';
+  try {
+    const customers = await apiGet('customers.php');
+    const sel = document.getElementById('cust-select');
+    sel.innerHTML = '<option value="">-- 顧客を選択してください --</option>';
+    customers.forEach(c => {
+      const label = esc(c.name || c.customer_name || '') +
+        (c.kana ? '（' + esc(c.kana) + '）' : '') +
+        (c.id ? ' [' + c.id + ']' : '');
+      sel.innerHTML += `<option value="${c.id}">${label}</option>`;
+    });
+  } catch(e) {
+    alert('顧客データの読み込みに失敗しました: ' + e.message);
+  } finally {
+    document.getElementById('app-loading').style.display = 'none';
+  }
+}
+
+// ── 顧客変更時 ──
+let currentCustomerId = null;
+let currentBalance    = 0;
+
+async function onCustomerChange() {
+  const id = document.getElementById('cust-select').value;
+  if (!id) {
+    document.getElementById('points-section').style.display = 'none';
+    return;
+  }
+  currentCustomerId = id;
+  document.getElementById('points-section').style.display = 'block';
+  await loadPoints();
+}
+
+async function loadPoints() {
+  document.getElementById('app-loading').style.display = 'flex';
+  try {
+    const data = await apiGet('customer_points.php?customer_id=' + currentCustomerId);
+    currentBalance = data.balance;
+    document.getElementById('balance-value').textContent = parseInt(data.balance).toLocaleString();
+    renderHistory(data.history || []);
+  } catch(e) {
+    alert('ポイント情報の読み込みに失敗しました: ' + e.message);
+  } finally {
+    document.getElementById('app-loading').style.display = 'none';
+  }
+}
+
+// ── 履歴レンダリング ──
+function renderHistory(list) {
+  const tbody = document.getElementById('pt-tbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">履歴がありません</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(r => {
+    const isAdd  = r.point_type === 'add';
+    const badge  = r.sale_id ? ' <span class="status done" style="font-size:11px;padding:1px 7px;vertical-align:middle">自動付与</span>' : '';
+    const ptSign = isAdd ? '+' : '−';
+    return `<tr>
+      <td class="mono" style="font-size:13px;white-space:nowrap">${esc(r.created_at)}</td>
+      <td><span class="status ${isAdd ? 'done' : 'low'}">${isAdd ? '付与' : '削除'}</span></td>
+      <td class="mono" style="text-align:right;color:${isAdd ? 'var(--green)' : 'var(--red)'};font-weight:600">
+        ${ptSign}${parseInt(r.points).toLocaleString()} pt
+      </td>
+      <td>${esc(r.reason || '')}${badge}</td>
+      <td class="mono" style="font-size:13px">${r.sale_id ? esc(String(r.sale_id)) : ''}</td>
+      <td>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="openCancelModal(${r.id})">取消</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── ポイント追加 ──
+function openAddModal() {
+  document.getElementById('add-points').value = '';
+  document.getElementById('add-reason').value = '';
+  document.getElementById('add-modal').classList.add('open');
+  setTimeout(() => document.getElementById('add-points').focus(), 80);
+}
+
+async function saveAdd() {
+  const points = parseInt(document.getElementById('add-points').value);
+  const reason = document.getElementById('add-reason').value.trim();
+  if (!points || points < 1) { alert('ポイント数を1以上で入力してください'); return; }
+  try {
+    await apiPost('customer_points.php', {
+      customer_id: currentCustomerId,
+      point_type:  'add',
+      points:      points,
+      reason:      reason,
+      created_by:  fbUser ? (fbUser.displayName || fbUser.email) : '',
+    });
+    closeModal('add-modal');
+    await loadPoints();
+  } catch(e) {
+    alert('追加に失敗しました: ' + e.message);
+  }
+}
+
+// ── ポイント削除 ──
+function openSubtractModal() {
+  document.getElementById('sub-points').value = '';
+  document.getElementById('sub-reason').value = '';
+  document.getElementById('subtract-balance-info').textContent = '現在の残高：' + currentBalance.toLocaleString() + ' pt';
+  document.getElementById('subtract-modal').classList.add('open');
+  setTimeout(() => document.getElementById('sub-points').focus(), 80);
+}
+
+async function saveSubtract() {
+  const points = parseInt(document.getElementById('sub-points').value);
+  const reason = document.getElementById('sub-reason').value.trim();
+  if (!points || points < 1) { alert('ポイント数を1以上で入力してください'); return; }
+  try {
+    await apiPost('customer_points.php', {
+      customer_id: currentCustomerId,
+      point_type:  'subtract',
+      points:      points,
+      reason:      reason,
+      created_by:  fbUser ? (fbUser.displayName || fbUser.email) : '',
+    });
+    closeModal('subtract-modal');
+    await loadPoints();
+  } catch(e) {
+    alert('削除に失敗しました: ' + e.message);
+  }
+}
+
+// ── 取消 ──
+let cancelTargetId = null;
+
+function openCancelModal(id) {
+  cancelTargetId = id;
+  document.getElementById('cancel-modal').classList.add('open');
+}
+
+async function execCancel() {
+  if (!cancelTargetId) return;
+  try {
+    await apiDelete('customer_points.php', { id: cancelTargetId });
+    closeModal('cancel-modal');
+    cancelTargetId = null;
+    await loadPoints();
+  } catch(e) {
+    alert('取消に失敗しました: ' + e.message);
+  }
+}
+
+// ── ユーティリティ ──
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

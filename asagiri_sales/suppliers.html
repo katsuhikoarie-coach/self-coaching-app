@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>仕入先マスタ — 朝霧店管理システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f4f6f8;
+    --bg2:     #ffffff;
+    --bg3:     #eef0f3;
+    --border:  #d0d4da;
+    --accent:  #2563b0;
+    --accent2: #1a4f9a;
+    --accent-soft: rgba(37,99,176,0.08);
+    --text:    #1a1c20;
+    --text2:   #4a5060;
+    --text3:   #8a90a0;
+    --red:     #c0392b;
+    --green:   #1a8a50;
+    --blue:    #2563b0;
+    --yellow:  #b06010;
+    --radius:  10px;
+    --shadow:  0 2px 12px rgba(0,0,0,0.10);
+    --font-base: 21px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; font-size: var(--font-base); overflow-x: hidden;
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* サイドバー */
+  .sidebar {
+    width: 248px; background: var(--bg2); border-right: 2px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top:0; left:0; bottom:0; z-index:100;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+  }
+  .sidebar-logo {
+    padding: 22px 20px 16px; border-bottom: 2px solid var(--border);
+    background: var(--accent);
+  }
+  .sidebar-logo .store-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
+  .sidebar-logo .store-sub  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .nav { padding: 10px 0; flex: 1; overflow-y: auto; }
+  .nav-section { font-size: 12px; color: var(--text3); letter-spacing: 0.08em; padding: 14px 18px 5px; font-weight: 700; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; color: var(--text2); cursor: pointer;
+    transition: all 0.12s; border-left: 3px solid transparent; font-size: 15px;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--accent); background: var(--accent-soft); }
+  .nav-item.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+  .nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+
+  /* メイン */
+  .main { margin-left: 248px; flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+  .topbar {
+    background: var(--bg2); border-bottom: 2px solid var(--border);
+    padding: 0 28px; height: 62px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top:0; z-index:50;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .topbar-title { font-size: 22px; font-weight: 600; }
+  .topbar-right { font-size: 15px; color: var(--text3); }
+  .content { padding: 28px; }
+
+  /* テーブル */
+  .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .table-head {
+    padding: 14px 20px; border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3);
+  }
+  .table-head h3 { font-size: 17px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--bg3); padding: 10px 14px; text-align: left; font-size: 13px; color: var(--text2); font-weight: 700; border-bottom: 1px solid var(--border); }
+  tbody tr { border-top: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: var(--accent-soft); }
+  tbody td { padding: 11px 14px; font-size: 15px; color: var(--text); }
+  tbody td.mono { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text2); }
+
+  /* ステータス */
+  .status { display: inline-block; border-radius: 4px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
+  .status.done { background: #d4f0e4; color: var(--green); }
+  .status.low  { background: #fde8e8; color: var(--red); }
+
+  /* ボタン */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border-radius: 7px; font-size: 15px;
+    cursor: pointer; border: none; transition: all 0.14s;
+    font-family: 'Noto Sans JP', sans-serif; font-weight: 500;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: #fff; color: var(--text2); border: 2px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: #fde8e8; color: var(--red); border: 1px solid #f5c6c6; }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+
+  /* 入力系 */
+  .search-bar { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+  input[type=text], input[type=email], select, textarea {
+    background: #fff; border: 2px solid var(--border); color: var(--text);
+    padding: 9px 13px; border-radius: 7px; font-size: 15px;
+    font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color 0.14s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input[type=text], input[type=email] { flex: 1; min-width: 160px; }
+
+  /* フォーム */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 13px; color: var(--text2); font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  /* モーダル */
+  .modal-overlay {
+    position: fixed; inset:0; background: rgba(0,0,0,0.45);
+    z-index:200; display:none; align-items:center; justify-content:center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    width: 640px; max-width: 96vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    animation: slideUp 0.18s ease;
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-header {
+    padding: 18px 22px 14px; border-bottom: 2px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background: var(--bg3); border-radius: 14px 14px 0 0;
+  }
+  .modal-header h3 { font-size: 18px; font-weight: 600; }
+  .modal-close { cursor:pointer; font-size:20px; background:none; border:none; color:var(--text3); }
+  .modal-close:hover { color: var(--red); }
+  .modal-body { padding: 20px 22px; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+  /* ハンバーガー */
+  .hamburger-btn {
+    display: none; background: none; border: none;
+    font-size: 24px; cursor: pointer;
+    color: var(--text); padding: 6px 10px;
+    border-radius: 6px; line-height: 1; flex-shrink: 0;
+  }
+  .hamburger-btn:hover { background: var(--accent-soft); }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 150;
+  }
+  .sidebar-overlay.open { display: block; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 200; }
+    .sidebar.open { transform: translateX(0); }
+    .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+    .main { margin-left: 0; }
+    .topbar { padding: 0 12px; gap: 8px; }
+    .topbar-title { font-size: 16px; }
+    .content { padding: 14px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+    .search-bar { flex-direction: column; align-items: stretch; }
+    .table-wrap { overflow-x: auto; }
+    /* スマホ時：仕入先コード・FAX・担当者・操作の一部を非表示 */
+    #sup-tbody td:nth-child(1),
+    #sup-tbody td:nth-child(4),
+    #sup-tbody td:nth-child(6),
+    table thead th:nth-child(1),
+    table thead th:nth-child(4),
+    table thead th:nth-child(6) { display: none; }
+    input[type=text], input[type=email], select, textarea { font-size: 16px !important; min-height: 44px; }
+    .btn { min-height: 44px; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<!-- ログインオーバーレイ -->
+<div id="login-overlay" style="
+  position:fixed;inset:0;background:#f4f6f8;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;">
+  <div style="text-align:center">
+    <div style="font-size:30px;font-weight:700;color:#2563b0;letter-spacing:.04em;margin-bottom:6px">朝霧店</div>
+    <div style="font-size:13px;color:#8a90a0;letter-spacing:.1em">売上・顧客管理システム</div>
+  </div>
+  <div style="background:#fff;border:2px solid #d0d4da;border-radius:14px;padding:36px 40px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
+    <div style="font-size:16px;font-weight:500;margin-bottom:6px;color:#1a1c20">ログインが必要です</div>
+    <div style="font-size:13px;color:#8a90a0;margin-bottom:28px">Googleアカウントでログインしてください</div>
+    <button onclick="doLogin()" style="
+      width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+      background:#2563b0;color:#fff;border:none;border-radius:8px;
+      padding:12px 20px;font-size:15px;font-weight:500;cursor:pointer;
+      font-family:'Noto Sans JP',sans-serif;transition:background .15s;">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Googleでログイン
+    </button>
+    <div id="login-error" style="color:#c0392b;font-size:13px;margin-top:14px;min-height:18px"></div>
+  </div>
+  <div style="font-size:12px;color:#8a90a0">朝霧店スタッフ専用システム</div>
+</div>
+
+<!-- ローディング -->
+<div id="app-loading" style="
+  position:fixed;inset:0;background:rgba(244,246,248,.9);z-index:8999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  backdrop-filter:blur(4px);">
+  <div style="width:40px;height:40px;border:3px solid #d0d4da;border-top-color:#2563b0;
+    border-radius:50%;animation:spin .8s linear infinite;"></div>
+  <div style="font-size:14px;color:#4a5060">データを読み込み中...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+
+<!-- サイドバー -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="store-name">朝霧店</div>
+    <div class="store-sub">管理システム</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">メニュー</div>
+    <div class="nav-item" onclick="location.href='index.html'"><span class="icon">🏠</span>ホーム</div>
+    <div class="nav-section">売上管理</div>
+    <div class="nav-item" onclick="location.href='index.html?page=sales'"><span class="icon">📋</span>売上伝票一覧</div>
+    <div class="nav-item" onclick="location.href='index.html?page=new-sales'"><span class="icon">✏️</span>売上伝票の入力</div>
+    <div class="nav-item" onclick="location.href='index.html?page=daily'"><span class="icon">📊</span>売上日計表</div>
+    <div class="nav-item" onclick="location.href='index.html?page=monthly'"><span class="icon">📈</span>月次レポート</div>
+    <div class="nav-item" onclick="location.href='index.html?page=quotes'"><span class="icon">📄</span>見積書</div>
+    <div class="nav-section">顧客管理</div>
+    <div class="nav-item" onclick="location.href='index.html?page=customers'"><span class="icon">👥</span>顧客一覧表</div>
+    <div class="nav-item" onclick="location.href='index.html?page=new-customer'"><span class="icon">➕</span>顧客マスタの登録</div>
+    <div class="nav-item" onclick="location.href='index.html?page=unvisited'"><span class="icon">📅</span>今月未来店顧客</div>
+    <div class="nav-section">在庫・商品</div>
+    <div class="nav-item" onclick="location.href='index.html?page=inventory'"><span class="icon">📦</span>在庫管理</div>
+    <div class="nav-item" onclick="location.href='index.html?page=products'"><span class="icon">🗂️</span>商品マスタの登録</div>
+    <div class="nav-item active" onclick="location.href='suppliers.html'"><span class="icon">🏭</span>仕入先マスタの登録</div>
+    <div class="nav-item" onclick="location.href='purchase_orders.html'"><span class="icon">📋</span>発注書</div>
+    <div class="nav-item" onclick="location.href='settings_orderer.html'"><span class="icon">⚙️</span>発注者設定</div>
+    <div class="nav-section">エステ</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-sales'"><span class="icon">🧾</span>エステ売上伝票</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-visit'"><span class="icon">💆</span>エステ来店入力</div>
+    <div class="nav-item" onclick="location.href='index.html?page=keep-items'"><span class="icon">💎</span>回数券残高一覧</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-list'"><span class="icon">📋</span>エステ来店一覧</div>
+    <div class="nav-item" onclick="location.href='index.html?page=este-menus'"><span class="icon">📝</span>コースマスタ</div>
+  </nav>
+</aside>
+
+<!-- メイン -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;overflow:hidden;min-width:0">
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title">仕入先マスタの登録</div>
+    </div>
+    <div class="topbar-right" style="display:flex;gap:16px;align-items:center">
+      <span id="firebase-user" style="font-size:13px;color:var(--text3)"></span>
+      <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="doSignOut()">ログアウト</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="search-bar">
+      <input type="text" id="sup-search" placeholder="仕入先コード・仕入先名で検索..." oninput="filterSuppliers()">
+      <button class="btn btn-primary" onclick="openNewModal()">＋ 仕入先登録</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>仕入先コード</th>
+          <th>仕入先名</th>
+          <th>フリガナ</th>
+          <th>電話番号</th>
+          <th>担当者</th>
+          <th>支払条件</th>
+          <th>状態</th>
+          <th>操作</th>
+        </tr></thead>
+        <tbody id="sup-tbody"></tbody>
+      </table>
+    </div>
+    <div id="sup-empty" style="display:none;text-align:center;padding:40px;color:var(--text3);font-size:15px">
+      該当する仕入先がありません
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ── 新規登録モーダル ── -->
+<div class="modal-overlay" id="new-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>仕入先登録</h3>
+      <button class="modal-close" onclick="closeModal('new-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>仕入先コード ＊</label>
+          <input type="text" id="nm-code" placeholder="例: SUP001">
+        </div>
+        <div class="form-group">
+          <label>仕入先名 ＊</label>
+          <input type="text" id="nm-name" placeholder="例: ○○化粧品株式会社">
+        </div>
+        <div class="form-group full">
+          <label>フリガナ</label>
+          <input type="text" id="nm-kana" placeholder="例: マルマルケショウヒンカブシキガイシャ">
+        </div>
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="text" id="nm-tel" placeholder="例: 03-1234-5678">
+        </div>
+        <div class="form-group">
+          <label>FAX番号</label>
+          <input type="text" id="nm-fax" placeholder="例: 03-1234-5679">
+        </div>
+        <div class="form-group full">
+          <label>メールアドレス</label>
+          <input type="email" id="nm-email" placeholder="例: info@example.co.jp">
+        </div>
+        <div class="form-group full">
+          <label>住所</label>
+          <input type="text" id="nm-address" placeholder="例: 東京都〇〇区〇〇1-2-3">
+        </div>
+        <div class="form-group">
+          <label>担当者名</label>
+          <input type="text" id="nm-contact" placeholder="例: 山田 太郎">
+        </div>
+        <div class="form-group">
+          <label>支払条件</label>
+          <input type="text" id="nm-payment" placeholder="例: 月末締め翌月末払い">
+        </div>
+        <div class="form-group full">
+          <label>備考</label>
+          <textarea id="nm-notes" rows="3" style="resize:vertical"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('new-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveNew()">登録</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 編集モーダル ── -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>仕入先編集</h3>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="em-id">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>仕入先コード ＊</label>
+          <input type="text" id="em-code">
+        </div>
+        <div class="form-group">
+          <label>仕入先名 ＊</label>
+          <input type="text" id="em-name">
+        </div>
+        <div class="form-group full">
+          <label>フリガナ</label>
+          <input type="text" id="em-kana">
+        </div>
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="text" id="em-tel">
+        </div>
+        <div class="form-group">
+          <label>FAX番号</label>
+          <input type="text" id="em-fax">
+        </div>
+        <div class="form-group full">
+          <label>メールアドレス</label>
+          <input type="email" id="em-email">
+        </div>
+        <div class="form-group full">
+          <label>住所</label>
+          <input type="text" id="em-address">
+        </div>
+        <div class="form-group">
+          <label>担当者名</label>
+          <input type="text" id="em-contact">
+        </div>
+        <div class="form-group">
+          <label>支払条件</label>
+          <input type="text" id="em-payment">
+        </div>
+        <div class="form-group full">
+          <label>備考</label>
+          <textarea id="em-notes" rows="3" style="resize:vertical"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('edit-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 削除確認ダイアログ ── -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <h3>削除の確認</h3>
+      <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:15px;color:var(--text2);line-height:1.7">
+        <strong id="del-name"></strong> を削除してもよいですか？<br>
+        <span style="font-size:13px;color:var(--text3)">（論理削除：データは保持されます）</span>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('delete-modal')">キャンセル</button>
+      <button class="btn btn-danger" onclick="execDelete()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Firebase 設定 ──
+const firebaseConfig = {
+  apiKey: "AIzaSyDZtuZa4RvofqIB375zbmPb9X-UwOUTMC0",
+  authDomain: "asagiri-sale.firebaseapp.com",
+  projectId: "asagiri-sale",
+  storageBucket: "asagiri-sale.firebasestorage.app",
+  messagingSenderId: "800075177148",
+  appId: "1:800075177148:web:f343f8daaf31bcc301c4b9"
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+
+const ALLOWED_EMAILS = ['katsuhiko.arie@gmail.com', 'ya.asagiriten@gmail.com'];
+const API_BASE = 'api';
+let _idToken = null;
+
+async function getToken() {
+  const user = fbAuth.currentUser;
+  if (!user) return null;
+  _idToken = await user.getIdToken(false);
+  return _idToken;
+}
+
+async function apiGet(endpoint) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!res.ok) throw new Error(`APIエラー ${res.status}: ${endpoint}`);
+  return res.json();
+}
+
+async function apiPost(endpoint, data) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j.error || j.detail || ''; } catch(e) {}
+    throw new Error(detail || `APIエラー ${res.status}`);
+  }
+  return res.json();
+}
+
+async function apiPut(endpoint, data) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    method: 'PUT',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j.error || j.detail || ''; } catch(e) {}
+    throw new Error(detail || `APIエラー ${res.status}`);
+  }
+  return res.json();
+}
+
+async function apiDelete(endpoint, data) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error(`APIエラー ${res.status}`);
+  return res.json();
+}
+
+// ── 認証 ──
+function doLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(e => {
+    document.getElementById('login-error').textContent = 'ログインに失敗しました: ' + e.message;
+  });
+}
+
+function doSignOut() {
+  fbAuth.signOut().then(() => { window.location.href = 'index.html'; });
+}
+
+fbAuth.onAuthStateChanged(async user => {
+  if (!user) { document.getElementById('login-overlay').style.display = 'flex'; return; }
+  if (!ALLOWED_EMAILS.includes(user.email)) {
+    document.getElementById('login-error').textContent = user.email + ' はアクセス権限がありません。';
+    return;
+  }
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('firebase-user').textContent = user.displayName || user.email;
+  await loadSuppliers();
+});
+
+// ── データ ──
+let suppliers = [];
+let deleteTargetId = null;
+
+async function loadSuppliers() {
+  document.getElementById('app-loading').style.display = 'flex';
+  try {
+    suppliers = await apiGet('suppliers.php');
+    renderSuppliers(suppliers);
+  } catch(e) {
+    alert('データ読み込みエラー: ' + e.message);
+  } finally {
+    document.getElementById('app-loading').style.display = 'none';
+  }
+}
+
+// ── 一覧レンダリング ──
+function renderSuppliers(list) {
+  const tbody = document.getElementById('sup-tbody');
+  const empty = document.getElementById('sup-empty');
+  if (!list.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = list.map(s => `<tr>
+    <td class="mono">${esc(s.supplier_code)}</td>
+    <td><strong>${esc(s.supplier_name)}</strong>${s.kana ? `<br><span style="font-size:12px;color:var(--text3)">${esc(s.kana)}</span>` : ''}</td>
+    <td style="font-size:14px;color:var(--text3)">${esc(s.kana)}</td>
+    <td class="mono" style="font-size:14px">${esc(s.tel)}</td>
+    <td style="font-size:14px">${esc(s.contact_person)}</td>
+    <td style="font-size:14px;color:var(--text3)">${esc(s.payment_terms)}</td>
+    <td><span class="status done">有効</span></td>
+    <td>
+      <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="openEditModal(${s.id})">編集</button>
+      <button class="btn btn-danger" style="padding:5px 10px;font-size:13px;margin-left:6px" onclick="openDeleteModal(${s.id},'${esc(s.supplier_name)}')">削除</button>
+    </td>
+  </tr>`).join('');
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function filterSuppliers() {
+  const q = document.getElementById('sup-search').value.toLowerCase();
+  renderSuppliers(q
+    ? suppliers.filter(s =>
+        s.supplier_code.toLowerCase().includes(q) || s.supplier_name.includes(q)
+      )
+    : suppliers
+  );
+}
+
+// ── 新規登録 ──
+function openNewModal() {
+  ['nm-code','nm-name','nm-kana','nm-tel','nm-fax','nm-email','nm-address','nm-contact','nm-payment','nm-notes']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('new-modal').classList.add('open');
+  setTimeout(() => document.getElementById('nm-code').focus(), 80);
+}
+
+async function saveNew() {
+  const code = document.getElementById('nm-code').value.trim();
+  const name = document.getElementById('nm-name').value.trim();
+  if (!code || !name) { alert('仕入先コードと仕入先名は必須です'); return; }
+  try {
+    const res = await apiPost('suppliers.php', {
+      supplier_code:    code,
+      supplier_name:    name,
+      kana:             document.getElementById('nm-kana').value.trim(),
+      tel:              document.getElementById('nm-tel').value.trim(),
+      fax:              document.getElementById('nm-fax').value.trim(),
+      email:            document.getElementById('nm-email').value.trim(),
+      address:          document.getElementById('nm-address').value.trim(),
+      contact_person:   document.getElementById('nm-contact').value.trim(),
+      payment_terms:    document.getElementById('nm-payment').value.trim(),
+      notes:            document.getElementById('nm-notes').value.trim(),
+    });
+    closeModal('new-modal');
+    await loadSuppliers();
+  } catch(e) {
+    alert('登録に失敗しました: ' + e.message);
+  }
+}
+
+// ── 編集 ──
+function openEditModal(id) {
+  const s = suppliers.find(x => x.id == id);
+  if (!s) return;
+  document.getElementById('em-id').value      = s.id;
+  document.getElementById('em-code').value    = s.supplier_code;
+  document.getElementById('em-name').value    = s.supplier_name;
+  document.getElementById('em-kana').value    = s.kana || '';
+  document.getElementById('em-tel').value     = s.tel || '';
+  document.getElementById('em-fax').value     = s.fax || '';
+  document.getElementById('em-email').value   = s.email || '';
+  document.getElementById('em-address').value = s.address || '';
+  document.getElementById('em-contact').value = s.contact_person || '';
+  document.getElementById('em-payment').value = s.payment_terms || '';
+  document.getElementById('em-notes').value   = s.notes || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+async function saveEdit() {
+  const id   = document.getElementById('em-id').value;
+  const code = document.getElementById('em-code').value.trim();
+  const name = document.getElementById('em-name').value.trim();
+  if (!code || !name) { alert('仕入先コードと仕入先名は必須です'); return; }
+  try {
+    await apiPut('suppliers.php', {
+      id:               parseInt(id),
+      supplier_code:    code,
+      supplier_name:    name,
+      kana:             document.getElementById('em-kana').value.trim(),
+      tel:              document.getElementById('em-tel').value.trim(),
+      fax:              document.getElementById('em-fax').value.trim(),
+      email:            document.getElementById('em-email').value.trim(),
+      address:          document.getElementById('em-address').value.trim(),
+      contact_person:   document.getElementById('em-contact').value.trim(),
+      payment_terms:    document.getElementById('em-payment').value.trim(),
+      notes:            document.getElementById('em-notes').value.trim(),
+    });
+    closeModal('edit-modal');
+    await loadSuppliers();
+  } catch(e) {
+    alert('保存に失敗しました: ' + e.message);
+  }
+}
+
+// ── 削除 ──
+function openDeleteModal(id, name) {
+  deleteTargetId = id;
+  document.getElementById('del-name').textContent = name;
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+async function execDelete() {
+  if (!deleteTargetId) return;
+  try {
+    await apiDelete('suppliers.php', { id: deleteTargetId });
+    closeModal('delete-modal');
+    deleteTargetId = null;
+    await loadSuppliers();
+  } catch(e) {
+    alert('削除に失敗しました: ' + e.message);
+  }
+}
+
+// ── ユーティリティ ──
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+</script>
+</body>
+</html>

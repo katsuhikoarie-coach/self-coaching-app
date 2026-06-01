@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>あなたに合った道を選ぶ｜ヤマノエステ教室 朝霧教室</title>
+  <meta name="description" content="技術一本で喜ばれながら稼ぐ道も、ビジネスを学んでサロン経営する道も。朝霧教室では、あなたのやりたい方向に合わせて学べます。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .intro-section {
+      background-color: var(--white);
+    }
+
+    .intro-lead {
+      font-size: 1.05rem;
+      color: var(--text-light);
+      line-height: 2.2;
+      max-width: 700px;
+      margin-bottom: 0;
+      border-left: 3px solid var(--sand);
+      padding-left: 1.5rem;
+    }
+
+    /* 2つの道 */
+    .paths-section {
+      background-color: var(--beige);
+    }
+
+    .paths-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .path-card {
+      background-color: var(--white);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(139,111,71,0.06);
+    }
+
+    .path-head {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--beige-dark);
+      position: relative;
+    }
+
+    .path-head::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .path-card:first-child .path-head::before {
+      background: linear-gradient(to right, var(--sand), var(--accent-light));
+    }
+
+    .path-card:last-child .path-head::before {
+      background: linear-gradient(to right, var(--accent), var(--brown-dark));
+    }
+
+    .path-type {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .path-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--brown-dark);
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+
+    .path-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      line-height: 1.9;
+    }
+
+    .path-body {
+      padding: 2rem;
+    }
+
+    .path-for {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+
+    .path-list {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .path-list li {
+      font-size: 0.875rem;
+      color: var(--text);
+      line-height: 1.9;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--beige-dark);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .path-list li:last-child {
+      border-bottom: none;
+    }
+
+    .path-list li::before {
+      content: '—';
+      color: var(--sand);
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .path-note {
+      background-color: var(--beige);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      font-size: 0.845rem;
+      color: var(--text-light);
+      line-height: 1.9;
+    }
+
+    /* どちらでも共通 */
+    .common-section {
+      background-color: var(--white);
+    }
+
+    .common-box {
+      background: linear-gradient(135deg, var(--brown-dark), #3d2416);
+      border-radius: 6px;
+      padding: 3rem;
+      color: var(--white);
+      text-align: center;
+    }
+
+    .common-box .section-label {
+      color: var(--accent-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .common-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .common-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .common-item {
+      background-color: rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 1.5rem 1rem;
+    }
+
+    .common-item-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.95rem;
+      color: var(--accent-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .common-item-text {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.9;
+    }
+
+    @media (max-width: 768px) {
+      .paths-grid { grid-template-columns: 1fr; }
+      .common-grid { grid-template-columns: 1fr; }
+      .common-box { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      ヤマノエステ教室 朝霧教室
+      <span>Yamano Esthetics School Asagiri</span>
+    </a>
+    <nav id="main-nav">
+      <a href="index.html">ホーム</a>
+      <a href="course.html">コース案内</a>
+      <a href="strength.html">5つの強み</a>
+      <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+      <a href="access.html">アクセス</a>
+      <a href="contact.html" class="nav-cta">お問い合わせ</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="page-hero">
+    <span class="section-label">Your Own Way</span>
+    <h1>あなたに合った道を選んでいい。</h1>
+  </div>
+
+  <!-- イントロ -->
+  <section class="section intro-section">
+    <div class="section-inner">
+      <p class="intro-lead">
+        エステの世界に入る理由は、人それぞれです。「技術が好きで、それだけで人に喜んでもらいたい」という人もいれば、「しっかり稼いで、自分のサロンをビジネスとして育てたい」という人もいる。どちらも正解です。朝霧教室では、あなたの「やりたいこと」に合わせて、学ぶ方向を一緒に考えます。
+      </p>
+    </div>
+  </section>
+
+  <!-- 2つの道 -->
+  <section class="section paths-section">
+    <div class="section-inner">
+      <span class="section-label">Two Paths</span>
+      <h2 class="section-title">2つの道</h2>
+      <div class="divider"></div>
+
+      <div class="paths-grid">
+
+        <!-- 技術の道 -->
+        <div class="path-card">
+          <div class="path-head">
+            <div class="path-type">Path 01 — Craft</div>
+            <h3 class="path-title">技術を磨いて、<br>喜ばれながら稼ぐ。</h3>
+            <p class="path-subtitle">「難しいビジネスのことは考えなくていい。ただ、技術で人を幸せにしたい。」そんな気持ちを大切にしていいんです。</p>
+          </div>
+          <div class="path-body">
+            <div class="path-for">こんな方に</div>
+            <ul class="path-list">
+              <li>手で触れることが好きで、施術自体に喜びを感じる</li>
+              <li>集客やビジネスより、まず技術を極めたい</li>
+              <li>お客様の「ありがとう」が一番の報酬になる</li>
+              <li>副業・週末だけのサロンでじゅうぶん</li>
+              <li>自分のペースで、無理なく続けたい</li>
+            </ul>
+            <div class="path-note">
+              技術が好きな人は、その純粋さがそのまま強みになります。「あの人の手じゃないと」と通い続けてくれるお客様は、技術への愛情から生まれます。
+            </div>
+          </div>
+        </div>
+
+        <!-- ビジネスの道 -->
+        <div class="path-card">
+          <div class="path-head">
+            <div class="path-type">Path 02 — Business</div>
+            <h3 class="path-title">仕組みをつくって、<br>稼ぎ続けるサロンを育てる。</h3>
+            <p class="path-subtitle">技術と経営の両輪を回す。集客・販売・顧客管理まで学んで、サロンをビジネスとして自立させる道です。</p>
+          </div>
+          <div class="path-body">
+            <div class="path-for">こんな方に</div>
+            <ul class="path-list">
+              <li>本業として、しっかり稼げるサロンを作りたい</li>
+              <li>マーケティングや集客にも興味がある</li>
+              <li>化粧品の代理店として販売も組み合わせたい</li>
+              <li>将来的にスタッフを雇う規模にしたい</li>
+              <li>「もうかる仕組み」を最初から設計したい</li>
+            </ul>
+            <div class="path-note">
+              マーケティング・セールス・カウンセリング研修がプログラムに含まれています。技術と経営を同時に学べるのが朝霧教室の強みです。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- どちらでも共通 -->
+  <section class="section common-section">
+    <div class="section-inner">
+      <div class="common-box">
+        <span class="section-label">What We Provide for Both</span>
+        <h2 class="common-title">どちらの道を選んでも、<br>朝霧教室が提供するものは変わりません。</h2>
+        <div class="common-grid">
+          <div class="common-item">
+            <div class="common-item-title">AEA資格講師による指導</div>
+            <p class="common-item-text">40年・120名の実績を持つ現役エステティシャンが、確かな技術を丁寧に伝えます。</p>
+          </div>
+          <div class="common-item">
+            <div class="common-item-title">少人数制・随時開講</div>
+            <p class="common-item-text">平均2名の少人数制。あなたのペースとスケジュールに合わせて始められます。</p>
+          </div>
+          <div class="common-item">
+            <div class="common-item-title">独立後のフォロー</div>
+            <p class="common-item-text">どちらの道を選んでも、開業後も継続的にサポートします。一人で悩まなくていい。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <span class="section-label">Contact</span>
+    <h2 class="section-title">どちらの道か、迷っていてもいい。</h2>
+    <p class="cta-lead">「技術だけでいいのか、ビジネスも学んだ方がいいのか」<br>そんな迷いも含めて、まずは話しましょう。</p>
+    <div class="cta-btns">
+      <a href="contact.html" class="btn btn-white">お問い合わせフォーム</a>
+      <a href="tel:0789180585" class="btn btn-outline-white">📞 078-918-0585</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div style="margin-bottom:2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;">
+    <img src="line_qr.jpg" alt="LINE QRコード" style="width:100px;height:100px;border-radius:4px;background:#fff;padding:6px;">
+    <div style="text-align:left;">
+      <div style="font-family:Noto Serif JP,serif;font-size:0.95rem;color:var(--white);margin-bottom:0.5rem;">LINEでお気軽にご相談ください</div>
+      <a href="https://lin.ee/Zldv5ze" target="_blank" rel="noopener"
+         style="display:inline-block;background:#06C755;color:#fff;font-size:0.9rem;padding:0.6rem 1.5rem;border-radius:4px;text-decoration:none;font-weight:500;">
+        💬 友だち追加・LINE相談
+      </a>
+    </div>
+  </div>
+  <div class="footer-logo">ヤマノエステ教室 朝霧教室</div>
+  <div class="footer-sub">Yamano Esthetics School Asagiri</div>
+  <nav>
+    <a href="index.html">ホーム</a>
+    <a href="course.html">コース案内</a>
+    <a href="strength.html">5つの強み</a>
+    <a href="style.html">あなたの道</a>
+    <a href="flow.html">開業の流れ</a>
+    <a href="vision.html">ビジョン</a>
+    <a href="access.html">アクセス</a>
+    <a href="contact.html">お問い合わせ</a>
+  </nav>
+  <div class="footer-contact">
+    TEL：<a href="tel:0789180585">078-918-0585</a>　携帯：<a href="tel:09016773387">090-1677-3387</a>（担当：有江啓子）<br>
+    MAIL：<a href="mailto:ya.asagiriten@gmail.com">ya.asagiriten@gmail.com</a>
+  </div>
+  <div style="margin-bottom:1.5rem;padding:1rem;background:rgba(255,255,255,0.05);border-radius:4px;font-size:0.82rem;">
+    エステ施術・化粧品のご購入は →
+    <a href="https://asagiriyamano.jp/" target="_blank" style="color:var(--accent-light);text-decoration:underline;">山野愛子どろんこ美容 朝霧店</a>
+  </div>
+  <div class="copyright">© ヤマノエステ教室 朝霧教室 / 有限会社まゆ企画</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('main-nav');
+  hamburger.addEventListener('click', () => nav.classList.toggle('open'));
+</script>
+</body>
+</html>

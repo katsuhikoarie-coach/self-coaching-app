@@ -1,0 +1,746 @@
+ソースファイルの場所：
+ローカルにはありません。
+FTPで直接サーバーから取得してください。
+
+FTPホスト：asagiri.s168.coreserver.jp
+FTPユーザー：asagiri
+FTPパスワード：asa123giri
+取得先：public_html/sales.asagiriyamano.jp/
+
+DBパスワード：6BDt
+
+DBユーザー名:asagiri_sales
+DBパスワード:asa123giri 
+
+
+FTPでapi/estevisits.phpとapi/estesales.phpを
+取得して内容を確認した上で修正してください。
+
+FTPパスワードが確認できました：6BDtZKPKQJJB
+アップロードをお願いします。
+
+
+
+以下の手順でFTPアップロードをしてください。
+
+ローカルファイル：
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html`
+
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`public_html/sales.asagiriyamano.jp/index.html`
+- パスワード：6BDtZKPKQJJB
+
+WinSCPのコマンドラインまたはスクリプトでアップロードしてください。パスワードが不明な場合は在りさんに確認してから実行してください。
+
+
+
+
+見積もり
+
+クロコへのプロンプト：
+
+---
+
+`C:\Users\User\Documents\claudeCode\mitsumori\index.php` を修正してください。
+
+`@media print` ブロック内にある以下の行：
+```css
+.totals-table .total-row { background: #333 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+```
+を以下に置き換えてください：
+```css
+.totals-table .total-row { background: transparent !important; border: 2px solid #333; }
+.totals-table .total-row td { color: #333 !important; }
+```
+
+修正後、PowerShellで以下を実行してサーバーにアップロードしてください：
+```powershell
+# WinSCPのパスは環境に合わせて調整
+& "C:\Program Files (x86)\WinSCP\WinSCP.com" /command `
+  "open sftp://asagiri@mitsumori.asagiriyamano.jp/" `
+  "put C:\Users\User\Documents\claudeCode\mitsumori\index.php /public_html/mitsumori.asagiriyamano.jp/index.php" `
+  "exit"
+```
+以下の手順でFTPアップロードをしてください。
+
+ローカルファイル：
+`C:\Users\User\Documents\claudeCode\mitsumori\index.php`
+
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/mitsumori.asagiriyamano.jp`
+- パスワード：実行時に入力します
+
+6BDtZKPKQJJB
+
+
+
+4/21わかりました。クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の見積書機能を以下の通り修正してください。
+
+**【修正1】見積入力モーダルのUIを売上伝票入力と同じ形式に変更**
+
+現在の見積入力モーダルを、売上伝票入力モーダル（`id="modal-sale"` または該当するモーダル）と同じレイアウトに揃えてください。
+
+具体的には：
+- 上部を「見積ヘッダー」セクションとして枠で囲む
+- 見積番号・見積日を横並び2カラム
+- 顧客検索を横幅いっぱい（番号・名前・フリガナで検索）
+- 下部を「明細」セクションとして枠で囲む
+- 明細テーブルのヘッダー：商品（コード・商品名で検索）／数量／上代／掛率／下代／税率／金額
+- 合計欄は右寄せで縦並び（10%対象下代小計・消費税10%・8%対象下代小計・消費税8%・税込合計）
+- 税込合計は赤文字・大きめフォントで目立たせる
+- ボタンは「キャンセル」「見積を保存」
+
+**【修正2】見積書の印刷レイアウトを売上伝票の印刷と同じ形式に変更**
+
+印刷時のレイアウトを売上伝票の印刷フォーマットに合わせてください。
+
+具体的には：
+- タイトル：「朝霧店」（中央）→「見積書」（中央）
+- 左上：見積番号・見積日・有効期限（見積日+30日）
+- 右上：顧客名・様
+- 明細テーブル：商品名／数量／上代／掛率／下代／税率／金額
+- 合計欄：右下に10%下代小計・消費税(10%)・8%下代小計・消費税(8%)・税込合計
+- フォント・余白・枠線は売上伝票の印刷CSSをそのまま流用
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+4/21
+わかりました。CSVの列構成はこれで進めます：
+
+```
+商品コード, 商品名, 単価, 個数, 価格
+```
+
+**設計方針**
+
+入庫登録ボタンの横に「CSVで入庫」ボタンを追加。CSVを読み込んだら確認画面を表示してから一括登録。
+
+**動作フロー**
+1. 「CSVで入庫」ボタン → ファイル選択
+2. CSV読み込み → 内容をプレビュー表示
+3. 在庫テーブルに商品コードが存在するか確認（ない場合は新規追加）
+4. 確認ボタン → 一括入庫登録
+
+**クロコへのプロンプトです：**
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の在庫管理ページに CSV入庫登録機能を追加してください。
+
+**① ボタン追加**
+
+在庫管理ページの「＋ 入庫登録」「↑ 出庫登録」ボタンの横に以下を追加：
+```
+?? CSVで入庫
+```
+
+**② CSVフォーマット**
+
+1行目はヘッダー行（スキップ）、2行目以降がデータ：
+```
+商品コード,商品名,単価,個数,価格
+0239,サンカットアクアジュリ,4000,10,40000
+```
+
+**③ CSV読み込みモーダルを新規作成**
+
+ファイル選択 → CSV解析 → プレビューテーブル表示：
+
+| 商品コード | 商品名 | 単価 | 個数 | 在庫マスタ |
+|---|---|---|---|---|
+| 0239 | サンカットアクアジュリ | \4,000 | 10 | ? 既存 |
+| 9999 | 新商品 | \1,000 | 5 | ?? 新規 |
+
+- 既存商品（stockテーブルに存在）→ ? 既存
+- 未登録商品 → ?? 新規（stockテーブルに追加される旨を表示）
+
+**④ 一括登録処理**
+
+「この内容で入庫登録する」ボタンを押したら：
+
+各行について以下を実行：
+- 既存商品 → `api/stock.php` で入庫数量を加算
+- 新規商品 → `api/stock.php` で新規登録してから入庫
+- 入出庫履歴（stock_inout）にも「CSV入庫」として記録
+
+**⑤ エラー処理**
+
+- 商品コードが空の行はスキップ
+- 個数が0以下の行はスキップ
+- 登録完了後にモーダルを閉じて在庫一覧を再描画
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+4/22
+まず500エラーを先に直しましょう。
+
+クロコへのプロンプトです：
+
+---
+
+`https://sales.asagiriyamano.jp/api/sales.php` でAPIエラー500が発生しています。
+
+以下の手順で原因を調査して修正してください。
+
+**① サーバーのエラーログを確認**
+
+CORESERVERのエラーログを確認してください。
+ログの場所：`/home/asagiri/logs/` または `/home/asagiri/error_log`
+
+**② ローカルファイルを確認**
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\api\sales.php` を読み込んで構文エラーや問題箇所を特定してください。
+
+**③ 修正して再アップロード**
+
+問題を修正したら FTP で `public_html/sales.asagiriyamano.jp/api/sales.php` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+修正内容と原因を報告してください。
+
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の売上伝票印刷レイアウトを修正してください。
+
+**修正内容：合計欄に上代小計を追加**
+
+現在の合計欄：
+```
+10%対象 下代小計　\XX
+消費税（10%）　\XX
+8%対象 下代小計　\XX
+消費税（8%）　\XX
+税込合計　\XX
+```
+
+修正後の合計欄：
+```
+上代合計　\XX
+10%対象 下代小計　\XX
+消費税（10%）　\XX
+8%対象 下代小計　\XX
+消費税（8%）　\XX
+税込合計　\XX
+```
+
+上代合計は明細の「上代×数量」の合計値を表示してください。
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の商品マスタ登録ページに商品修正機能を追加してください。
+
+**現状：** 商品一覧に「終息にする」「再開」ボタンのみ。修正ボタンがない。
+
+**追加内容：**
+
+**① 商品一覧の操作列に「修正」ボタンを追加**
+
+```
+終息にする　修正
+再開　　　　修正
+```
+
+**② 商品修正モーダルを新規作成**
+
+修正ボタンを押したら以下の項目を編集できるモーダルを表示：
+
+- 商品コード（表示のみ・編集不可）
+- 商品名（テキスト入力）
+- ジャンル（セレクト）
+- 上代価格（数値入力）
+- 仕入先（テキスト入力）
+
+「保存」ボタン → `api/products.php` にPUTまたはPOST action=updateで送信
+「キャンセル」ボタン → モーダルを閉じる
+
+**③ api/products.php に更新処理を追加**
+
+以下のアクションを追加：
+```php
+// POST action=update
+$id   = $body['id'] ?? '';
+$data = $body['data'] ?? [];
+// name, genre, price, supplierを更新
+UPDATE products SET name=?, genre=?, price=?, supplier=? WHERE id=?
+```
+
+**④ 保存後の処理**
+
+- `store.products` の該当商品を更新
+- 商品一覧を再描画
+
+修正後、FTPで以下の2ファイルをアップロードしてください：
+- `public_html/sales.asagiriyamano.jp/index.html`
+- `public_html/sales.asagiriyamano.jp/api/products.php`
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の売上伝票入力と見積書入力の両方に、キーボード操作機能を追加してください。
+
+**目標：マウスを使わず以下の流れで入力できるようにする**
+
+```
+商品入力 → ↑↓で候補選択 → Enterで確定
+→ 自動的に数量欄へ移動 → 数量入力 → Tab
+→ 掛率欄へ移動 → ↑↓で選択 → Enter確定
+→ 次の明細行の商品欄へ移動
+```
+
+**① 商品サジェストのキーボード操作**
+
+- 文字入力でサジェストリストが表示される
+- `↓` キー → リストの次の候補にフォーカス
+- `↑` キー → リストの前の候補にフォーカス
+- `Enter` キー → フォーカス中の候補を確定・サジェストを閉じる
+- `Escape` キー → サジェストを閉じる
+- 確定後 → 同じ明細行の数量欄（qty input）に自動フォーカス
+
+**② 数量欄のキーボード操作**
+
+- `Tab` キー → 同じ明細行の掛率欄（rate select）に移動
+
+**③ 掛率欄のキーボード操作**
+
+- `↑↓` キー → 選択肢を変更（100%/90%/80%/75%/70%/65%/60%）
+- `Enter` キー → 確定して次の明細行の商品入力欄に移動
+- 次の行がなければ「＋行追加」を自動実行してから移動
+
+**④ 対象画面**
+
+- 売上伝票入力モーダル（`#modal-sale` または該当するモーダル）
+- 見積書入力モーダル（`#modal-quote` または該当するモーダル）
+
+**⑤ 実装方針**
+
+- 明細行は動的に生成されるため、`addEventListener` ではなく**イベント委譲**（`document.addEventListener('keydown', ...)`）で実装
+- `data-row` などの属性で行番号を管理して、フォーカス移動先を特定する
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+見えました。`↓`を1回押すと即確定してしまう問題ですね。
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` のキーボード操作を修正してください。
+
+**問題：** サジェストリストで`↓↑`キーを押すと即座に確定してしまう
+
+**原因と修正：**
+
+`↓↑`キーはハイライト移動のみ行い、`Enter`キーを押したときだけ確定するように修正してください。
+
+具体的には：
+
+- `↓` → 次の候補をハイライト（`.active`クラスを付与）するだけ。確定しない
+- `↑` → 前の候補をハイライトするだけ。確定しない
+- `Enter` → ハイライト中の候補を確定 → 数量欄へ移動
+- ハイライト中の候補がない状態で`Enter` → サジェストを閉じるだけ
+
+**実装のポイント：**
+
+- 現在選択中のインデックスを変数（例：`let suggestIndex = -1`）で管理
+- 商品入力欄への文字入力のたびに `suggestIndex = -1` にリセット
+- `↓↑`キーで `suggestIndex` を増減させて該当候補に `.active` クラスを付ける
+- `Enter`キーで `suggestIndex >= 0` の場合のみ確定処理を実行
+- 売上伝票・見積書の両方に適用
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+2つの問題ですね。クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` のキーボード操作をさらに修正してください。
+
+**問題1：顧客サジェストも↑↓Enterで選択できるようにする**
+
+商品サジェストと同じ実装を顧客検索欄にも適用してください。
+
+- 顧客検索欄（売上伝票・見積書両方）で文字入力 → サジェスト表示
+- `↓↑`で候補をハイライト移動
+- `Enter`で確定
+- `Escape`でサジェストを閉じる
+- `_custSugIdx = -1` で未選択管理（商品と同じパターン）
+
+**問題2：数量・掛率が1回操作で即確定してしまう**
+
+数量欄（input）と掛率欄（select）のキー操作を以下に修正：
+
+数量欄：
+- `↑↓`キーは数値を増減するだけ（デフォルト動作を許可）
+- `Tab`キーのみ掛率欄へ移動
+- `Enter`キーは何もしない（フォーム送信防止のみ）
+
+掛率欄：
+- `↑↓`キーはセレクトの選択肢を変えるだけ（デフォルト動作を許可）
+- `Enter`キーを押したときだけ次の明細行の商品欄へ移動
+- `Tab`キーは通常動作
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の数量欄のキーボード操作を修正してください。
+
+**問題：** 数量欄で`↑↓`キーを押すと即座に確定（renderRows実行）してしまう
+
+**原因：** 数量欄の`oninput`または`onchange`イベントが`↑↓`キーでも発火してrenderRows()を呼んでいる
+
+**修正：**
+
+数量欄（`data-type="qty"`）のキーボード操作を以下に変更：
+
+- `↑`キー → 数値を+1するだけ。renderRows()を呼ばない
+- `↓`キー → 数値を-1するだけ（最小値1）。renderRows()を呼ばない
+- `Tab`キー → 現在の数量をrows[ri].qtyに保存 → renderRows() → 掛率欄にフォーカス
+- `Enter`キー → 現在の数量をrows[ri].qtyに保存 → renderRows() → 掛率欄にフォーカス
+
+つまり**TabまたはEnterを押したときだけ**renderRows()を実行して確定する。
+
+また数量欄のoninput/onchangeイベントでrenderRows()を直接呼んでいる箇所があれば、キーボード操作中は発火しないよう修正してください。
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の数量欄のキーボード操作を修正してください。
+
+**修正内容：↑↓キーの増減を逆にする**
+
+現在：`↑`で+1、`↓`で-1
+修正後：`↓`で+1、`↑`で-1（最小値1）
+
+keydownハンドラの `type === 'qty'` ブロックの`↑`と`↓`の処理を入れ替えてください。
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の税率欄のキーボード操作を追加してください。
+
+**追加内容：税率欄（data-type="tax"）のキーボード操作**
+
+税率欄（8%/10%のselect）に `data-type="tax" data-row="{i}" data-context="sale"` および見積書側に `data-context="quote"` を追加。
+
+keydownハンドラに `type === 'tax'` ブロックを追加：
+
+- `↑↓`キー → `e.preventDefault()` → `selectedIndex`を手動変更（onchange非発火）
+- `Tab`または`Enter`キー → 現在の税率を `rows[ri].tax` に保存 → `renderRows()` → 次の明細行の商品欄にフォーカス（最終行なら行を自動追加してからフォーカス）
+
+**操作の流れ（修正後）：**
+```
+商品入力 → ↓↑Enterで選択確定
+→ 数量欄（↓で増加・↑で減少）→ Tab/Enter
+→ 掛率欄（↓↑で変更）→ Tab/Enter  
+→ 税率欄（↓↑で変更）→ Tab/Enter
+→ 次の行の商品欄へ移動
+```
+
+掛率欄の`Tab`/`Enter`の移動先も、税率欄（`data-type="tax"`）に変更してください。
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` の売上伝票入力モーダルと見積書入力モーダルの合計欄に上代合計を追加してください。
+
+**修正内容：合計欄の先頭に上代合計を追加**
+
+現在の合計欄：
+```
+10%対象 下代小計：\XX
+消費税（10%）：\XX
+8%対象 下代小計：\XX
+消費税（8%）：\XX
+税込合計：\XX
+```
+
+修正後：
+```
+上代合計：\XX
+10%対象 下代小計：\XX
+消費税（10%）：\XX
+8%対象 下代小計：\XX
+消費税（8%）：\XX
+税込合計：\XX
+```
+
+上代合計 = 明細の「上代 × 数量」の合計値
+
+売上伝票・見積書両方の合計計算関数とHTML描画部分に追加してください。
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/index.html` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+上代合計の表示はできていますね。保存時にsales.php 500エラーが出ています。
+
+クロコへのプロンプトです：
+
+---
+
+`https://sales.asagiriyamano.jp/api/sales.php` で保存時にAPIエラー500が発生しています。
+
+以下の手順で調査・修正してください。
+
+**① ローカルのsales.phpを確認**
+`C:\Users\User\Documents\claudeCode\asagiri_sales\api\sales.php` を読み込んでPOST処理（保存処理）に問題がないか確認してください。
+
+**② index.htmlの送信データを確認**
+売上伝票保存時にsales.phpに送っているJSONデータの構造を確認してください。sales.phpが期待するフィールド名と一致しているか確認してください。
+
+**③ 修正して再アップロード**
+問題を特定して修正し、FTPで以下をアップロードしてください：
+- `public_html/sales.asagiriyamano.jp/api/sales.php`
+- 必要であれば `public_html/sales.asagiriyamano.jp/index.html` も
+
+修正内容と原因を報告してください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+原因わかりました。SQLの構文エラーです。
+
+`year_month, deliver_date, customer_id, customer_name, customer...` の部分でSQL構文エラーが出ています。おそらく今回の修正でINSERT文のカラム名が変わってしまっています。
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\api\sales.php` のPOST保存処理にSQL構文エラーがあります。
+
+**エラー内容：**
+```
+SQLSTATE[42000]: Syntax error or access violation: 1064 
+near 'year_month, deliver_date, customer_id, customer_name, customer...' at line 2
+```
+
+**調査手順：**
+
+①`sales.php`のINSERT文を確認してください。
+
+②`asagiri_sales`データベースの`sales`テーブルの実際のカラム構成を確認するSQLを実行してください：
+```sql
+SHOW COLUMNS FROM sales;
+```
+
+③INSERT文のカラム名とテーブルの実際のカラム名が一致しているか確認して修正してください。
+
+修正後、FTPで `public_html/sales.asagiriyamano.jp/api/sales.php` にアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+
+---
+
+スッキリしましたね。4件だけ残りました。
+
+では次に**売上伝票の修正・削除ボタン追加**を進めます。クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` と `api/sales.php` に売上伝票の修正・削除機能を追加してください。
+
+**① 売上伝票一覧の操作列に「修正」「削除」ボタンを追加**
+
+現在：`詳細` `印刷`
+修正後：`詳細` `修正` `削除` `印刷`
+
+**② 削除機能**
+
+「削除」ボタン → `confirm('この伝票を削除しますか？')` → `api/sales.php` に `POST action=delete` で送信 → 一覧を再描画
+
+`api/sales.php` に以下を追加：
+```php
+if ($action === 'delete') {
+    $id = $body['id'] ?? '';
+    $db->prepare("DELETE FROM sales_items WHERE sale_id = ?")->execute([$id]);
+    $db->prepare("DELETE FROM sales WHERE id = ?")->execute([$id]);
+    jsonResponse(['ok' => true]);
+}
+```
+
+**③ 修正機能**
+
+「修正」ボタン → 既存の売上伝票入力モーダルを開いて該当伝票のデータを読み込む
+
+- 伝票番号・受付日・納品日・顧客・明細をすべてモーダルに展開
+- 保存ボタンで `POST action=update` を送信
+- `api/sales.php` に update処理を追加：
+  - salesテーブルをUPDATE
+  - sales_itemsを一旦DELETE → 再INSERT
+
+修正後、FTPで以下をアップロードしてください：
+- `public_html/sales.asagiriyamano.jp/index.html`
+- `public_html/sales.asagiriyamano.jp/api/sales.php`
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+成功9件・失敗83件ですね。失敗しているのは「新規」商品の登録部分だと思います。
+
+クロコへのプロンプトです：
+
+---
+
+`C:\Users\User\Documents\claudeCode\asagiri_sales\index.html` のCSV入庫登録で「失敗83件」が出ています。
+
+**調査内容：**
+
+`saveCsvInout` 関数の新規商品登録処理（`add_item` アクション）を確認してください。
+
+合わせて `api/stock.php` の `add_item` アクションの処理も確認してください。
+
+**よくある原因：**
+- stock.phpに `add_item` アクションが存在しない
+- 新規商品をstockテーブルに登録するときのカラム名が実際のテーブルと一致していない
+- productsテーブルに存在しない商品コードをstockに追加しようとしてエラー
+
+**確認SQL（phpMyAdminで実行）：**
+```sql
+SHOW COLUMNS FROM stock;
+```
+結果も合わせて確認してください。
+
+問題を特定して修正後、FTPで `public_html/sales.asagiriyamano.jp/api/stock.php` と必要なら `index.html` もアップロードしてください。
+アップロード先：
+- FTPホスト：`asagiri.s168.coreserver.jp`
+- ユーザー：`asagiri`
+- パス：`/public_html/sales.asagiriyamano.jp`
+- パスワード：6BDtZKPKQJJB
+---
+
+
+FTPで以下にアップして
+ホスト：asagiri.s168.coreserver.jp
+ユーザー：asagiri
+パスワード：6BDtZKPKQJJB
+アップ先：/public_html/demo-will.asagiriyamano.jp/
+ローカル：C:\Users\User\Documents\claudeCode\asagiri_will
+
+
+
+C:\Users\User\Documents\claudeCode\asagiri_will\ の全ファイルを
+以下のFTPサーバーにアップロードしてください。
+
+FTPサーバー：ftp://asagiri.s168.coreserver.jp
+リモートパス：/public_html/demo-will.asagiriyamano.jp/
+FTPユーザー：asagiri
+
+サブディレクトリ（apiフォルダ等）も含めて全ファイルをアップロードしてください。
+FTPで以下にアップして
+ホスト：asagiri.s168.coreserver.jp
+ユーザー：asagiri
+パスワード：6BDtZKPKQJJB
+アップ先：/public_html/demo-will.asagiriyamano.jp/
+ローカル：C:\Users\User\Documents\claudeCode\asagiri_will
+
+DB名:asagiri_will
+DBパスワード：YOt0rUBDmYtX8M
+
+phpMyAdmin
+ユーザー名:asagiri
+パスワード：6BDt

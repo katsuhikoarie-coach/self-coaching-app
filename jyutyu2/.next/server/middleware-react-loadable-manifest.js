@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST='{"app\\\\admin\\\\page.tsx -> encoding-japanese":{"id":8549,"files":["static/chunks/549.81a5031ec166f1ac.js"]},"app\\\\home\\\\page.tsx -> encoding-japanese":{"id":8549,"files":["static/chunks/549.81a5031ec166f1ac.js"]}}';

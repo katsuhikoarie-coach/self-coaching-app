@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>発注者設定 — 朝霧店管理システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f6f8;--bg2:#ffffff;--bg3:#eef0f3;--border:#d0d4da;--accent:#2563b0;--accent2:#1a4f9a;--accent-soft:rgba(37,99,176,0.08);--text:#1a1c20;--text2:#4a5060;--text3:#8a90a0;--red:#c0392b;--green:#1a8a50;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,0.10);--font-base:21px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:var(--font-base);}
+  .layout{display:flex;min-height:100vh;}
+  .sidebar{width:248px;background:var(--bg2);border-right:2px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,0.06);}
+  .sidebar-logo{padding:22px 20px 16px;border-bottom:2px solid var(--border);background:var(--accent);}
+  .sidebar-logo .store-name{font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em;}
+  .sidebar-logo .store-sub{font-size:13px;color:rgba(255,255,255,0.7);margin-top:2px;}
+  .nav{padding:10px 0;flex:1;overflow-y:auto;}
+  .nav-section{font-size:12px;color:var(--text3);letter-spacing:.08em;padding:14px 18px 5px;font-weight:700;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:12px 18px;color:var(--text2);cursor:pointer;transition:all .12s;border-left:3px solid transparent;font-size:15px;text-decoration:none;}
+  .nav-item:hover{color:var(--accent);background:var(--accent-soft);}
+  .nav-item.active{color:var(--accent);background:var(--accent-soft);border-left-color:var(--accent);font-weight:600;}
+  .nav-item .icon{font-size:18px;width:22px;text-align:center;}
+  .main{margin-left:248px;flex:1;display:flex;flex-direction:column;}
+  .topbar{background:var(--bg2);border-bottom:2px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 6px rgba(0,0,0,0.06);}
+  .topbar-title{font-size:22px;font-weight:600;}
+  .content{padding:28px;}
+  .table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+  table{width:100%;border-collapse:collapse;}
+  thead th{background:var(--bg3);padding:10px 14px;text-align:left;font-size:13px;color:var(--text2);font-weight:700;border-bottom:1px solid var(--border);}
+  tbody tr{border-top:1px solid var(--border);transition:background .1s;}
+  tbody tr:hover{background:var(--accent-soft);}
+  tbody td{padding:11px 14px;font-size:15px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:7px;font-size:15px;cursor:pointer;border:none;transition:all .14s;font-family:'Noto Sans JP',sans-serif;font-weight:500;}
+  .btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:var(--accent2);}
+  .btn-ghost{background:#fff;color:var(--text2);border:2px solid var(--border);}.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-danger{background:#fde8e8;color:var(--red);border:1px solid #f5c6c6;}.btn-danger:hover{background:var(--red);color:#fff;}
+  input[type=text],input[type=tel],textarea{background:#fff;border:2px solid var(--border);color:var(--text);padding:9px 13px;border-radius:7px;font-size:15px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .14s;width:100%;}
+  input:focus,textarea:focus{border-color:var(--accent);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:13px;color:var(--text2);font-weight:600;}
+  .form-group.full{grid-column:1/-1;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border:1px solid var(--border);border-radius:14px;width:560px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:slideUp .18s ease;}
+  @keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-header{padding:18px 22px 14px;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:14px 14px 0 0;}
+  .modal-header h3{font-size:18px;font-weight:600;}
+  .modal-close{cursor:pointer;font-size:20px;background:none;border:none;color:var(--text3);}
+  .modal-close:hover{color:var(--red);}
+  .modal-body{padding:20px 22px;}
+  .modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+  .hamburger-btn{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text);padding:6px 10px;border-radius:6px;line-height:1;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:150;}
+  .sidebar-overlay.open{display:block;}
+  @media(max-width:768px){
+    .sidebar{transform:translateX(-100%);transition:transform .25s ease;z-index:200;}
+    .sidebar.open{transform:translateX(0);}
+    .hamburger-btn{display:flex;align-items:center;justify-content:center;}
+    .main{margin-left:0;}
+    .topbar{padding:0 12px;}
+    .content{padding:14px;}
+    .form-grid{grid-template-columns:1fr;}
+    .form-group.full{grid-column:1;}
+    input[type=text],input[type=tel],textarea{font-size:16px!important;min-height:44px;}
+    .btn{min-height:44px;}
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+<div id="login-overlay" style="position:fixed;inset:0;background:#f4f6f8;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;">
+  <div style="text-align:center"><div style="font-size:30px;font-weight:700;color:#2563b0;margin-bottom:6px">朝霧店</div><div style="font-size:13px;color:#8a90a0">売上・顧客管理システム</div></div>
+  <div style="background:#fff;border:2px solid #d0d4da;border-radius:14px;padding:36px 40px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.1)">
+    <div style="font-size:16px;font-weight:500;margin-bottom:6px">ログインが必要です</div>
+    <div style="font-size:13px;color:#8a90a0;margin-bottom:28px">Googleアカウントでログインしてください</div>
+    <button onclick="doLogin()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#2563b0;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      Googleでログイン
+    </button>
+    <div id="login-error" style="color:#c0392b;font-size:13px;margin-top:14px;min-height:18px"></div>
+  </div>
+</div>
+<div id="app-loading" style="position:fixed;inset:0;background:rgba(244,246,248,.9);z-index:8999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px);">
+  <div style="width:40px;height:40px;border:3px solid #d0d4da;border-top-color:#2563b0;border-radius:50%;animation:spin .8s linear infinite;"></div>
+  <div style="font-size:14px;color:#4a5060">読み込み中...</div>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="store-name">朝霧店</div><div class="store-sub">管理システム</div></div>
+  <nav class="nav">
+    <div class="nav-section">メニュー</div>
+    <a class="nav-item" href="index.html"><span class="icon">🏠</span>ホーム</a>
+    <div class="nav-section">在庫・商品</div>
+    <a class="nav-item" href="index.html?page=inventory"><span class="icon">📦</span>在庫管理</a>
+    <a class="nav-item" href="index.html?page=products"><span class="icon">🗂️</span>商品マスタの登録</a>
+    <a class="nav-item" href="suppliers.html"><span class="icon">🏭</span>仕入先マスタの登録</a>
+    <a class="nav-item" href="purchase_orders.html"><span class="icon">📋</span>発注書</a>
+    <a class="nav-item active" href="settings_orderer.html"><span class="icon">⚙️</span>発注者設定</a>
+  </nav>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px"><button class="hamburger-btn" onclick="toggleSidebar()">☰</button><div class="topbar-title">発注者設定</div></div>
+    <div style="display:flex;gap:16px;align-items:center"><span id="firebase-user" style="font-size:13px;color:var(--text3)"></span><button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="doSignOut()">ログアウト</button></div>
+  </header>
+  <div class="content">
+    <div style="margin-bottom:18px"><button class="btn btn-primary" onclick="openNewModal()">＋ 発注者を追加</button></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>名前</th><th>郵便番号</th><th>住所</th><th>電話番号</th><th>FAX</th><th>操作</th></tr></thead>
+        <tbody id="orderer-tbody"></tbody>
+      </table>
+    </div>
+    <div id="orderer-empty" style="display:none;text-align:center;padding:40px;color:var(--text3)">発注者が登録されていません</div>
+  </div>
+</div>
+</div>
+
+<!-- 新規・編集モーダル -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title">発注者登録</h3><button class="modal-close" onclick="closeModal('edit-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="em-id">
+      <div class="form-grid">
+        <div class="form-group full"><label>名前 ＊</label><input type="text" id="em-name" placeholder="朝霧店"></div>
+        <div class="form-group"><label>郵便番号</label><input type="text" id="em-postal" placeholder="000-0000"></div>
+        <div class="form-group"><label>電話番号</label><input type="tel" id="em-tel" placeholder="0000-00-0000"></div>
+        <div class="form-group full"><label>住所</label><input type="text" id="em-address" placeholder="都道府県市区町村番地"></div>
+        <div class="form-group"><label>FAX</label><input type="tel" id="em-fax" placeholder="0000-00-0000"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('edit-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveOrderer()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 削除確認モーダル -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal" style="width:400px">
+    <div class="modal-header"><h3>削除の確認</h3><button class="modal-close" onclick="closeModal('del-modal')">✕</button></div>
+    <div class="modal-body"><p style="font-size:15px;color:var(--text2)"><strong id="del-name"></strong> を削除しますか？</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('del-modal')">キャンセル</button>
+      <button class="btn btn-danger" onclick="execDelete()">削除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyDZtuZa4RvofqIB375zbmPb9X-UwOUTMC0",authDomain:"asagiri-sale.firebaseapp.com",projectId:"asagiri-sale",storageBucket:"asagiri-sale.firebasestorage.app",messagingSenderId:"800075177148",appId:"1:800075177148:web:f343f8daaf31bcc301c4b9"};
+firebase.initializeApp(firebaseConfig);
+const fbAuth=firebase.auth();
+const ALLOWED_EMAILS=['katsuhiko.arie@gmail.com','ya.asagiriten@gmail.com'];
+const API_BASE='api';
+let _token=null;
+async function getToken(){const u=fbAuth.currentUser;if(!u)return null;_token=await u.getIdToken(false);return _token;}
+async function apiGet(ep){const t=await getToken();const r=await fetch(`${API_BASE}/${ep}`,{headers:{'Authorization':'Bearer '+t}});if(!r.ok)throw new Error(`APIエラー ${r.status}`);return r.json();}
+async function apiPost(ep,d){const t=await getToken();const r=await fetch(`${API_BASE}/${ep}`,{method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(d)});if(!r.ok){let msg='';try{const j=await r.json();msg=j.error||'';}catch(e){}throw new Error(msg||`APIエラー ${r.status}`);}return r.json();}
+async function apiPut(ep,d){const t=await getToken();const r=await fetch(`${API_BASE}/${ep}`,{method:'PUT',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(d)});if(!r.ok){let msg='';try{const j=await r.json();msg=j.error||'';}catch(e){}throw new Error(msg||`APIエラー ${r.status}`);}return r.json();}
+async function apiDelete(ep,d){const t=await getToken();const r=await fetch(`${API_BASE}/${ep}`,{method:'DELETE',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(d)});if(!r.ok)throw new Error(`APIエラー ${r.status}`);return r.json();}
+
+function doLogin(){fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{document.getElementById('login-error').textContent='ログイン失敗: '+e.message;});}
+function doSignOut(){fbAuth.signOut().then(()=>location.href='index.html');}
+
+fbAuth.onAuthStateChanged(async user=>{
+  if(!user){document.getElementById('login-overlay').style.display='flex';return;}
+  if(!ALLOWED_EMAILS.includes(user.email)){document.getElementById('login-error').textContent=user.email+' はアクセス権限がありません';return;}
+  document.getElementById('login-overlay').style.display='none';
+  document.getElementById('firebase-user').textContent=user.displayName||user.email;
+  await load();
+});
+
+let orderers=[];
+let delId=null;
+
+async function load(){
+  document.getElementById('app-loading').style.display='flex';
+  try{orderers=await apiGet('orderer_master.php');render();}
+  catch(e){alert('読み込みエラー: '+e.message);}
+  finally{document.getElementById('app-loading').style.display='none';}
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function render(){
+  const tb=document.getElementById('orderer-tbody');
+  const em=document.getElementById('orderer-empty');
+  if(!orderers.length){tb.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  tb.innerHTML=orderers.map(o=>`<tr>
+    <td><strong>${esc(o.name)}</strong></td>
+    <td>${esc(o.postal_code)}</td>
+    <td style="font-size:14px">${esc(o.address)}</td>
+    <td>${esc(o.tel)}</td>
+    <td>${esc(o.fax)}</td>
+    <td>
+      <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="openEdit(${o.id})">編集</button>
+      <button class="btn btn-danger" style="padding:5px 10px;font-size:13px;margin-left:6px" onclick="openDel(${o.id},'${esc(o.name)}')">削除</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openNewModal(){
+  document.getElementById('modal-title').textContent='発注者登録';
+  document.getElementById('em-id').value='';
+  ['em-name','em-postal','em-tel','em-address','em-fax'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('edit-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('em-name').focus(),80);
+}
+
+function openEdit(id){
+  const o=orderers.find(x=>x.id==id);if(!o)return;
+  document.getElementById('modal-title').textContent='発注者編集';
+  document.getElementById('em-id').value=o.id;
+  document.getElementById('em-name').value=o.name||'';
+  document.getElementById('em-postal').value=o.postal_code||'';
+  document.getElementById('em-tel').value=o.tel||'';
+  document.getElementById('em-address').value=o.address||'';
+  document.getElementById('em-fax').value=o.fax||'';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+async function saveOrderer(){
+  const id=document.getElementById('em-id').value;
+  const name=document.getElementById('em-name').value.trim();
+  if(!name){alert('名前は必須です');return;}
+  const d={name,postal_code:document.getElementById('em-postal').value.trim(),tel:document.getElementById('em-tel').value.trim(),address:document.getElementById('em-address').value.trim(),fax:document.getElementById('em-fax').value.trim()};
+  try{
+    if(id){await apiPut('orderer_master.php',{...d,id:parseInt(id)});}
+    else{await apiPost('orderer_master.php',d);}
+    closeModal('edit-modal');
+    await load();
+  }catch(e){alert('保存エラー: '+e.message);}
+}
+
+function openDel(id,name){delId=id;document.getElementById('del-name').textContent=name;document.getElementById('del-modal').classList.add('open');}
+async function execDelete(){
+  if(!delId)return;
+  try{await apiDelete('orderer_master.php',{id:delId});closeModal('del-modal');delId=null;await load();}
+  catch(e){alert('削除エラー: '+e.message);}
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+===== 朝霧店 index.html 修正箇所 =====
+
+【修正1】サービスカード06（エステ教室）
+--- 変更前 ---
+        < div  class = "service-price" >詳細はお問い合わせ< /div >
+        < span  class = "service-price-label" >受講コースにより異なります< /span >
+        < div  class = "service-arrow" >→ </div>
+
+--- 変更後（↓これに差し替え）---
+        <div class="service-price">詳細はお問い合わせ</div>
+        <span class="service-price-label">受講コースにより異なります</span>
+        <a href="https://school.asagiriyamano.jp/" target="_blank" 
+           style="display:inline-block;margin-top:16px;padding:10px 20px;background:var(--gold);color:#fff;font-size:13px;letter-spacing:0.08em;border-radius:2px;">
+          教室専用サイトを見る →
+        </a>
+
+
+【修正2】recruitセクション、エステ教室カードのLINEボタンの直前
+--- 変更前 ---
+          <a href="https://lin.ee/eD6X9aa" target="_blank" class="btn-primary" style="width:100%;justify-content:center;">LINEで教室についてお問い合わせ</a>
+
+--- 変更後（↓ボタンを2つに）---
+          <a href="https://school.asagiriyamano.jp/" target="_blank" class="btn-primary" 
+             style="width:100%;justify-content:center;margin-bottom:12px;background:var(--brown-mid);">
+            📚 エステ教室の専用サイトを見る
+          </a>
+          <a href="https://lin.ee/eD6X9aa" target="_blank" class="btn-primary" style="width:100%;justify-content:center;">LINEで教室についてお問い合わせ</a>

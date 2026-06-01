@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TILLET I-UP｜15秒ショート動画プレビュー</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    font-family: 'Noto Sans JP', sans-serif;
+    padding: 24px 0 40px;
+  }
+
+  .outer-label {
+    color: #888;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 40px;
+    border: 2px solid #333;
+    box-shadow: 0 0 60px rgba(201,168,76,0.15), 0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  /* ─── CUT BASE ─── */
+  .cut {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+  .cut.active { opacity: 1; pointer-events: auto; }
+
+  /* ─── CUT 1 ─── */
+  #cut1 { background: #000; }
+
+  .c1-badge {
+    position: absolute;
+    top: 48px;
+    right: 32px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e8c96c, #C9A84C 60%, #a07830);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 16px rgba(201,168,76,0.5);
+    opacity: 0;
+    z-index: 10;
+  }
+  .c1-badge.animate {
+    animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards 0.8s;
+  }
+  .c1-badge-main {
+    font-size: 11px;
+    font-weight: 900;
+    color: #1a1a1a;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .c1-badge-sub {
+    font-size: 9px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+  @keyframes badgePop {
+    from { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  .c1-text {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    animation: none;
+  }
+  .c1-text.animate {
+    animation: fadeInScale 0.8s ease forwards 0.3s;
+  }
+  .c1-line { display: block; }
+
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ─── BG IMAGE (CUT2/CUT3共通) ─── */
+  .cut-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* テキスト要素をbg imgより前面に */
+  #cut2 > *:not(.cut-bg-img):not(.cut-label),
+  #cut3 > *:not(.cut-bg-img):not(.cut-label) { position: relative; z-index: 1; }
+
+  /* ─── CUT 2 ─── */
+  #cut2 { background: linear-gradient(160deg, #1a1a1a 0%, #2a2a2a 100%); }
+
+  .c2-main {
+    font-size: 42px;
+    font-weight: 700;
+    color: #C9A84C;
+    letter-spacing: 0.08em;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  .c2-main.animate {
+    animation: slideInLeft 0.6s cubic-bezier(0.22,1,0.36,1) forwards 0.1s;
+  }
+
+  .c2-sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: #ddd;
+    letter-spacing: 0.15em;
+    margin-top: 12px;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  .c2-sub.animate {
+    animation: slideInLeft 0.6s cubic-bezier(0.22,1,0.36,1) forwards 0.35s;
+  }
+
+  .c2-line {
+    width: 60px;
+    height: 1px;
+    background: #C9A84C;
+    margin: 20px auto 0;
+    opacity: 0;
+  }
+  .c2-line.animate {
+    animation: lineExpand 0.5s ease forwards 0.6s;
+  }
+
+  @keyframes slideInLeft {
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes lineExpand {
+    from { opacity: 0; transform: scaleX(0); }
+    to   { opacity: 1; transform: scaleX(1); }
+  }
+
+  /* ─── CUT 3 ─── */
+  #cut3 { background: linear-gradient(160deg, #111 0%, #222 100%); }
+
+  .c3-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: #C9A84C;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    opacity: 0;
+  }
+  .c3-label.animate {
+    animation: fadeUp 0.5s ease forwards 0.1s;
+  }
+
+  .c3-counter {
+    font-size: 80px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .c3-counter span.gold { color: #C9A84C; }
+
+  .c3-unit {
+    font-size: 18px;
+    font-weight: 300;
+    color: #aaa;
+    letter-spacing: 0.1em;
+    margin-top: 10px;
+    opacity: 0;
+  }
+  .c3-unit.animate {
+    animation: fadeUp 0.4s ease forwards 1.8s;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── CUT 4 ─── */
+  #cut4 { background: linear-gradient(160deg, #0e0e0e 0%, #1e1e1e 100%); }
+
+  .c4-main {
+    font-size: 72px;
+    font-weight: 900;
+    color: #C9A84C;
+    letter-spacing: 0.1em;
+    text-align: center;
+    opacity: 0;
+  }
+  .c4-main.animate {
+    animation: fadeInScale 0.5s ease forwards 0.1s;
+  }
+
+  .c4-sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: #ccc;
+    letter-spacing: 0.15em;
+    margin-top: 10px;
+    text-align: center;
+    opacity: 0;
+  }
+  .c4-sub.animate {
+    animation: fadeUp 0.5s ease forwards 0.5s;
+  }
+
+  .pulse-wrap {
+    margin-top: 40px;
+    width: 280px;
+    height: 60px;
+    position: relative;
+    opacity: 0;
+  }
+  .pulse-wrap.animate {
+    animation: fadeIn 0.3s ease forwards 0.7s;
+  }
+
+  .pulse-svg { width: 100%; height: 100%; }
+
+  .pulse-path {
+    stroke: #C9A84C;
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+  }
+  .pulse-path.animate {
+    animation: drawPulse 1.2s ease forwards 0.8s;
+  }
+
+  .pulse-glow {
+    stroke: #C9A84C;
+    stroke-width: 1;
+    fill: none;
+    opacity: 0.25;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    filter: blur(3px);
+  }
+  .pulse-glow.animate {
+    animation: drawPulse 1.2s ease forwards 0.85s;
+  }
+
+  @keyframes drawPulse {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* ─── CUT 5 ─── */
+  #cut5 { background: #f8f5f0; }
+
+  .c5-text {
+    font-size: 28px;
+    font-weight: 500;
+    color: #1a1a1a;
+    text-align: center;
+    line-height: 1.7;
+    letter-spacing: 0.06em;
+    opacity: 0;
+    padding: 0 30px;
+  }
+  .c5-text.animate {
+    animation: fadeSlow 1.2s ease forwards 0.2s;
+  }
+
+  .c5-accent {
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: #C9A84C;
+    margin: 24px auto 0;
+    opacity: 0;
+  }
+  .c5-accent.animate {
+    animation: fadeSlow 0.8s ease forwards 1s;
+  }
+
+  @keyframes fadeSlow {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── CUT 6 ─── */
+  #cut6 { background: #fff; }
+
+  .c6-brand {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.15em;
+    text-align: center;
+    opacity: 0;
+  }
+  .c6-brand.animate {
+    animation: brandReveal 0.8s ease forwards 0.2s;
+  }
+
+  .c6-divider {
+    width: 1px;
+    height: 0;
+    background: #C9A84C;
+    margin: 14px auto;
+  }
+  .c6-divider.animate {
+    animation: dividerGrow 0.5s ease forwards 0.7s;
+  }
+
+  .c6-sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: #888;
+    letter-spacing: 0.3em;
+    text-transform: lowercase;
+    text-align: center;
+    opacity: 0;
+  }
+  .c6-sub.animate {
+    animation: brandReveal 0.6s ease forwards 1s;
+  }
+
+  .c6-tagline {
+    font-size: 11px;
+    font-weight: 300;
+    color: #C9A84C;
+    letter-spacing: 0.25em;
+    margin-top: 20px;
+    text-align: center;
+    opacity: 0;
+  }
+  .c6-tagline.animate {
+    animation: brandReveal 0.6s ease forwards 1.3s;
+  }
+
+  /* CUT6 product image */
+  .c6-product-wrap {
+    width: 260px;
+    height: 340px;
+    position: relative;
+    margin-bottom: 28px;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .c6-product-wrap.animate {
+    animation: productRise 0.9s cubic-bezier(0.22,1,0.36,1) forwards 0.1s;
+  }
+  .c6-product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 32px rgba(0,0,0,0.15));
+  }
+  @keyframes productRise {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* CUT6 ranking badge bottom */
+  .c6-ranking {
+    position: absolute;
+    bottom: 36px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 400;
+    color: #888;
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+    padding: 0 20px;
+    opacity: 0;
+  }
+  .c6-ranking.animate {
+    animation: brandReveal 0.6s ease forwards 1.5s;
+  }
+  .c6-ranking strong {
+    color: #C9A84C;
+    font-weight: 700;
+  }
+
+  @keyframes brandReveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes dividerGrow {
+    to { height: 30px; }
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #C9A84C, #e8c96c);
+    width: 0%;
+    transition: none;
+    z-index: 100;
+  }
+
+  /* ─── CUT LABEL (台本表示) ─── */
+  .cut-label {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.15em;
+    font-family: monospace;
+    z-index: 50;
+    pointer-events: none;
+  }
+  #cut5 .cut-label, #cut6 .cut-label {
+    color: rgba(0,0,0,0.2);
+  }
+
+  /* ─── REPLAY BUTTON ─── */
+  .replay-btn {
+    margin-top: 20px;
+    padding: 10px 28px;
+    background: transparent;
+    border: 1px solid #C9A84C;
+    color: #C9A84C;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .replay-btn:hover {
+    background: #C9A84C;
+    color: #000;
+  }
+
+  /* ─── SCRIPT TABLE ─── */
+  .script-section {
+    width: 390px;
+    margin-top: 32px;
+    color: #aaa;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+  }
+  .script-title {
+    color: #C9A84C;
+    letter-spacing: 0.2em;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .script-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .script-table th {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid #2a2a2a;
+    color: #666;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+  .script-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid #1e1e1e;
+    vertical-align: top;
+    line-height: 1.6;
+    color: #999;
+  }
+  .script-table tr:hover td { background: rgba(201,168,76,0.04); }
+  .time-cell { color: #C9A84C; white-space: nowrap; font-family: monospace; }
+</style>
+</head>
+<body>
+
+<div class="outer-label">TILLET I-UP｜15sec SHORT PREVIEW ／ 9:16</div>
+
+<div class="phone-frame" id="frame">
+
+  <!-- CUT 1 -->
+  <div class="cut active" id="cut1">
+    <div class="cut-label">CUT 1 ／ 0〜3s</div>
+    <p class="c1-text" id="c1text">
+      <span class="c1-line">目元、</span>
+      <span class="c1-line">諦めてませんか？</span>
+    </p>
+    <div class="c1-badge" id="c1badge">
+      <span class="c1-badge-main">お悩み</span>
+      <span class="c1-badge-main">No.1</span>
+      <span class="c1-badge-sub">★★★</span>
+    </div>
+  </div>
+
+  <!-- CUT 2 -->
+  <div class="cut" id="cut2">
+    <div class="cut-label">CUT 2 ／ 3〜5s</div>
+    <img class="cut-bg-img" src="tileet_006.png" alt="">
+    <p class="c2-main" id="c2main">プラチナヘッド</p>
+    <p class="c2-sub" id="c2sub">肌細胞を活性化</p>
+    <div class="c2-line" id="c2line"></div>
+  </div>
+
+  <!-- CUT 3 -->
+  <div class="cut" id="cut3">
+    <div class="cut-label">CUT 3 ／ 5〜8s</div>
+    <img class="cut-bg-img" src="tileet_006.png" alt="">
+    <p class="c3-label" id="c3label">TAPPING</p>
+    <div class="c3-counter" id="c3counter">0</div>
+    <p class="c3-unit" id="c3unit">回 / 分</p>
+  </div>
+
+  <!-- CUT 4 -->
+  <div class="cut" id="cut4">
+    <div class="cut-label">CUT 4 ／ 8〜11s</div>
+    <p class="c4-main" id="c4main">EMS</p>
+    <p class="c4-sub" id="c4sub">表情筋を鍛える</p>
+    <div class="pulse-wrap" id="pulsewrap">
+      <svg class="pulse-svg" viewBox="0 0 280 60" preserveAspectRatio="none">
+        <path class="pulse-glow" id="pulseGlow"
+          d="M0,30 L40,30 L55,30 L62,8 L70,52 L78,8 L86,52 L94,30 L110,30
+             L117,8 L125,52 L133,8 L141,52 L149,30 L165,30
+             L172,8 L180,52 L188,8 L196,52 L204,30 L220,30
+             L227,12 L235,48 L243,12 L251,48 L259,30 L280,30"/>
+        <path class="pulse-path" id="pulsePath"
+          d="M0,30 L40,30 L55,30 L62,8 L70,52 L78,8 L86,52 L94,30 L110,30
+             L117,8 L125,52 L133,8 L141,52 L149,30 L165,30
+             L172,8 L180,52 L188,8 L196,52 L204,30 L220,30
+             L227,12 L235,48 L243,12 L251,48 L259,30 L280,30"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CUT 5 -->
+  <div class="cut" id="cut5">
+    <div class="cut-label">CUT 5 ／ 11〜13s</div>
+    <p class="c5-text" id="c5text">累計5万台突破。<br>選ばれ続ける理由がある。</p>
+    <span class="c5-accent" id="c5accent"></span>
+  </div>
+
+  <!-- CUT 6 -->
+  <div class="cut" id="cut6">
+    <div class="cut-label">CUT 6 ／ 13〜15s</div>
+    <div class="c6-product-wrap" id="c6productwrap">
+      <img class="c6-product-img" src="tileet_006.png" alt="TILLET I-UP">
+    </div>
+    <p class="c6-brand" id="c6brand">TILLET I-UP</p>
+    <div class="c6-divider" id="c6divider"></div>
+    <p class="c6-sub" id="c6sub">yamano</p>
+    <p class="c6-tagline" id="c6tagline">FACIAL LIFTING STICK</p>
+    <p class="c6-ranking" id="c6ranking">
+      <strong>2025年 川崎市ふるさと納税</strong><br>目元美容ランキング 1位
+    </p>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<button class="replay-btn" onclick="startVideo()">▶ REPLAY</button>
+
+<!-- 構成台本 -->
+<div class="script-section">
+  <div class="script-title">■ 構成台本（動画編集用）</div>
+  <table class="script-table">
+    <thead>
+      <tr>
+        <th>カット</th>
+        <th>タイム</th>
+        <th>テキスト</th>
+        <th>演出</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>C1</td>
+        <td class="time-cell">0〜3s</td>
+        <td>目元、諦めてませんか？</td>
+        <td>黒背景・文字スケールイン／右上に「お悩みNo.1」ゴールドバッジ</td>
+      </tr>
+      <tr>
+        <td>C2</td>
+        <td class="time-cell">3〜5s</td>
+        <td>プラチナヘッド<br>肌細胞を活性化</td>
+        <td>商品写真（_006）薄く背景配置・テキスト左スライドイン</td>
+      </tr>
+      <tr>
+        <td>C3</td>
+        <td class="time-cell">5〜8s</td>
+        <td>毎分8,600回タッピング</td>
+        <td>商品写真（_006）薄く背景配置・数字カウントアップ→8600フリーズ</td>
+      </tr>
+      <tr>
+        <td>C4</td>
+        <td class="time-cell">8〜11s</td>
+        <td>EMS<br>表情筋を鍛える</td>
+        <td>パルス波形アニメーション（ゴールド）</td>
+      </tr>
+      <tr>
+        <td>C5</td>
+        <td class="time-cell">11〜13s</td>
+        <td>累計5万台突破。<br>選ばれ続ける理由がある。</td>
+        <td>白背景・ゆっくりフェードイン</td>
+      </tr>
+      <tr>
+        <td>C6</td>
+        <td class="time-cell">13〜15s</td>
+        <td>商品写真（_006）大・TILLET I-UP｜yamano<br>下部：川崎市ふるさと納税ランキング1位</td>
+        <td>商品写真ライズアップ→ロゴ順次フェードイン</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const CUTS = [
+    { id: 'cut1', duration: 3000 },
+    { id: 'cut2', duration: 2000 },
+    { id: 'cut3', duration: 3000 },
+    { id: 'cut4', duration: 3000 },
+    { id: 'cut5', duration: 2000 },
+    { id: 'cut6', duration: 2000 },
+  ];
+
+  const TOTAL = 15000;
+  let currentCut = 0;
+  let timers = [];
+  let progressTimer = null;
+  let startTime = null;
+
+  function clearAll() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    if (progressTimer) { cancelAnimationFrame(progressTimer); progressTimer = null; }
+  }
+
+  function resetAnimClasses() {
+    // Remove all animate classes
+    document.querySelectorAll('[class*="animate"]').forEach(el => {
+      const classes = Array.from(el.classList).filter(c => c !== 'animate');
+      el.className = classes.join(' ').trim() + (el.className.includes('animate') ? '' : '');
+    });
+
+    const animatable = [
+      'c1text','c1badge',
+      'c2main','c2sub','c2line',
+      'c3label','c3unit',
+      'c4main','c4sub','pulsewrap','pulsePath','pulseGlow',
+      'c5text','c5accent',
+      'c6productwrap','c6brand','c6divider','c6sub','c6tagline','c6ranking'
+    ];
+    animatable.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('animate');
+    });
+
+    // Reset counter
+    document.getElementById('c3counter').textContent = '0';
+    // Reset divider
+    const div = document.getElementById('c6divider');
+    if (div) div.style.height = '0';
+    // Reset progress
+    document.getElementById('progressBar').style.width = '0%';
+  }
+
+  function showCut(index) {
+    CUTS.forEach((c, i) => {
+      const el = document.getElementById(c.id);
+      if (i === index) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+    triggerCutAnimation(index);
+  }
+
+  function triggerCutAnimation(index) {
+    if (index === 0) {
+      ['c1text','c1badge'].forEach(id => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+    }
+    if (index === 1) {
+      ['c2main','c2sub','c2line'].forEach((id, i) => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+    }
+    if (index === 2) {
+      ['c3label','c3unit'].forEach(id => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+      countUp(0, 8600, 2200, 'c3counter');
+    }
+    if (index === 3) {
+      ['c4main','c4sub','pulsewrap'].forEach(id => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+      ['pulsePath','pulseGlow'].forEach(id => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+    }
+    if (index === 4) {
+      ['c5text','c5accent'].forEach(id => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+    }
+    if (index === 5) {
+      ['c6productwrap','c6brand','c6divider','c6sub','c6tagline','c6ranking'].forEach(id => {
+        const el = document.getElementById(id);
+        void el.offsetWidth;
+        el.classList.add('animate');
+      });
+    }
+  }
+
+  function countUp(from, to, duration, elId) {
+    const el = document.getElementById(elId);
+    const startTs = performance.now();
+    function step(ts) {
+      const elapsed = ts - startTs;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out quart
+      const eased = 1 - Math.pow(1 - progress, 4);
+      const val = Math.round(from + (to - from) * eased);
+      el.textContent = val.toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function updateProgress() {
+    const elapsed = performance.now() - startTime;
+    const pct = Math.min((elapsed / TOTAL) * 100, 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    if (elapsed < TOTAL) {
+      progressTimer = requestAnimationFrame(updateProgress);
+    }
+  }
+
+  function startVideo() {
+    clearAll();
+    resetAnimClasses();
+    currentCut = 0;
+    showCut(0);
+
+    startTime = performance.now();
+    progressTimer = requestAnimationFrame(updateProgress);
+
+    let elapsed = 0;
+    for (let i = 1; i < CUTS.length; i++) {
+      elapsed += CUTS[i - 1].duration;
+      const capturedI = i;
+      const capturedElapsed = elapsed;
+      timers.push(setTimeout(() => {
+        showCut(capturedI);
+      }, capturedElapsed));
+    }
+  }
+
+  // Auto-start on load
+  window.addEventListener('load', () => {
+    setTimeout(startVideo, 400);
+  });
+</script>
+</body>
+</html>

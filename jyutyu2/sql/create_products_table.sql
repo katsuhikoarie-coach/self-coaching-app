@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS products (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  code         VARCHAR(20)   NOT NULL UNIQUE,
+  name         VARCHAR(200)  NOT NULL,
+  category     VARCHAR(50)   NOT NULL,
+  price_hansha INT           NOT NULL DEFAULT 0,
+  price_bc     INT           NOT NULL DEFAULT 0,
+  price_fc     INT           NOT NULL DEFAULT 0,
+  tax_rate     DECIMAL(4,2)  NOT NULL DEFAULT 0.10,
+  active       TINYINT(1)    NOT NULL DEFAULT 1,
+  note         VARCHAR(200)  DEFAULT NULL,
+  created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

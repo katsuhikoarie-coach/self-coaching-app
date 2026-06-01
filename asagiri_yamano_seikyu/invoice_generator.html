@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>請求書作成ツール｜朝霧ヤマノ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+:root {
+  --ink: #1a1a1a;
+  --ink-light: #666;
+  --line: #d0c8bc;
+  --bg: #f5f2ee;
+  --white: #ffffff;
+  --accent: #7a5c3e;
+  --accent-light: #f0e8df;
+  --red: #c0392b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media screen {
+  .screen-ui {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--ink-light);
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+    display: block;
+  }
+
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+
+  .panel-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 9px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .form-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-light);
+    margin-bottom: 4px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    border: 1px solid var(--line);
+    padding: 7px 10px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fdfcfb;
+    outline: none;
+    border-radius: 1px;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+
+  .drop-zone {
+    border: 2px dashed var(--line);
+    padding: 22px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 1px;
+  }
+
+  .drop-zone:hover, .drop-zone.over {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .drop-zone p { font-size: 13px; color: var(--ink-light); }
+  .drop-zone strong { color: var(--accent); display: block; font-size: 14px; margin-bottom: 2px; }
+  #file-input { display: none; }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .data-table th {
+    background: var(--accent-light);
+    font-weight: 500;
+    padding: 6px 9px;
+    text-align: left;
+    border-bottom: 2px solid var(--line);
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  .data-table td {
+    padding: 4px 7px;
+    border-bottom: 1px solid #ede8e0;
+    vertical-align: middle;
+  }
+
+  .data-table tr:hover td { background: #fdf9f6; }
+
+  .data-table input, .data-table select {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .btn-icon {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 1px 5px;
+    transition: color 0.15s;
+    line-height: 1;
+  }
+
+  .btn-icon:hover { color: var(--red); }
+
+  .btn-add {
+    margin-top: 8px;
+    background: none;
+    border: 1px dashed var(--line);
+    padding: 5px 16px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 1px;
+  }
+
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+  .manual-row {
+    display: grid;
+    grid-template-columns: 2fr 50px 90px 60px 90px 100px 60px auto;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .action-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 11px 30px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: opacity 0.15s;
+  }
+
+  .btn-primary:hover { opacity: 0.82; }
+
+  .btn-outline {
+    background: white;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 10px 22px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: 1px;
+  }
+
+  .btn-outline:hover { background: var(--accent-light); }
+
+  .msg {
+    font-size: 12px;
+    padding: 9px 14px;
+    border-radius: 1px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .msg-info    { background: #eef3fb; color: #1e56a0; border: 1px solid #c0d4f0; }
+  .msg-error   { background: #fdf0ef; color: #b02020; border: 1px solid #f0c4c0; }
+  .msg-success { background: #edfbf1; color: #1a7038; border: 1px solid #b0e8c0; }
+
+  #preview-area { display: none; margin-top: 20px; }
+
+  .tab-bar {
+    display: flex;
+    background: var(--bg);
+    border-bottom: 2px solid var(--line);
+  }
+
+  .tab {
+    padding: 9px 20px;
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: var(--ink-light);
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+  }
+
+  .tab.active { border-bottom-color: var(--accent); color: var(--accent); font-weight: 500; }
+
+  .tab-body {
+    background: white;
+    border: 1px solid var(--line);
+    border-top: none;
+    display: none;
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .tab-body.active { display: block; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-left: 3px;
+    vertical-align: middle;
+    font-weight: 400;
+  }
+
+  .badge-8  { background: #e8f4ec; color: #1a6b2a; border: 1px solid #a0d8b0; }
+  .badge-10 { background: #f4ece0; color: #7a4c1e; border: 1px solid #d8b880; }
+  .badge-hk { background: #eef3fb; color: #1e4a8a; border: 1px solid #b0c8f0; }
+
+  .hint {
+    font-size: 11px;
+    color: var(--ink-light);
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+}
+
+/* ===== 印刷用 ===== */
+.invoice-page {
+  width: 210mm;
+  min-height: 270mm;
+  padding: 16mm 14mm;
+  font-family: 'MS Mincho', 'MS 明朝', 'Noto Serif JP', serif;
+  font-size: 10pt;
+  line-height: 1.55;
+  color: #111;
+  background: white;
+}
+
+.inv-h1 {
+  text-align: center;
+  font-size: 17pt;
+  font-weight: bold;
+  letter-spacing: 0.55em;
+  margin-bottom: 14pt;
+}
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10pt;
+}
+
+.inv-to .to-addr { font-size: 8.5pt; line-height: 1.6; }
+.inv-to .to-name { font-size: 12pt; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 2pt; margin-top: 4pt; }
+
+.inv-from { text-align: right; font-size: 8.5pt; line-height: 1.8; }
+.inv-from .shop-name { font-size: 10.5pt; font-weight: bold; margin-bottom: 1pt; }
+
+.inv-period { text-align: right; font-size: 9.5pt; margin-bottom: 6pt; }
+
+.inv-summary {
+  display: flex;
+  border: 1px solid #999;
+  margin-bottom: 10pt;
+}
+
+.inv-summary-cell {
+  flex: 1;
+  padding: 5pt 7pt;
+  border-right: 1px solid #bbb;
+  text-align: center;
+}
+
+.inv-summary-cell:last-child { border-right: none; }
+.inv-summary-cell .sc-lbl { font-size: 7.5pt; display: block; }
+.inv-summary-cell .sc-val { font-size: 10pt; font-weight: bold; }
+
+.inv-totals {
+  display: flex;
+  border: 1px solid #999;
+  margin-bottom: 12pt;
+}
+
+.inv-totals-cell {
+  flex: 1;
+  padding: 4pt 6pt;
+  border-right: 1px solid #bbb;
+  text-align: center;
+  font-size: 8.5pt;
+}
+
+.inv-totals-cell:last-child { border-right: none; }
+.inv-totals-cell .tc-lbl { display: block; font-size: 7.5pt; }
+.inv-totals-cell .tc-val { font-weight: bold; }
+.inv-totals-cell.highlight { background: #f5f0e5; }
+.inv-totals-cell.highlight .tc-val { font-size: 11pt; }
+
+.inv-tax-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+  margin-bottom: 10pt;
+}
+
+.inv-tax-table th, .inv-tax-table td {
+  border: 1px solid #bbb;
+  padding: 3pt 5pt;
+}
+
+.inv-tax-table th { background: #f0ebe0; text-align: center; }
+.inv-tax-table td.r { text-align: right; }
+
+.inv-footer {
+  margin-top: 10pt;
+  font-size: 7.5pt;
+  color: #555;
+  border-top: 1px solid #ccc;
+  padding-top: 5pt;
+  line-height: 1.9;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  margin-bottom: 10pt;
+}
+
+.detail-table th {
+  background: #f0ebe0;
+  padding: 3.5pt 4pt;
+  border: 1px solid #999;
+  text-align: center;
+  font-size: 7.5pt;
+  white-space: nowrap;
+}
+
+.detail-table td {
+  border: 1px solid #ccc;
+  padding: 2.5pt 4pt;
+  vertical-align: middle;
+}
+
+.detail-table td.r { text-align: right; white-space: nowrap; }
+.detail-table td.c { text-align: center; }
+
+.detail-table .cat-row td {
+  background: #ebe5d8;
+  font-weight: bold;
+  font-size: 7.5pt;
+  padding: 2pt 4pt;
+}
+
+.detail-table .sub-row td {
+  background: #f8f5ef;
+  font-size: 7.5pt;
+}
+
+.detail-table tr:nth-child(even):not(.cat-row):not(.sub-row) td {
+  background: #fafaf7;
+}
+
+.tax-mk {
+  display: inline-block;
+  font-size: 6.5pt;
+  padding: 0 2pt;
+  border: 1px solid;
+  border-radius: 1pt;
+}
+
+.tax-mk.t8  { color: #1a6b2a; border-color: #1a6b2a; }
+.tax-mk.t10 { color: #7a4c1e; border-color: #7a4c1e; }
+
+.tax-summary {
+  width: 220pt;
+  margin-left: auto;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+  margin-top: 8pt;
+}
+
+.tax-summary th, .tax-summary td {
+  border: 1px solid #bbb;
+  padding: 3pt 7pt;
+}
+
+.tax-summary th { background: #f0ebe0; text-align: left; }
+.tax-summary td.r { text-align: right; }
+.tax-summary .tr-total td { font-weight: bold; background: #f5f0e5; }
+
+@media print {
+  .screen-ui { display: none !important; }
+  body { background: white; margin: 0; }
+  .invoice-page { width: 100%; padding: 10mm; min-height: auto; }
+  #preview-area { display: block !important; }
+  .tab-bar { display: none !important; }
+  .tab-body { display: none !important; }
+  .action-bar { display: none; }
+  #print-only { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="screen-ui">
+  <h1>請求書作成ツール</h1>
+  <span class="subtitle">山野愛子どろんこ美容 朝霧ヤマノ ／ Salesforce CSV → 御請求書・請求明細書</span>
+
+  <!-- 01 基本情報 -->
+  <div class="panel">
+    <div class="panel-title">01 ── 請求書 基本情報</div>
+    <div class="form-3">
+      <div>
+        <label>請求年月</label>
+        <input type="text" id="inv-month" placeholder="2026年3月分">
+      </div>
+      <div>
+        <label>発行日</label>
+        <input type="text" id="inv-date" placeholder="2026年3月20日">
+      </div>
+      <div>
+        <label>締切り表示</label>
+        <input type="text" id="inv-deadline" placeholder="2026年3月20日 締切り">
+      </div>
+    </div>
+    <div class="form-3">
+      <div>
+        <label>宛先（代理店名・担当者名）</label>
+        <input type="text" id="inv-to" placeholder="西舞子ゆかり 稲岡ゆかり 様（47881）">
+      </div>
+      <div>
+        <label>宛先 郵便番号</label>
+        <input type="text" id="inv-zip" placeholder="〒655-0048">
+      </div>
+      <div>
+        <label>宛先 住所</label>
+        <input type="text" id="inv-addr" placeholder="兵庫県神戸市垂水区西舞子3-4-24">
+      </div>
+    </div>
+    <div class="form-3">
+      <div>
+        <label>前月御請求額（円）</label>
+        <input type="number" id="prev-amount" value="0" min="0" oninput="calcCarryover()">
+      </div>
+      <div>
+        <label>当月御入金額（円）</label>
+        <input type="number" id="paid-amount" value="0" min="0" oninput="calcCarryover()">
+      </div>
+      <div>
+        <label>繰越額（自動）</label>
+        <input type="text" id="carryover-disp" readonly style="background:#f5f5f5;color:#888;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 代理店マスタ -->
+  <div class="panel">
+    <div class="panel-title">
+      <span>02 ── 代理店マスタ（掛率設定）</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-add" onclick="addDealerRow()">＋ 追加</button>
+        <button class="btn-add" onclick="exportMaster()" style="border-color:#2563a0;color:#2563a0;">↓ エクスポート</button>
+        <button class="btn-add" onclick="document.getElementById('import-file2').click()" style="border-color:#1a7038;color:#1a7038;">↑ インポート</button>
+        <input type="file" id="import-file2" accept=".json" style="display:none;" onchange="importMaster(this)">
+      </div>
+    </div>
+    <p class="hint">代理店ごとにシステム掛率・一般掛率を設定します。設定はブラウザに保存されます。<br>
+    ※ CSVのuser_idで自動照合します。</p>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>user_id（コード）</th>
+            <th>代理店名</th>
+            <th>宛名（請求書表示）</th>
+            <th>郵便番号</th>
+            <th>住所</th>
+            <th>システム掛率</th>
+            <th>一般掛率</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="dealer-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 03 CSV -->
+  <div class="panel">
+    <div class="panel-title">
+      <span>03 ── CSV読み込み</span>
+      <button class="btn-add" onclick="resetForNewDealer()" style="border-color:#c0392b;color:#c0392b;">↺ 別代理店に切替</button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label>代理店を選択（CSVを読み込む前に選んでください）</label>
+      <select id="dealer-select" style="width:100%;font-size:14px;padding:9px 12px;"
+        onchange="onDealerSelect(this.value)">
+        <option value="">── 代理店を選択 ──</option>
+      </select>
+    </div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <p><strong>CSVをドロップ または クリックして選択</strong>代理店ごとにフィルタ済みのCSVを読み込んでください</p>
+    </div>
+    <input type="file" id="file-input" accept=".csv">
+    <div id="csv-msg" style="margin-top:8px;"></div>
+  </div>
+
+  <!-- 03b CSVデータ確認・区分設定 -->
+  <div class="panel" id="csv-review-panel" style="display:none;">
+    <div class="panel-title">03b ── CSVデータ確認・区分設定</div>
+    <p class="hint">読み込んだCSVの商品一覧です。区分を確認・変更してください。<br>
+    <strong>system</strong>＝システム掛率　／　<strong>general</strong>＝一般掛率　／　<strong>food</strong>＝食品8%　／　<strong>hanbai</strong>＝販促　／　<strong>manual</strong>＝除外（手入力側）</p>
+    <div style="overflow-x:auto;">
+      <table class="data-table" id="csv-review-table">
+        <thead>
+          <tr>
+            <th>商品ID</th>
+            <th>商品名</th>
+            <th>数量</th>
+            <th>上代単価</th>
+            <th>区分</th>
+            <th>税率</th>
+          </tr>
+        </thead>
+        <tbody id="csv-review-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 04 商品マスタ -->
+  <div class="panel">
+    <div class="panel-title">
+      <span>04 ── 商品マスタ（区分・税率）</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-add" onclick="addProductRow()">＋ 追加</button>
+        <button class="btn-add" onclick="exportMaster()" style="border-color:#2563a0;color:#2563a0;">↓ エクスポート</button>
+        <button class="btn-add" onclick="document.getElementById('import-file').click()" style="border-color:#1a7038;color:#1a7038;">↑ インポート</button>
+        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importMaster(this)">
+        <button class="btn-add" onclick="resetProductMaster()" style="border-color:#c0392b;color:#c0392b;">🗑 リセット</button>
+      </div>
+    </div>
+    <p class="hint">
+      CSVを読み込むと product_id が自動追加されます。区分を設定してください。<br>
+      <strong>system</strong>＝システム掛率適用　／　<strong>general</strong>＝一般掛率適用　／　<strong>food</strong>＝食品8%・一般掛率　／　<strong>hanbai</strong>＝販促（item_priceそのまま・10%）　／　<strong>manual</strong>＝除外（手入力側で管理）
+    </p>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>商品ID</th>
+            <th>商品名（表示）</th>
+            <th>区分</th>
+            <th>税率</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="product-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 05 業務品 -->
+  <div class="panel">
+    <div class="panel-title">05 ── 業務品・手入力品目（「manual」区分の商品はここに入力）</div>
+    <p class="hint">掛率で計算できない業務品を直接入力。金額は税抜で入力してください。<br>
+    ※ CSVに含まれる商品で区分を「manual」にしたものはCSVから除外され、ここで管理します。</p>
+    <div style="display:grid;grid-template-columns:2fr 50px 90px 60px 90px 100px 60px auto;gap:6px;padding:0 2px;margin-bottom:4px;">
+      <span style="font-size:11px;color:var(--ink-light);">品名</span>
+      <span style="font-size:11px;color:var(--ink-light);">数量</span>
+      <span style="font-size:11px;color:var(--ink-light);">上代（税抜）</span>
+      <span style="font-size:11px;color:var(--ink-light);">掛率</span>
+      <span style="font-size:11px;color:var(--ink-light);">下代（請求額）</span>
+      <span style="font-size:11px;color:var(--ink-light);">区分</span>
+      <span style="font-size:11px;color:var(--ink-light);">税率</span>
+      <span></span>
+    </div>
+    <div id="manual-area"></div>
+    <button class="btn-add" onclick="addManualRow()">＋ 業務品を追加</button>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-primary" onclick="generate()">請求書を生成</button>
+    <button class="btn-outline" onclick="window.print()">印刷 (Ctrl+P)</button>
+  </div>
+  <div id="main-msg"></div>
+
+  <div id="preview-area">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('invoice')">御請求書</div>
+      <div class="tab" onclick="switchTab('detail')">請求明細書</div>
+    </div>
+    <div class="tab-body active" id="tab-invoice"></div>
+    <div class="tab-body" id="tab-detail"></div>
+  </div>
+</div>
+
+<!-- 印刷専用 -->
+<div id="print-only" style="display:none;"></div>
+
+<script>
+const SHOP = {
+  name:  '山野愛子どろんこ美容 朝霧ヤマノ',
+  zip:   '〒674-0068',
+  addr1: '兵庫県明石市',
+  addr2: '朝霧町3-15-15',
+  tel:   'TEL 078-918-0585',
+  regNo: 'T3140002005245'
+};
+
+const CAT = {
+  system:  { label: 'システム',       useRate: 'sys', tax: 10 },
+  general: { label: '一般',           useRate: 'gen', tax: 10 },
+  food:    { label: '食品（8%）',     useRate: 'sys', tax: 8  },
+  hanbai:  { label: '販促',   useRate: null,  tax: 10 },
+  manual:  { label: '業務品（手入力）',useRate: null,  tax: 10 }
+};
+
+let csvRows    = [];
+let dealerMap  = {};
+let productMap = {};
+let manualList = [];
+
+/* ---------- ストレージ ---------- */
+function save() {
+  localStorage.setItem('inv2_dealer',  JSON.stringify(dealerMap));
+  localStorage.setItem('inv2_product', JSON.stringify(productMap));
+}
+
+function load() {
+  try { dealerMap  = JSON.parse(localStorage.getItem('inv2_dealer')  || '{}'); } catch(e){}
+  try { productMap = JSON.parse(localStorage.getItem('inv2_product') || '{}'); } catch(e){}
+  renderDealerTable();
+  renderProductTable();
+}
+
+/* ---------- 繰越 ---------- */
+function calcCarryover() {
+  const prev = parseInt(document.getElementById('prev-amount').value) || 0;
+  const paid = parseInt(document.getElementById('paid-amount').value) || 0;
+  document.getElementById('carryover-disp').value = fmt(prev - paid) + ' 円';
+  return prev - paid;
+}
+
+/* ---------- CSV ---------- */
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); if(e.dataTransfer.files[0]) readCSV(e.dataTransfer.files[0]); });
+document.getElementById('file-input').addEventListener('change', e => { if(e.target.files[0]) readCSV(e.target.files[0]); });
+
+function readCSV(file) {
+  // cp932（Windows日本語）→ UTF-8 の順で試みる
+  // cp932はブラウザによってサポート外のためwindows-1252経由で読む
+  // Shift_JIS → cp932相当はブラウザでは'Shift_JIS'か'windows-31j'で対応
+  const tryEncodings = ['Shift_JIS', 'UTF-8'];
+  let encIdx = 0;
+
+  function tryNext() {
+    if (encIdx >= tryEncodings.length) {
+      // どれも文字化けする場合でも最後の結果で強行
+      showMsg('csv-msg', 'CSVを読み込みました（一部文字が正確でない場合があります）。', 'info');
+      return;
+    }
+    const enc = tryEncodings[encIdx++];
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result;
+      const garbled = (text.match(/\ufffd/g) || []).length;
+      if (garbled > 0 && encIdx < tryEncodings.length) {
+        tryNext();
+      } else {
+        parseCSV(text);
+      }
+    };
+    reader.readAsText(file, enc);
+  }
+  tryNext();
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) { showMsg('csv-msg','行数が少なすぎます','error'); return; }
+  const headers = splitLine(lines[0]).map(s => s.replace(/"/g,'').trim());
+  csvRows = lines.slice(1).map(l => {
+    const vals = splitLine(l);
+    const row = {};
+    headers.forEach((h2,i) => { row[h2] = (vals[i]||'').replace(/"/g,'').trim(); });
+    return row;
+  });
+
+  let added = 0;
+  csvRows.forEach(r => {
+    const pid = r.product_id;
+    const csvCat = r.item_category && CAT[r.item_category] ? r.item_category : null;
+    if (pid && !productMap[pid]) {
+      // 新規：CSVのitem_categoryがあればそれを使い、なければsystemをデフォルトに
+      productMap[pid] = { name: r.product_name||'', cat: csvCat || 'system' };
+      added++;
+    } else if (pid && csvCat) {
+      // 既存でもCSVにitem_categoryが書いてあれば上書き
+      productMap[pid].cat = csvCat;
+    }
+  });
+  save();
+  renderProductTable();
+
+  // セレクトで選ばれた代理店 or CSVのuser_idで照合
+  const selCode = document.getElementById('dealer-select').value;
+  const uid     = selCode || (csvRows[0] ? csvRows[0].user_id : '');
+  if (uid && dealerMap[uid]) {
+    applyDealerToForm(uid);
+    document.getElementById('dealer-select').value = uid;
+  }
+
+  renderCsvReview();
+  showMsg('csv-msg', `${csvRows.length}行読み込み完了。新規商品 ${added}件 追加。区分を確認してください。`, added>0?'info':'success');
+}
+
+function splitLine(line) {
+  const res = []; let cur='', inQ=false;
+  for (let i=0;i<line.length;i++) {
+    const c=line[i];
+    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(c===','&&!inQ){res.push(cur);cur='';}
+    else cur+=c;
+  }
+  res.push(cur);
+  return res;
+}
+
+/* ---------- 代理店テーブル ---------- */
+function renderDealerTable() {
+  const tbody = document.getElementById('dealer-tbody');
+  tbody.innerHTML = '';
+  renderDealerSelect();
+  Object.keys(dealerMap).forEach(code => {
+    const d = dealerMap[code];
+    const tr = document.createElement('tr');
+    tr.dataset.code = code;
+    tr.innerHTML = `
+      <td><input type="text" value="${h(code)}" style="width:80px;"
+        onchange="renameDealer('${code}',this)"></td>
+      <td><input type="text" value="${h(d.name)}" style="width:120px;"
+        onchange="dealerMap['${code}'].name=this.value;save();"></td>
+      <td><input type="text" value="${h(d.to||'')}" style="width:180px;"
+        onchange="dealerMap['${code}'].to=this.value;save();"></td>
+      <td><input type="text" value="${h(d.zip||'')}" style="width:90px;"
+        onchange="dealerMap['${code}'].zip=this.value;save();"></td>
+      <td><input type="text" value="${h(d.addr||'')}" style="width:200px;"
+        onchange="dealerMap['${code}'].addr=this.value;save();"></td>
+      <td><input type="number" value="${d.sysRate}" min="0" max="1" step="0.01" style="width:60px;"
+        onchange="dealerMap['${code}'].sysRate=parseFloat(this.value);save();"></td>
+      <td><input type="number" value="${d.genRate}" min="0" max="1" step="0.01" style="width:60px;"
+        onchange="dealerMap['${code}'].genRate=parseFloat(this.value);save();"></td>
+      <td><button class="btn-icon" onclick="deleteDealer('${code}')">×</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- 別代理店切替 ---------- */
+function resetForNewDealer() {
+  // CSVデータをクリア
+  csvRows = [];
+  manualList = [];
+
+  // 宛先欄をクリア
+  document.getElementById('inv-to').value   = '';
+  document.getElementById('inv-zip').value  = '';
+  document.getElementById('inv-addr').value = '';
+  document.getElementById('prev-amount').value = 0;
+  document.getElementById('paid-amount').value = 0;
+  calcCarryover();
+
+  // 代理店セレクトをリセット
+  document.getElementById('dealer-select').value = '';
+
+  // CSVプレビューを非表示
+  document.getElementById('csv-review-panel').style.display = 'none';
+
+  // プレビューを非表示
+  document.getElementById('preview-area').style.display = 'none';
+  document.getElementById('print-only').innerHTML = '';
+
+  // 業務品エリアをリセット
+  renderManualArea();
+
+  // メッセージクリア
+  showMsg('csv-msg', '', 'info');
+  showMsg('main-msg', '', 'info');
+
+  showMsg('csv-msg', '切替完了。代理店を選んでCSVを読み込んでください。', 'success');
+}
+
+/* ---------- 代理店セレクト ---------- */
+function renderDealerSelect() {
+  const sel = document.getElementById('dealer-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">── 代理店を選択 ──</option>';
+  Object.keys(dealerMap).forEach(code => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = `${dealerMap[code].name || code}（${code}）`;
+    if (code === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function onDealerSelect(code) {
+  if (!code) return;
+  applyDealerToForm(code);
+}
+
+function applyDealerToForm(code) {
+  const d = dealerMap[code];
+  if (!d) return;
+  // 空でも必ずセット（前の代理店の値をクリアする）
+  document.getElementById('inv-to').value   = d.to   || '';
+  document.getElementById('inv-zip').value  = d.zip  || '';
+  document.getElementById('inv-addr').value = d.addr || '';
+}
+
+/* ---------- CSVプレビュー ---------- */
+function renderCsvReview() {
+  const panel = document.getElementById('csv-review-panel');
+  const tbody = document.getElementById('csv-review-tbody');
+  if (!csvRows.length) { panel.style.display='none'; return; }
+
+  // 重複product_idをまとめて表示（1商品1行）
+  const seen = {};
+  csvRows.forEach(r => {
+    const pid = r.product_id;
+    if (!seen[pid]) seen[pid] = { pid, name: r.product_name, qty: 0, price: r.item_price };
+    seen[pid].qty += parseInt(r.item_quantity)||0;
+  });
+
+  tbody.innerHTML = '';
+  Object.values(seen).forEach(item => {
+    const p = productMap[item.pid] || { cat:'system' };
+    const catOpts = Object.keys(CAT).map(k =>
+      `<option value="${k}" ${p.cat===k?'selected':''}>${CAT[k].label}</option>`
+    ).join('');
+    const taxBadge = p.cat==='food'
+      ? '<span class="badge badge-8">8%</span>'
+      : '<span class="badge badge-10">10%</span>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="white-space:nowrap;">${h(item.pid)}</td>
+      <td>${h(item.name)}</td>
+      <td class="r" style="text-align:right;">${item.qty}</td>
+      <td class="r" style="text-align:right;">${fmt(parseFloat(item.price)||0)}</td>
+      <td>
+        <select style="width:130px;font-size:12px;" onchange="setCatFromReview('${item.pid}',this.value)">
+          ${catOpts}
+        </select>
+      </td>
+      <td id="tax-badge-${item.pid}" style="text-align:center;">${taxBadge}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  panel.style.display = 'block';
+}
+
+function setCatFromReview(pid, catVal) {
+  if (!productMap[pid]) productMap[pid] = { name:'', cat: catVal };
+  else productMap[pid].cat = catVal;
+  save();
+  // 税率バッジ更新
+  const badge = document.getElementById('tax-badge-'+pid);
+  if (badge) {
+    badge.innerHTML = catVal==='food'
+      ? '<span class="badge badge-8">8%</span>'
+      : '<span class="badge badge-10">10%</span>';
+  }
+  renderProductTable();
+}
+
+function addDealerRow() {
+  const c = 'CODE_'+Date.now();
+  dealerMap[c] = { name:'', sysRate:0.55, genRate:0.65 };
+  save(); renderDealerTable();
+}
+
+function deleteDealer(code) { delete dealerMap[code]; save(); renderDealerTable(); }
+
+function renameDealer(oldCode, input) {
+  const newCode = input.value.trim();
+  if (!newCode || newCode === oldCode) return;
+  dealerMap[newCode] = dealerMap[oldCode];
+  delete dealerMap[oldCode];
+  save(); renderDealerTable();
+}
+
+/* ---------- 商品テーブル ---------- */
+function renderProductTable() {
+  const tbody = document.getElementById('product-tbody');
+  tbody.innerHTML = '';
+  Object.keys(productMap).forEach(pid => {
+    const p = productMap[pid];
+    const opts = Object.keys(CAT).map(k =>
+      `<option value="${k}" ${p.cat===k?'selected':''}>${CAT[k].label}</option>`
+    ).join('');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${h(pid)}" style="width:90px;"
+        onchange="renameProduct('${pid}',this)"></td>
+      <td><input type="text" value="${h(p.name)}" style="width:210px;"
+        onchange="productMap['${pid}'].name=this.value;save();"></td>
+      <td><select style="width:160px;" onchange="productMap['${pid}'].cat=this.value;save();renderProductTable();">${opts}</select></td>
+      <td style="text-align:center;">
+        ${p.cat==='food'
+          ? '<span class="badge badge-8">8%</span>'
+          : p.cat==='hanbai'
+          ? '<span class="badge badge-hk">販促10%</span>'
+          : '<span class="badge badge-10">10%</span>'}
+      </td>
+      <td><button class="btn-icon" onclick="deleteProduct('${pid}')">×</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- マスタ エクスポート・インポート ---------- */
+function exportMaster() {
+  const data = {
+    version: '1.0',
+    exported: new Date().toISOString(),
+    dealer:  dealerMap,
+    product: productMap
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.href     = url;
+  a.download = `invoice_master_${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importMaster(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.dealer || !data.product) {
+        showMsg('main-msg', 'ファイル形式が正しくありません。', 'error');
+        return;
+      }
+      if (!confirm('現在のマスタデータを上書きします。よろしいですか？')) return;
+      dealerMap  = data.dealer;
+      productMap = data.product;
+      save();
+      renderDealerTable();
+      renderDealerSelect();
+      renderProductTable();
+      showMsg('main-msg', `マスタをインポートしました（代理店 ${Object.keys(dealerMap).length}件・商品 ${Object.keys(productMap).length}件）`, 'success');
+    } catch(err) {
+      showMsg('main-msg', 'JSONの読み込みに失敗しました: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+  input.value = ''; // 同じファイルを再選択できるようリセット
+}
+
+function resetProductMaster() {
+  if (!confirm('商品マスタをすべて削除します。\n次回CSV読み込み時に再登録されます。\nよろしいですか？')) return;
+  productMap = {};
+  save();
+  renderProductTable();
+  showMsg('main-msg', '商品マスタをリセットしました。CSVを読み込むと再登録されます。', 'success');
+}
+
+function addProductRow() {
+  const pid = 'PROD_'+Date.now();
+  productMap[pid] = { name:'', cat:'system' };
+  save(); renderProductTable();
+}
+
+function deleteProduct(pid) { delete productMap[pid]; save(); renderProductTable(); }
+
+function renameProduct(oldPid, input) {
+  const newPid = input.value.trim();
+  if (!newPid || newPid === oldPid) return;
+  productMap[newPid] = productMap[oldPid];
+  delete productMap[oldPid];
+  save(); renderProductTable();
+}
+
+/* ---------- 業務品 ---------- */
+function addManualRow() {
+  manualList.push({ id:Date.now(), name:'', qty:1, listPrice:0, rate:'', price:0, cat:'general', tax:10 });
+  renderManualArea();
+}
+
+function renderManualArea() {
+  const area = document.getElementById('manual-area');
+  area.innerHTML = '';
+  if (manualList.length === 0) {
+    area.innerHTML = '<p style="font-size:12px;color:#aaa;margin-bottom:6px;">なし</p>';
+    return;
+  }
+  manualList.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'manual-row';
+    const catOptsMl = [
+      ['system','システム'],['food','食品(8%)'],['general','一般'],
+      ['hanbai','販促'],['manual','業務品']
+    ].map(([v,l])=>`<option value="${v}" ${(item.cat||'general')===v?'selected':''}>${l}</option>`).join('');
+    // 下代 = 上代×掛率、掛率空欄なら直接入力
+    const calcPrice = (id) => {
+      const m = manualList.find(x=>x.id===id);
+      if (!m) return;
+      if (m.rate !== '' && m.rate > 0) {
+        m.price = Math.round(m.listPrice * m.rate);
+      }
+      // 下代inputを更新
+      const el = document.getElementById('manual-price-'+id);
+      if (el) el.value = m.price;
+    };
+    div.innerHTML = `
+      <input type="text" placeholder="品名" value="${h(item.name)}"
+        onchange="updM(${item.id},'name',this.value)">
+      <input type="number" value="${item.qty}" min="1"
+        onchange="updM(${item.id},'qty',+this.value)">
+      <input type="number" placeholder="上代" value="${item.listPrice||''}" min="0"
+        onchange="updM(${item.id},'listPrice',+this.value); calcManualPrice(${item.id})">
+      <input type="number" placeholder="例: 0.65" value="${item.rate||''}" min="0" max="1" step="0.01"
+        onchange="updM(${item.id},'rate',this.value===''?'':+this.value); calcManualPrice(${item.id})">
+      <input type="number" id="manual-price-${item.id}" placeholder="下代（税抜）" value="${item.price||''}" min="0"
+        onchange="updM(${item.id},'price',+this.value)">
+      <select onchange="updM(${item.id},'cat',this.value)">${catOptsMl}</select>
+      <select onchange="updM(${item.id},'tax',+this.value)">
+        <option value="8" ${item.tax===8?'selected':''}>8%</option>
+        <option value="10" ${item.tax===10?'selected':''}>10%</option>
+      </select>
+      <button class="btn-icon" onclick="delM(${item.id})">×</button>
+    `;
+    area.appendChild(div);
+  });
+}
+
+function updM(id,f,v) { const m=manualList.find(x=>x.id===id); if(m) m[f]=v; }
+function calcManualPrice(id) {
+  const m = manualList.find(x=>x.id===id);
+  if (!m) return;
+  if (m.rate !== '' && m.rate > 0 && m.listPrice > 0) {
+    m.price = Math.round(m.listPrice * m.rate);
+    const el = document.getElementById('manual-price-'+id);
+    if (el) el.value = m.price;
+  }
+}
+function delM(id) { manualList=manualList.filter(x=>x.id!==id); renderManualArea(); }
+
+/* ---------- 生成 ---------- */
+function generate() {
+  const invMonth    = document.getElementById('inv-month').value.trim();
+  const invDate     = document.getElementById('inv-date').value.trim();
+  const invDeadline = document.getElementById('inv-deadline').value.trim();
+  const invTo       = document.getElementById('inv-to').value.trim();
+  const invZip      = document.getElementById('inv-zip').value.trim();
+  const invAddr     = document.getElementById('inv-addr').value.trim();
+  const prevAmt     = parseInt(document.getElementById('prev-amount').value)||0;
+  const paidAmt     = parseInt(document.getElementById('paid-amount').value)||0;
+  const carryover   = prevAmt - paidAmt;
+
+  if (csvRows.length===0 && manualList.filter(m=>m.name).length===0) {
+    showMsg('main-msg','CSVを読み込むか業務品を入力してください。','error'); return;
+  }
+
+  // 掛率特定
+  let sysRate=null, genRate=null, dealerWarning='';
+  const uid = csvRows[0] ? csvRows[0].user_id : '';
+  if (uid && dealerMap[uid]) {
+    sysRate = parseFloat(dealerMap[uid].sysRate);
+    genRate = parseFloat(dealerMap[uid].genRate);
+  } else {
+    const keys = Object.keys(dealerMap);
+    if (keys.length > 0) {
+      sysRate = parseFloat(dealerMap[keys[0]].sysRate);
+      genRate = parseFloat(dealerMap[keys[0]].genRate);
+      dealerWarning = `代理店コード「${uid}」が見つからないため「${dealerMap[keys[0]].name||keys[0]}」の掛率（システム${(sysRate*100).toFixed(0)}% / 一般${(genRate*100).toFixed(0)}%）を使用しています。`;
+    } else {
+      showMsg('main-msg','代理店マスタが空です。掛率を設定してください。','error'); return;
+    }
+  }
+
+  const lines = [];
+
+  csvRows.forEach(r => {
+    const pid = r.product_id;
+    const p   = productMap[pid];
+    if (!p || p.cat==='manual') return;
+
+    const listPrice = parseFloat(r.item_price)||0;
+    const qty       = parseInt(r.item_quantity)||0;
+    const catInfo   = CAT[p.cat];
+
+    let rate;
+    if      (p.cat==='system')  rate = sysRate;
+    else if (p.cat==='food')    rate = sysRate;
+    else if (p.cat==='general') rate = genRate;
+    else    rate = 1.0; // hanbai
+
+    const unitEx  = Math.round(listPrice * rate);
+    const totalEx = unitEx * qty;
+    const taxRate = catInfo.tax;
+    const totalIn = Math.round(totalEx * (1 + taxRate/100));
+
+    lines.push({
+      date:     (r.order_date||'').split(' ')[0],
+      code:     pid,
+      name:     p.name || r.product_name,
+      cat:      p.cat,
+      catLabel: catInfo.label,
+      tax:      taxRate,
+      qty, listPrice, rate, unitEx, totalEx, totalIn,
+      hanbai:   p.cat==='hanbai'
+    });
+  });
+
+  manualList.forEach(item => {
+    if (!item.name) return;
+    const mCat = item.cat || 'manual';
+    const mTax = mCat === 'food' ? 8 : item.tax;
+    // 掛率あれば上代×掛率、なければ直接入力の下代を使う
+    const unitEx = (item.rate !== '' && item.rate > 0 && item.listPrice > 0)
+      ? Math.round(item.listPrice * item.rate)
+      : (item.price || 0);
+    const lp = item.listPrice || unitEx;
+    const totalEx = unitEx * item.qty;
+    const totalIn = Math.round(totalEx * (1 + mTax/100));
+    const catInfo = CAT[mCat] || CAT['manual'];
+    lines.push({
+      date:'', code:'', name:item.name, cat:mCat, catLabel:catInfo.label,
+      tax:mTax, qty:item.qty, listPrice:lp, rate: item.rate||1,
+      unitEx, totalEx, totalIn, hanbai: mCat==='hanbai'
+    });
+  });
+
+  if (lines.length===0) {
+    showMsg('main-msg','明細行がゼロです。商品マスタの区分を確認してください。','error'); return;
+  }
+
+  // 区分別小計（上代＝listPrice×qty、下代＝totalEx）
+  const catSum = (cat) => ({
+    list: lines.filter(l=>l.cat===cat).reduce((a,l)=>a+(l.listPrice*l.qty),0),
+    ex:   lines.filter(l=>l.cat===cat).reduce((a,l)=>a+l.totalEx,0),
+    tax:  lines.filter(l=>l.cat===cat).reduce((a,l)=>a+(l.totalIn-l.totalEx),0),
+  });
+  const cs = catSum('system'), cg = catSum('general'),
+        cf = catSum('food'),   ch = catSum('hanbai'), cm = catSum('manual');
+  const sumSysEx  = cs.ex,  sumSysTax  = cs.tax,  sumSysList  = cs.list;
+  const sumGenEx  = cg.ex,  sumGenTax  = cg.tax,  sumGenList  = cg.list;
+  const sumFoodEx = cf.ex,  sumFoodTax = cf.tax,  sumFoodList = cf.list;
+  const sumHanEx  = ch.ex,  sumHanTax  = ch.tax,  sumHanList  = ch.list;
+  const sumManEx  = cm.ex,  sumManTax  = cm.tax,  sumManList  = cm.list;
+  const totalList = sumSysList + sumGenList + sumFoodList + sumHanList + sumManList;
+
+  // 税率別小計（インボイス用）
+  const sum8Ex   = lines.filter(l=>l.tax===8).reduce((a,l)=>a+l.totalEx,0);
+  const sum8Tax  = lines.filter(l=>l.tax===8).reduce((a,l)=>a+(l.totalIn-l.totalEx),0);
+  const sum10Ex  = lines.filter(l=>l.tax===10).reduce((a,l)=>a+l.totalEx,0);
+  const sum10Tax = lines.filter(l=>l.tax===10).reduce((a,l)=>a+(l.totalIn-l.totalEx),0);
+  const totalEx  = sum8Ex + sum10Ex;
+  const totalTax = sum8Tax + sum10Tax;
+  const totalIn  = totalEx + totalTax;
+  const grand    = totalIn + carryover;
+
+  const ctx = {
+    invMonth, invDate, invDeadline, invTo, invZip, invAddr,
+    prevAmt, paidAmt, carryover, grand,
+    sumSysEx, sumSysTax, sumSysList,
+    sumGenEx, sumGenTax, sumGenList,
+    sumFoodEx, sumFoodTax, sumFoodList,
+    sumHanEx, sumHanTax, sumHanList,
+    sumManEx, sumManTax, sumManList, totalList,
+    sum8Ex, sum8Tax, sum10Ex, sum10Tax,
+    totalEx, totalTax, totalIn, lines, sysRate, genRate
+  };
+
+  const invHTML    = buildInvoice(ctx);
+  const detailHTML = buildDetail(ctx);
+
+  document.getElementById('tab-invoice').innerHTML = invHTML;
+  document.getElementById('tab-detail').innerHTML  = detailHTML;
+  document.getElementById('print-only').innerHTML  =
+    invHTML + '<div style="page-break-before:always;break-before:page;"></div>' + detailHTML;
+
+  document.getElementById('preview-area').style.display = 'block';
+  document.getElementById('preview-area').scrollIntoView({ behavior:'smooth' });
+
+  if (dealerWarning) showMsg('main-msg', '⚠ ' + dealerWarning, 'info');
+  else showMsg('main-msg','','info');
+}
+
+/* ---------- 御請求書HTML ---------- */
+function buildInvoice(c) {
+  return `
+<div class="invoice-page">
+  <div class="inv-h1">御　請　求　書</div>
+  <div class="inv-header">
+    <div class="inv-to">
+      <div class="to-addr">${h(c.invZip)}<br>${h(c.invAddr)}</div>
+      <div class="to-name">${h(c.invTo)}</div>
+      <div style="font-size:8.5pt;margin-top:3pt;">下記の通り御請求申し上げます。</div>
+    </div>
+    <div class="inv-from">
+      <div class="shop-name">${h(SHOP.name)}</div>
+      <div>登録番号：${h(SHOP.regNo)}</div>
+      <div>${h(SHOP.zip)} ${h(SHOP.addr1)} ${h(SHOP.addr2)}</div>
+      <div>${h(SHOP.tel)}</div>
+    </div>
+  </div>
+  <div class="inv-period">${h(c.invMonth)}　${h(c.invDate)}${c.invDeadline?'　'+h(c.invDeadline):''}</div>
+  <div class="inv-summary">
+    <div class="inv-summary-cell"><span class="sc-lbl">前月御請求額</span><span class="sc-val">${fmt(c.prevAmt)}</span></div>
+    <div class="inv-summary-cell"><span class="sc-lbl">当月御入金額</span><span class="sc-val">${fmt(c.paidAmt)}</span></div>
+    <div class="inv-summary-cell"><span class="sc-lbl">繰　越　額</span><span class="sc-val">${fmt(c.carryover)}</span></div>
+  </div>
+  <table class="inv-tax-table">
+    <tr><th>区分</th><th>税率</th><th>上代（定価）</th><th>下代（掛率後）</th><th>消費税</th><th>税込金額</th></tr>
+    ${c.sumSysEx>0?`<tr><td>システム</td><td class="r">10%</td><td class="r">${fmt(c.sumSysList)}</td><td class="r">${fmt(c.sumSysEx)}</td><td class="r">${fmt(c.sumSysTax)}</td><td class="r">${fmt(c.sumSysEx+c.sumSysTax)}</td></tr>`:''}
+    ${c.sumFoodEx>0?`<tr><td>食品</td><td class="r">8%</td><td class="r">${fmt(c.sumFoodList)}</td><td class="r">${fmt(c.sumFoodEx)}</td><td class="r">${fmt(c.sumFoodTax)}</td><td class="r">${fmt(c.sumFoodEx+c.sumFoodTax)}</td></tr>`:''}
+    ${c.sumGenEx>0?`<tr><td>一般</td><td class="r">10%</td><td class="r">${fmt(c.sumGenList)}</td><td class="r">${fmt(c.sumGenEx)}</td><td class="r">${fmt(c.sumGenTax)}</td><td class="r">${fmt(c.sumGenEx+c.sumGenTax)}</td></tr>`:''}
+    ${c.sumHanEx>0?`<tr><td>販促</td><td class="r">10%</td><td class="r">${fmt(c.sumHanList)}</td><td class="r">${fmt(c.sumHanEx)}</td><td class="r">${fmt(c.sumHanTax)}</td><td class="r">${fmt(c.sumHanEx+c.sumHanTax)}</td></tr>`:''}
+    ${c.sumManEx>0?`<tr><td>業務品</td><td class="r">-</td><td class="r">-</td><td class="r">${fmt(c.sumManEx)}</td><td class="r">${fmt(c.sumManTax)}</td><td class="r">${fmt(c.sumManEx+c.sumManTax)}</td></tr>`:''}
+    ${c.sum8Ex>0?`<tr style="background:#edf5ef;"><td colspan="2"><b>8%対象 小計</b></td><td class="r">${fmt(c.sumFoodList)}</td><td class="r">${fmt(c.sum8Ex)}</td><td class="r">${fmt(c.sum8Tax)}</td><td class="r">${fmt(c.sum8Ex+c.sum8Tax)}</td></tr>`:''}
+    ${c.sum10Ex>0?`<tr style="background:#f5f0e5;"><td colspan="2"><b>10%対象 小計</b></td><td class="r">${fmt(c.sumSysList+c.sumGenList+c.sumHanList+c.sumManList)}</td><td class="r">${fmt(c.sum10Ex)}</td><td class="r">${fmt(c.sum10Tax)}</td><td class="r">${fmt(c.sum10Ex+c.sum10Tax)}</td></tr>`:''}
+    <tr style="background:#f0ebe0;font-weight:bold;">
+      <td>当月御買上額</td><td class="r">-</td>
+      <td class="r">${fmt(c.totalList)}</td>
+      <td class="r">${fmt(c.totalEx)}</td>
+      <td class="r">${fmt(c.totalTax)}</td>
+      <td class="r">${fmt(c.totalIn)}</td>
+    </tr>
+    <tr style="background:#f5edd8;font-weight:bold;font-size:10pt;">
+      <td colspan="5" style="text-align:right;letter-spacing:0.1em;">当月御請求金額（繰越 ${fmt(c.carryover)} 円含む）</td>
+      <td class="r" style="font-size:11pt;">¥ ${fmt(c.grand)}</td>
+    </tr>
+  </table>
+  <div class="inv-footer">
+    お振込先：三井住友銀行 明石支店 普通 No.4810132　名義：有限会社まゆ企画<br>
+    ※振り込み手数料は、ご負担いただきますようよろしくお願いいたします。<br>
+    適格請求書発行事業者　登録番号：${h(SHOP.regNo)}
+  </div>
+</div>`;
+}
+
+/* ---------- 請求明細書HTML ---------- */
+function buildDetail(c) {
+  // 日付順ソート（空日付は末尾）
+  const sorted = [...c.lines].sort((a, b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return a.date.localeCompare(b.date);
+  });
+
+  const rows = sorted.map(item => `
+    <tr>
+      <td class="c">${h(item.date)}</td>
+      <td class="c">${h(item.code)}</td>
+      <td>${h(item.name)}</td>
+      <td class="c"><span class="tax-mk ${item.tax===8?'t8':'t10'}">${item.tax}%</span></td>
+      <td class="c">${item.hanbai?'<span style="font-size:7pt;color:#666;">販促</span>':''}</td>
+      <td class="r">${item.qty}</td>
+      <td class="r">${fmt(item.unitEx)}</td>
+      <td class="r">${fmt(item.totalEx)}</td>
+    </tr>`).join('');
+
+  return `
+<div class="invoice-page">
+  <div class="inv-h1" style="font-size:14pt;">請　求　明　細　書</div>
+  <div class="inv-header" style="margin-bottom:8pt;">
+    <div class="inv-to">
+      <div class="to-name" style="font-size:10pt;">${h(c.invTo)}</div>
+      <div style="font-size:8pt;margin-top:2pt;">${h(c.invMonth)}　（${h(c.invDate)} 発行）</div>
+    </div>
+    <div class="inv-from">
+      <div class="shop-name">${h(SHOP.name)}</div>
+      <div>${h(SHOP.zip)} ${h(SHOP.addr1)} ${h(SHOP.addr2)}</div>
+      <div>${h(SHOP.tel)}</div>
+    </div>
+  </div>
+  <table class="detail-table">
+    <thead>
+      <tr>
+        <th style="width:9%;">注文日</th>
+        <th style="width:8%;">商品コード</th>
+        <th style="width:37%;">商品名</th>
+        <th style="width:6%;">税率</th>
+        <th style="width:5%;">備考</th>
+        <th style="width:6%;">数量</th>
+        <th style="width:14%;">単価（税抜下代）</th>
+        <th style="width:15%;">金額（税抜）</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="inv-footer">
+    適格請求書発行事業者　登録番号：${h(SHOP.regNo)}<br>
+    ※ 本明細は御請求書の内訳です。お支払いは御請求書の金額をご確認ください。
+  </div>
+</div>`;
+}
+
+/* ---------- タブ ---------- */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[onclick="switchTab('${name}')"]`).classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+/* ---------- 印刷 ---------- */
+window.addEventListener('beforeprint', () => { document.getElementById('print-only').style.display='block'; });
+window.addEventListener('afterprint',  () => { document.getElementById('print-only').style.display='none'; });
+
+/* ---------- utils ---------- */
+function fmt(n) { return Number(n).toLocaleString('ja-JP'); }
+function h(s)   { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showMsg(id,text,type) {
+  const el = document.getElementById(id);
+  if(!text){el.innerHTML='';return;}
+  el.innerHTML = `<div class="msg msg-${type}">${h(text)}</div>`;
+}
+
+/* ---------- 初期化 ---------- */
+// 代理店マスタの初期データ（既存データとマージ）
+(function() {
+  let existing = {};
+  try { existing = JSON.parse(localStorage.getItem('inv2_dealer') || '{}'); } catch(e){}
+  const defaults = {
+    '47881': { name: '稲岡ゆかり（岩田様方）稲岡ゆかり', sysRate: 0.55, genRate: 0.65,
+               to: '西舞子ゆかり　稲岡ゆかり 様（47881）', zip: '〒655-0048', addr: '兵庫県神戸市垂水区西舞子3-4-24' },
+    '44628': { name: '森本すずみ', sysRate: 0.55, genRate: 0.65,
+               to: '三木すず　森本すずみ 様（44628）', zip: '〒673-0402', addr: '兵庫県三木市加佐320-1 育英ハイツD棟102号' },
+    '46481': { name: 'マキ朝霧　土野麻希子', sysRate: 0.55, genRate: 0.65,
+               to: 'マキ朝霧　土野麻希子様（46481）', zip: '〒655-0006', addr: '兵庫県神戸市垂水区本多聞1丁目22-38-102' }
+  };
+  // マージ：既存データを優先しつつ、to/zip/addrが空なら defaults の値で補完
+  const merged = Object.assign({}, defaults);
+  Object.keys(existing).forEach(code => {
+    if (!merged[code]) {
+      merged[code] = existing[code];
+    } else {
+      // 掛率など既存設定は保持、to/zip/addrは空なら defaults で補完
+      merged[code] = Object.assign({}, merged[code], {
+        sysRate: existing[code].sysRate !== undefined ? existing[code].sysRate : merged[code].sysRate,
+        genRate: existing[code].genRate !== undefined ? existing[code].genRate : merged[code].genRate,
+        name:    existing[code].name  || merged[code].name,
+        to:      existing[code].to    || merged[code].to,
+        zip:     existing[code].zip   || merged[code].zip,
+        addr:    existing[code].addr  || merged[code].addr,
+      });
+    }
+  });
+  localStorage.setItem('inv2_dealer', JSON.stringify(merged));
+})();
+load();
+renderDealerSelect();
+renderManualArea();
+(function(){
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth()+1;
+  document.getElementById('inv-month').value    = `${y}年${m}月分`;
+  document.getElementById('inv-date').value     = `${y}年${m}月20日`;
+  document.getElementById('inv-deadline').value = `${y}年${m}月20日 締切り`;
+  calcCarryover();
+})();
+</script>
+</body>
+</html>

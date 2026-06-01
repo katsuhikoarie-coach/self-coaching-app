@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>朝霧ヤマノ FC受注システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --amber:     #d97706;
+  --amber-dk:  #b45309;
+  --amber-lt:  #fef3c7;
+  --amber-bg:  #fffbeb;
+  --stone-50:  #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-200: #e7e5e4;
+  --stone-400: #a8a29e;
+  --stone-500: #78716c;
+  --stone-700: #44403c;
+  --stone-800: #292524;
+  --green:     #16a34a;
+  --red:       #dc2626;
+  --radius:    14px;
+  --shadow:    0 2px 12px rgba(0,0,0,0.09);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--stone-50);
+  color: var(--stone-800);
+  font-size: 15px;
+  overflow-x: hidden;
+}
+
+/* ── スクリーン切り替え ─────────────────────────── */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── 共通ヘッダー ────────────────────────────────── */
+.hdr {
+  background: #fff;
+  border-bottom: 1px solid var(--stone-200);
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 14px; height: 54px;
+  position: sticky; top: 0; z-index: 50;
+  flex-shrink: 0;
+}
+.hdr-title { font-size: 16px; font-weight: 600; flex: 1; }
+.hdr-back {
+  background: none; border: none; cursor: pointer;
+  color: var(--stone-500); padding: 6px; display: flex; align-items: center;
+}
+.hdr-back:active { opacity: .6; }
+
+/* ── ボタン ──────────────────────────────────────── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 14px;
+  border: none; border-radius: var(--radius);
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.btn:active { opacity: .8; transform: scale(.98); }
+.btn-amber  { background: var(--amber); color: #fff; }
+.btn-amber:hover { background: var(--amber-dk); }
+.btn-outline { background: #fff; color: var(--stone-700); border: 1.5px solid var(--stone-200); }
+.btn-ghost   { background: none; border: none; color: var(--stone-500); font-size: 14px; }
+.btn-sm      { padding: 8px 14px; font-size: 13px; width: auto; border-radius: 10px; }
+
+/* ── カード ──────────────────────────────────────── */
+.card {
+  background: #fff; border: 1px solid var(--stone-200);
+  border-radius: var(--radius); padding: 16px;
+}
+
+/* ── ページコンテンツ ─────────────────────────────── */
+.page { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.page-pb { padding-bottom: 80px; }
+
+/* ── ローディング ────────────────────────────────── */
+#screen-loading {
+  background: var(--stone-50); display: flex;
+  align-items: center; justify-content: center;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--stone-200);
+  border-top-color: var(--amber);
+  border-radius: 50%; animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════
+   ログイン画面
+   ════════════════════════════════════════ */
+#screen-login {
+  background: var(--stone-50);
+  align-items: center; justify-content: center;
+}
+.login-box {
+  width: 100%; max-width: 360px;
+  padding: 24px 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.login-logo {
+  text-align: center; margin-bottom: 8px;
+}
+.login-logo .mark {
+  width: 64px; height: 64px; margin: 0 auto 10px;
+  background: var(--amber-bg); border: 1.5px solid #fde68a;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+.login-logo h1 { font-size: 22px; font-weight: 700; letter-spacing: .08em; }
+.login-logo p  { font-size: 13px; color: var(--amber); font-weight: 500; margin-top: 2px; letter-spacing: .06em; }
+.login-card { background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius); overflow: hidden; }
+.login-card-inner { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 13px;
+  background: #fff; border: 1.5px solid var(--stone-200); border-radius: 12px;
+  font-size: 15px; font-weight: 500; color: var(--stone-700);
+  cursor: pointer; transition: background .12s;
+}
+.btn-google:hover { background: var(--stone-100); }
+.btn-google:active { transform: scale(.98); }
+.divider { display: flex; align-items: center; gap: 10px; }
+.divider hr { flex: 1; border: none; border-top: 1px solid var(--stone-200); }
+.divider span { font-size: 12px; color: var(--stone-400); }
+#login-error { color: var(--red); font-size: 13px; text-align: center; display: none; padding: 8px; }
+
+/* ════════════════════════════════════════
+   ホーム画面
+   ════════════════════════════════════════ */
+.welcome-card {
+  background: linear-gradient(135deg, var(--amber-bg), var(--amber-lt));
+  border: 1.5px solid #fde68a; border-radius: var(--radius); padding: 16px;
+}
+.welcome-card .sub { font-size: 12px; color: var(--amber-dk); }
+.welcome-card h2   { font-size: 20px; font-weight: 700; margin: 2px 0; }
+.welcome-card .fc  { font-size: 13px; color: var(--stone-600, #57534e); }
+.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.action-card {
+  background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius);
+  padding: 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer; transition: border-color .15s, box-shadow .15s;
+}
+.action-card:hover { border-color: var(--amber); box-shadow: var(--shadow); }
+.action-card:active { background: var(--stone-100); }
+.action-card .icon { font-size: 28px; }
+.action-card span  { font-size: 13px; font-weight: 600; }
+.section-title { font-size: 12px; font-weight: 700; color: var(--stone-400); letter-spacing: .08em; }
+.order-row {
+  background: #fff; border: 1px solid var(--stone-200); border-radius: 12px;
+  padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;
+}
+.order-row .meta  { font-size: 12px; color: var(--stone-400); }
+.order-row .items { font-size: 12px; color: var(--stone-500); margin-top: 2px; }
+.order-row .total { font-weight: 700; color: var(--amber-dk); }
+.order-row .total-sub { font-size: 11px; color: var(--stone-400); margin-top: 1px; text-align: right; }
+.empty-state { text-align: center; padding: 28px 0; color: var(--stone-400); font-size: 14px; }
+
+/* ════════════════════════════════════════
+   商品検索画面
+   ════════════════════════════════════════ */
+.search-bar {
+  position: relative;
+}
+.search-bar input {
+  width: 100%; padding: 10px 14px 10px 38px;
+  border: 1.5px solid var(--stone-200); border-radius: 12px;
+  font-size: 14px; font-family: inherit; background: var(--stone-100);
+  outline: none; transition: border-color .15s, background .15s;
+}
+.search-bar input:focus { border-color: var(--amber); background: #fff; }
+.search-bar .icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--stone-400); }
+.category-filter {
+  display: flex; gap: 7px; overflow-x: auto; padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.category-filter::-webkit-scrollbar { display: none; }
+.cat-btn {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+  border: 1.5px solid var(--stone-200); background: #fff;
+  font-size: 13px; font-family: inherit; cursor: pointer; transition: all .12s;
+  white-space: nowrap;
+}
+.cat-btn.active { background: var(--amber); border-color: var(--amber); color: #fff; font-weight: 600; }
+.cat-btn:hover:not(.active) { border-color: var(--amber); }
+.product-count { font-size: 12px; color: var(--stone-400); }
+.product-list { display: flex; flex-direction: column; gap: 8px; }
+.product-row {
+  background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius);
+  padding: 12px; display: flex; align-items: center; gap: 10px;
+}
+.product-info { flex: 1; min-width: 0; }
+.product-code { font-size: 11px; color: var(--stone-400); font-family: monospace; }
+.product-name { font-size: 14px; font-weight: 500; line-height: 1.4; margin: 2px 0; }
+.product-vol  { font-size: 11px; color: var(--stone-400); }
+.product-price { font-size: 15px; font-weight: 700; color: var(--amber-dk); }
+.product-price .tax { font-size: 11px; font-weight: 400; color: var(--stone-400); }
+.in-cart { font-size: 11px; color: var(--amber); margin-top: 2px; }
+.product-ctrl { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.qty-ctrl { display: flex; align-items: center; gap: 4px; }
+.qty-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: var(--stone-100); color: var(--stone-700);
+  font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .12s;
+}
+.qty-btn:active { background: var(--stone-200); }
+.qty-val { width: 28px; text-align: center; font-size: 14px; font-weight: 600; }
+.add-btn {
+  padding: 7px 12px; border-radius: 10px; border: none;
+  font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer;
+  transition: all .15s;
+}
+.add-btn-normal { background: var(--amber); color: #fff; }
+.add-btn-normal:active { background: var(--amber-dk); }
+.add-btn-done   { background: var(--green); color: #fff; }
+.no-results { text-align: center; padding: 40px 0; color: var(--stone-400); }
+
+/* ════════════════════════════════════════
+   カート・確認・完了共通
+   ════════════════════════════════════════ */
+.cart-item {
+  background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius); padding: 12px;
+}
+.cart-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.cart-item-name { font-size: 14px; font-weight: 500; flex: 1; }
+.del-btn {
+  background: none; border: none; color: var(--stone-300); cursor: pointer; padding: 2px;
+  transition: color .12s;
+}
+.del-btn:hover { color: var(--red); }
+.cart-item-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.cart-qty-ctrl { display: flex; align-items: center; gap: 6px; }
+.cart-qty-input {
+  width: 52px; text-align: center; border: 1px solid var(--stone-200); border-radius: 8px;
+  padding: 5px; font-size: 14px; font-weight: 600; font-family: inherit; outline: none;
+}
+.cart-qty-input:focus { border-color: var(--amber); }
+.line-total { font-weight: 700; color: var(--amber-dk); }
+.line-total .note { font-size: 11px; font-weight: 400; color: var(--stone-400); }
+.totals-card { background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius); padding: 14px; }
+.total-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--stone-600, #57534e); padding: 4px 0; }
+.total-row.grand { font-size: 17px; font-weight: 700; color: var(--stone-800); border-top: 1px solid var(--stone-200); margin-top: 6px; padding-top: 10px; }
+.total-row.grand span:last-child { color: var(--amber-dk); }
+.add-more-link { text-align: center; padding: 6px 0; }
+.add-more-link a { color: var(--amber); font-size: 14px; font-weight: 500; cursor: pointer; }
+
+/* 備考・チェック */
+.note-area {
+  width: 100%; border: 1.5px solid var(--stone-200); border-radius: 12px;
+  padding: 10px 12px; font-size: 14px; font-family: inherit;
+  resize: none; outline: none; transition: border-color .15s;
+}
+.note-area:focus { border-color: var(--amber); }
+.agree-label {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius);
+  padding: 14px; cursor: pointer;
+}
+.agree-label input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--amber); flex-shrink: 0; }
+
+/* 確認画面 */
+.info-rows { display: flex; flex-direction: column; gap: 8px; }
+.info-row  { display: flex; gap: 10px; }
+.info-lbl  { font-size: 12px; color: var(--stone-400); width: 56px; flex-shrink: 0; padding-top: 1px; }
+.info-val  { font-size: 14px; color: var(--stone-700); flex: 1; }
+.items-table { background: #fff; border: 1px solid var(--stone-200); border-radius: var(--radius); overflow: hidden; }
+.items-table-hdr { background: var(--stone-100); padding: 10px 14px; font-size: 12px; font-weight: 700; color: var(--stone-500); }
+.items-table-row { padding: 10px 14px; border-top: 1px solid var(--stone-100); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.items-table-row .item-info { flex: 1; min-width: 0; }
+.items-table-row .item-code { font-size: 11px; color: var(--stone-400); font-family: monospace; }
+.items-table-row .item-name { font-size: 13px; line-height: 1.4; margin-top: 1px; }
+.items-table-row .item-right { text-align: right; flex-shrink: 0; }
+.items-table-row .item-qty  { font-size: 11px; color: var(--stone-400); }
+.items-table-row .item-amt  { font-size: 13px; font-weight: 600; }
+.items-table-footer { background: var(--stone-100); padding: 10px 14px; font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; border-top: 1.5px solid var(--stone-200); }
+.items-table-footer span:last-child { color: var(--amber-dk); }
+
+/* 完了画面 */
+.complete-wrap { padding: 32px 16px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.complete-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: #dcfce7; border: 2px solid #86efac;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: var(--green);
+}
+.complete-title { text-align: center; }
+.complete-title h1 { font-size: 22px; font-weight: 700; }
+.complete-title p  { font-size: 13px; color: var(--stone-500); margin-top: 4px; }
+.order-number-card {
+  background: #fff; border: 2px solid #fde68a; border-radius: var(--radius);
+  padding: 20px; text-align: center; width: 100%; box-shadow: var(--shadow);
+}
+.order-number-card .label { font-size: 12px; font-weight: 700; color: var(--amber-dk); letter-spacing: .1em; }
+.order-number-card .number { font-size: 28px; font-weight: 700; font-family: monospace; letter-spacing: .08em; margin: 6px 0; }
+.order-number-card .date   { font-size: 12px; color: var(--stone-400); }
+.order-number-card .amount { font-size: 18px; font-weight: 700; color: var(--amber-dk); margin-top: 8px; }
+.complete-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+/* ── 固定フッター ────────────────────────────────── */
+.sticky-footer {
+  position: sticky; bottom: 0; background: #fff;
+  border-top: 1px solid var(--stone-200); padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
+  z-index: 30;
+}
+.footer-summary { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.footer-summary .total { font-weight: 700; color: var(--stone-700); }
+.footer-row { display: flex; gap: 8px; }
+.footer-row .btn { flex: 1; }
+
+/* カートバッジ */
+.cart-badge-wrap { position: relative; }
+.cart-badge {
+  position: absolute; top: -5px; right: -6px;
+  background: var(--amber); color: #fff;
+  font-size: 10px; font-weight: 700;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.cart-icon-btn {
+  background: none; border: none; cursor: pointer; padding: 6px;
+  display: flex; align-items: center; color: var(--stone-500);
+}
+
+/* トースト */
+#toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--stone-800); color: #fff;
+  padding: 10px 20px; border-radius: 20px; font-size: 13px;
+  opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 999;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ── ローディング ──────────────────────────── -->
+<!-- asagiri_salesと同じく display:none で開始、必要なときだけ表示 -->
+<div id="screen-loading" class="screen" style="display:none;">
+  <div class="spinner"></div>
+</div>
+
+<!-- ── ログイン ──────────────────────────────── -->
+<!-- asagiri_salesと同じく最初から display:flex で表示 -->
+<div id="screen-login" class="screen" style="display:flex;">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="mark">🌿</div>
+      <h1>朝霧ヤマノ</h1>
+      <p>FC 受注システム</p>
+    </div>
+    <div class="login-card">
+      <div class="login-card-inner">
+        <button id="login-btn" class="btn-google" onclick="doLogin()">
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Googleでログイン
+        </button>
+        <p id="login-error"></p>
+      </div>
+      <div style="padding: 10px 20px 16px; background: var(--stone-100); font-size: 12px; color: var(--stone-400); text-align: center;">
+        ※ GmailアドレスでFCご担当者がログインできます
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ホーム ─────────────────────────────────── -->
+<div id="screen-home" class="screen">
+  <div class="hdr">
+    <span style="font-size:18px;">🌿</span>
+    <span class="hdr-title" style="font-size:14px; letter-spacing:.05em;">朝霧ヤマノ FC受注</span>
+    <button class="btn-ghost btn-sm" onclick="doSignOut()">ログアウト</button>
+  </div>
+  <div class="page">
+    <div class="welcome-card">
+      <div class="sub">ようこそ</div>
+      <h2 id="home-contact"></h2>
+      <div class="fc" id="home-fcname"></div>
+    </div>
+    <div class="actions-grid">
+      <div class="action-card" onclick="showProducts()">
+        <div class="icon">📦</div>
+        <span>新規注文</span>
+      </div>
+      <div class="action-card" onclick="showOrderHistory()">
+        <div class="icon">📋</div>
+        <span>注文履歴</span>
+      </div>
+    </div>
+    <div class="section-title">最近の注文</div>
+    <div id="home-orders">
+      <div class="empty-state">読み込み中…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 商品選択 ──────────────────────────────── -->
+<div id="screen-products" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="showScreen('home')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="hdr-title">商品を選ぶ</span>
+    <div class="cart-badge-wrap">
+      <button class="cart-icon-btn" onclick="showCart()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      </button>
+      <div class="cart-badge" id="cart-badge" style="display:none;">0</div>
+    </div>
+  </div>
+  <!-- 検索・フィルター（ページ内固定） -->
+  <div style="padding: 10px 14px 0; background: var(--stone-50); flex-shrink: 0;">
+    <div class="search-bar" style="margin-bottom: 8px;">
+      <span class="icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </span>
+      <input type="search" id="search-input" placeholder="商品名・コードで検索" oninput="renderProducts()">
+    </div>
+    <div class="category-filter" id="cat-filter"></div>
+  </div>
+  <!-- 商品一覧 -->
+  <div class="page page-pb" id="product-list-wrap" style="padding-top: 10px;">
+    <div class="product-count" id="product-count"></div>
+    <div class="product-list" id="product-list"></div>
+  </div>
+  <!-- カートへ進む（商品あるとき） -->
+  <div class="sticky-footer" id="products-footer" style="display:none;">
+    <div class="footer-summary">
+      <span style="font-size:14px;">カート内</span>
+      <span class="total" id="products-footer-total"></span>
+    </div>
+    <button class="btn btn-amber" onclick="showCart()">カートを確認する（<span id="products-footer-count"></span>点）</button>
+  </div>
+</div>
+
+<!-- ── カート ─────────────────────────────────── -->
+<div id="screen-cart" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="showScreen('products')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="hdr-title">カート</span>
+    <span id="cart-count-label" style="font-size:13px; color:var(--stone-400);"></span>
+  </div>
+  <div class="page page-pb" id="cart-items-wrap"></div>
+  <div class="sticky-footer" id="cart-footer" style="display:none;">
+    <div class="footer-summary">
+      <span>合計</span>
+      <span class="total" id="cart-footer-total"></span>
+    </div>
+    <button class="btn btn-amber" onclick="showConfirm()">注文内容を確認する</button>
+  </div>
+</div>
+
+<!-- ── 注文確認 ──────────────────────────────── -->
+<div id="screen-confirm" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="showScreen('cart')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="hdr-title">注文確認</span>
+  </div>
+  <div class="page page-pb" id="confirm-body"></div>
+  <div class="sticky-footer">
+    <div class="footer-row">
+      <button class="btn btn-outline" onclick="showCart()" style="flex:.7;">戻る</button>
+      <button class="btn btn-amber" id="submit-btn" onclick="submitOrder()" disabled style="flex:1.3; opacity:.5;">注文を確定する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 注文完了 ──────────────────────────────── -->
+<div id="screen-complete" class="screen">
+  <div class="complete-wrap" id="complete-body"></div>
+</div>
+
+<!-- ── 注文履歴 ──────────────────────────────── -->
+<div id="screen-history" class="screen">
+  <div class="hdr">
+    <button class="hdr-back" onclick="showScreen('home')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="hdr-title">注文履歴</span>
+    <button onclick="downloadOrdersCsv()" style="
+      background:none; border:1px solid var(--stone-200); border-radius:8px;
+      padding:5px 10px; font-size:12px; color:var(--stone-600);
+      cursor:pointer; display:flex; align-items:center; gap:4px;
+      white-space:nowrap; font-family:inherit;
+    ">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CSV
+    </button>
+  </div>
+  <div class="page" id="history-body">
+    <div class="empty-state">読み込み中…</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ── Firebase SDK ──────────────────────────── -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<!-- ── Shift-JIS 変換（Excel対応CSV用） ──────── -->
+<script src="https://cdn.jsdelivr.net/npm/encoding-japanese@2/encoding.min.js"></script>
+
+<script>
+// ══════════════════════════════════════════
+// Firebase 初期化
+// ══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "AIzaSyDZtuZa4RvofqIB375zbmPb9X-UwOUTMC0",
+  authDomain:        "asagiri-sale.firebaseapp.com",
+  projectId:         "asagiri-sale",
+  storageBucket:     "asagiri-sale.firebasestorage.app",
+  messagingSenderId: "800075177148",
+  appId:             "1:800075177148:web:f343f8daaf31bcc301c4b9"
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+
+// ══════════════════════════════════════════
+// 商品データ（全113品目）
+// ══════════════════════════════════════════
+const PRODUCTS = [
+  // ── スキンケア ──────────────────────────────
+  { code:'20',   name:'キャビアフェイスマスク(ゴールド)',                           price:4000,  cat:'スキンケア', tax:0.10 },
+  { code:'21',   name:'キャビアフェイスマスク(ゴールド)5個セット',                  price:20000, cat:'スキンケア', tax:0.10 },
+  { code:'38',   name:'ヤマノ肌 Mu-2 ドロンコ クレンジングミルク',                price:6200,  cat:'スキンケア', tax:0.10 },
+  { code:'39',   name:'ヤマノ肌 Mu-2 ドロンコ フェイシャルクリーム',              price:6200,  cat:'スキンケア', tax:0.10 },
+  { code:'40',   name:'ヤマノ肌 Mu-2 KO・HA・KU エモリエントローション',          price:7500,  cat:'スキンケア', tax:0.10 },
+  { code:'41',   name:'ヤマノ肌 Mu-2 KO・HA・KU モイスチュア ミルクローション',   price:7800,  cat:'スキンケア', tax:0.10 },
+  { code:'42',   name:'ヤマノ トーニングローション',                               price:4900,  cat:'スキンケア', tax:0.10 },
+  { code:'138',  name:'for men フェイシャルC',                                    price:4100,  cat:'スキンケア', tax:0.10 },
+  { code:'139',  name:'for men KO・HA・KU スキンL',                              price:4700,  cat:'スキンケア', tax:0.10 },
+  { code:'140',  name:'for men セット',                                           price:6980,  cat:'スキンケア', tax:0.10 },
+  { code:'156',  name:'ワールドパック ドイツ（クリーン&アクティブ）',              price:6600,  cat:'スキンケア', tax:0.10 },
+  { code:'157',  name:'ワールドパック ブラジル（モイスト）',                       price:6600,  cat:'スキンケア', tax:0.10 },
+  { code:'216',  name:'ヤマノ フレッシュアップ ドロンコミスト 24',                price:4000,  cat:'スキンケア', tax:0.10 },
+  { code:'221',  name:'カームサンテ',                                              price:3900,  cat:'スキンケア', tax:0.10 },
+  { code:'222',  name:'ヤマノ リフレッシュナー',                                  price:3700,  cat:'スキンケア', tax:0.10 },
+  { code:'227',  name:'ヤマノVIT マッサージクリスタル',                           price:8100,  cat:'スキンケア', tax:0.10 },
+  { code:'234',  name:'UVデイエマルジョンR',                                      price:11000, cat:'スキンケア', tax:0.10 },
+  { code:'235',  name:'アクアマスク',                                              price:3500,  cat:'スキンケア', tax:0.10 },
+  { code:'237',  name:'サンカットアクアジェリー',                                 price:4700,  cat:'スキンケア', tax:0.10 },
+  { code:'239',  name:'シセア フェイス マスク',                                   price:3400,  cat:'スキンケア', tax:0.10 },
+  { code:'261',  name:'ヤマノVIT マッサージクリームR',                           price:8100,  cat:'スキンケア', tax:0.10 },
+  { code:'274',  name:'AW クレンジングオイル WH',                                price:7500,  cat:'スキンケア', tax:0.10 },
+  { code:'275',  name:'AW ドロンコフェイシャルクリーム WH',                      price:7500,  cat:'スキンケア', tax:0.10 },
+  { code:'276',  name:'AW エッセンス WH',                                        price:9800,  cat:'スキンケア', tax:0.10 },
+  { code:'277',  name:'AW エマルジョン WH',                                      price:9800,  cat:'スキンケア', tax:0.10 },
+  { code:'279',  name:'AW クリーム WH',                                          price:11600, cat:'スキンケア', tax:0.10 },
+  { code:'280',  name:'AW ドロンコパック WH',                                    price:13700, cat:'スキンケア', tax:0.10 },
+  { code:'303',  name:'ヤマノ肌ドロンコクレー24 WH',                             price:4500,  cat:'スキンケア', tax:0.10 },
+  { code:'304',  name:'ヤマノ肌ドロンコクレー24 BK',                             price:4500,  cat:'スキンケア', tax:0.10 },
+  { code:'313',  name:'キャンペーン特別ドロンコクレー24 オリジナルWH',            price:3700,  cat:'スキンケア', tax:0.10 },
+  { code:'314',  name:'キャンペーン特別ドロンコクレー24 オリジナルBK',            price:3700,  cat:'スキンケア', tax:0.10 },
+  { code:'320',  name:'ヤマノ KO・HA・KU イミュア オイルセラム',                 price:5300,  cat:'スキンケア', tax:0.10 },
+  { code:'321',  name:'ヤマノ肌ドロンコクレー24 WH ハーフ',                     price:2800,  cat:'スキンケア', tax:0.10 },
+  { code:'322',  name:'ヤマノ肌ドロンコクレー24 BK ハーフ',                     price:2800,  cat:'スキンケア', tax:0.10 },
+  { code:'330',  name:'モイスチュア24S',                                          price:12000, cat:'スキンケア', tax:0.10 },
+  { code:'335',  name:'ローションスキンクリアC',                                  price:8100,  cat:'スキンケア', tax:0.10 },
+  { code:'337',  name:'モイストナノジェル',                                       price:15000, cat:'スキンケア', tax:0.10 },
+  { code:'515',  name:'モンプレーヌ ドロンコパックセット',                        price:16500, cat:'スキンケア', tax:0.10 },
+  { code:'812',  name:'期間限定チューブ ゼロ フェイシャルC',                     price:12000, cat:'スキンケア', tax:0.10 },
+  { code:'850',  name:'MDプレミアム クレンジングローション',                      price:8100,  cat:'スキンケア', tax:0.10 },
+  { code:'851',  name:'ヤマノ肌 ゼロ NK Pローション',                            price:17600, cat:'スキンケア', tax:0.10 },
+  { code:'852',  name:'ヤマノ肌 ゼロ NK セラムミルク',                           price:18700, cat:'スキンケア', tax:0.10 },
+  { code:'857',  name:'コハクセンチュリーゼロ ネック&デコルテクリーム',           price:9900,  cat:'スキンケア', tax:0.10 },
+  { code:'858',  name:'コハクセンチュリーゼロ ドロンコ クレンジングクリーム',     price:14400, cat:'スキンケア', tax:0.10 },
+  { code:'865',  name:'ヤマノ肌 クレオリ24 クレンジングクリーム',                price:4200,  cat:'スキンケア', tax:0.10 },
+  { code:'866',  name:'ヤマノ肌 クレオリ24 フェイシャルクリーム',                price:4200,  cat:'スキンケア', tax:0.10 },
+  { code:'867',  name:'ヤマノ肌 クレオリ24 KO・HA・KU スキンローション',         price:4200,  cat:'スキンケア', tax:0.10 },
+  { code:'868',  name:'ヤマノ肌 クレオリ24 KO・HA・KU ミルクローション',         price:4900,  cat:'スキンケア', tax:0.10 },
+  { code:'869',  name:'ヤマノ肌 クレオリ24 KO・HA・KU ナリクリ',                price:4900,  cat:'スキンケア', tax:0.10 },
+  { code:'870',  name:'ヤマノ肌 クレオリ24 KO・HA・KU クリーム',                price:5200,  cat:'スキンケア', tax:0.10 },
+  { code:'871',  name:'ヤマノ肌 クレオリ24 4点セット（WH）',                    price:17500, cat:'スキンケア', tax:0.10 },
+  { code:'872',  name:'ヤマノ肌 クレオリ24 4点セット（BK）',                    price:17500, cat:'スキンケア', tax:0.10 },
+  { code:'874',  name:'コハクセンチュリー白-SHIRO-セット（1ヶ月用）',            price:35000, cat:'スキンケア', tax:0.10 },
+  { code:'875',  name:'コハクセンチュリー白-SHIRO-パーフェクトセット',            price:105000,cat:'スキンケア', tax:0.10 },
+  { code:'917',  name:'ゼロクラリファイイングローション レギュラーサイズ',        price:7900,  cat:'スキンケア', tax:0.10 },
+  { code:'918',  name:'ゼロクラリファイイングローション ミディアムサイズ',        price:5800,  cat:'スキンケア', tax:0.10 },
+  { code:'919',  name:'ゼロクラリファイイングローション スペシャルセット',        price:15800, cat:'スキンケア', tax:0.10 },
+  { code:'950',  name:'コハクセンチュリーゼロ ローションN',                       price:17600, cat:'スキンケア', tax:0.10 },
+  { code:'951',  name:'コハクセンチュリーゼロ セラムミルクN',                     price:18700, cat:'スキンケア', tax:0.10 },
+  { code:'952',  name:'コハクセンチュリーゼロ 4点スペシャルセットN',              price:65000, cat:'スキンケア', tax:0.10 },
+  { code:'6112', name:'サンカットプルーフRE',                                     price:4700,  cat:'スキンケア', tax:0.10 },
+  { code:'6500', name:'コハクソーム Kボタニカルセラム',                           price:6400,  cat:'スキンケア', tax:0.10 },
+  { code:'6598', name:'ヤマノ EGFセラム KL',                                     price:13500, cat:'スキンケア', tax:0.10 },
+  { code:'6601', name:'ハリケアローション',                                       price:12500, cat:'スキンケア', tax:0.10 },
+  { code:'6604', name:'ヤマノ モイスト ボディ ローション',                        price:3500,  cat:'スキンケア', tax:0.10 },
+  { code:'7518', name:'インナー&アウタービューティ KO・HA・KU マッサージクリーム',price:4500,  cat:'スキンケア', tax:0.10 },
+  { code:'7523', name:'ヤマノ肌 超シンプルスキンケアセット',                      price:5900,  cat:'スキンケア', tax:0.10 },
+  { code:'7524', name:'ヤマノ肌 ドロンコクレーオリジナル24 ブラックフェイスソープ',price:2500, cat:'スキンケア', tax:0.10 },
+  { code:'7525', name:'KO・HA・KU オールインワンジェル',                         price:4200,  cat:'スキンケア', tax:0.10 },
+  { code:'7526', name:'KO・HA・KU パワーエキスオールインワン 美溶液EX',           price:5200,  cat:'スキンケア', tax:0.10 },
+  { code:'7551', name:'インナー&アウタービューティ KO・HA・KU マスク',            price:5800,  cat:'スキンケア', tax:0.10 },
+  { code:'7611', name:'美道 ドロンコクレンジングクリーム',                        price:10500, cat:'スキンケア', tax:0.10 },
+  { code:'7612', name:'美道 ドロンコフェイシャルクリーム',                        price:11500, cat:'スキンケア', tax:0.10 },
+  { code:'7613', name:'美道 コハクスキンローション',                              price:12500, cat:'スキンケア', tax:0.10 },
+  { code:'7614', name:'美道 コハクミルクローション',                              price:13500, cat:'スキンケア', tax:0.10 },
+  { code:'7619', name:'薬用美道 4点セット',                                       price:39400, cat:'スキンケア', tax:0.10 },
+  { code:'7620', name:'薬用美道 ドロンコ クレンジングミルク',                     price:10000, cat:'スキンケア', tax:0.10 },
+  { code:'7621', name:'薬用美道 ドロンコ フェイシャルクリーム',                   price:9600,  cat:'スキンケア', tax:0.10 },
+  { code:'7622', name:'薬用美道 KO・HA・KU スキンローション',                    price:9800,  cat:'スキンケア', tax:0.10 },
+  { code:'7624', name:'薬用美道 KO・HA・KU ナリクリ',                            price:10000, cat:'スキンケア', tax:0.10 },
+  { code:'7625', name:'薬用美道 KO・HA・KU コハクミルクローション',               price:10000, cat:'スキンケア', tax:0.10 },
+  { code:'7626', name:'薬用美道 KO・HA・KU コハククリーム',                       price:14300, cat:'スキンケア', tax:0.10 },
+  { code:'7646', name:'美道MDスキンローション',                                   price:8800,  cat:'スキンケア', tax:0.10 },
+  { code:'7647', name:'美道MDミルクローション',                                   price:9000,  cat:'スキンケア', tax:0.10 },
+  // ── ヘアケア ────────────────────────────────
+  { code:'4015', name:'ナチュラルエセンシャルドロンコヘアパック',                 price:4500,  cat:'ヘアケア', tax:0.10 },
+  { code:'4016', name:'ESSドロンコボディシャンプー',                              price:6600,  cat:'ヘアケア', tax:0.10 },
+  { code:'5509', name:'和漢ヘアカラートリートメント',                             price:4400,  cat:'ヘアケア', tax:0.10 },
+  { code:'5510', name:'和漢ヘアカラートリートメント3本セット',                    price:11500, cat:'ヘアケア', tax:0.10 },
+  { code:'5511', name:'薬用和漢 育毛エッセンス',                                  price:9100,  cat:'ヘアケア', tax:0.10 },
+  { code:'5512', name:'薬用和漢スカルプ ドロンコシャンプー',                     price:4400,  cat:'ヘアケア', tax:0.10 },
+  { code:'5513', name:'薬用和漢スカルプ コンディショナー',                        price:4400,  cat:'ヘアケア', tax:0.10 },
+  { code:'5514', name:'薬用和漢スカルプ ヘアケアセット',                          price:8000,  cat:'ヘアケア', tax:0.10 },
+  { code:'5515', name:'薬用和漢 育毛エッセンス 3ヶ月実感セット',                 price:24900, cat:'ヘアケア', tax:0.10 },
+  { code:'5520', name:'薬用和漢スカルプ コンディショナー リッターサイズ',         price:7500,  cat:'ヘアケア', tax:0.10 },
+  { code:'7503', name:'ヤマノ肌ヘアケアセット 2点セット',                         price:4200,  cat:'ヘアケア', tax:0.10 },
+  { code:'7520', name:'ヤマノ肌ドロンコ ヘアソープ',                             price:2500,  cat:'ヘアケア', tax:0.10 },
+  { code:'7521', name:'ヤマノ肌モイスチュア コンディショナー',                    price:2700,  cat:'ヘアケア', tax:0.10 },
+  { code:'7522', name:'ヤマノ肌琥珀プレミアム ヘア美容液',                       price:4300,  cat:'ヘアケア', tax:0.10 },
+  { code:'7540', name:'ヤマノ肌ヘアケアセットBOX 3点セット',                     price:8100,  cat:'ヘアケア', tax:0.10 },
+  // ── 健康食品 ────────────────────────────────
+  { code:'6224', name:'田七液',                                                   price:15000, cat:'健康食品', tax:0.08 },
+  { code:'6251', name:'ヤマノ肌 プラセンタ&コラーゲン ドリンク',                 price:7900,  cat:'健康食品', tax:0.08 },
+  { code:'6253', name:'ヒアルロン酸&コラーゲン&ハトムギエキス',                  price:13000, cat:'健康食品', tax:0.08 },
+  { code:'6254', name:'グルコサミン&コンドロイチンRE',                            price:7600,  cat:'健康食品', tax:0.08 },
+  { code:'6278', name:'ビタミンC&E',                                              price:7300,  cat:'健康食品', tax:0.08 },
+  // ── メイク ──────────────────────────────────
+  { code:'220',  name:'アイメークアップリムーバーRE',                             price:3200,  cat:'メイク', tax:0.10 },
+  { code:'238',  name:'アイコントゥアジェル 24N',                                price:7800,  cat:'メイク', tax:0.10 },
+  { code:'258',  name:'メイクアップベース',                                        price:4000,  cat:'メイク', tax:0.10 },
+  { code:'271',  name:'エッセンス35 BBクリーム（ピンク）',                        price:4200,  cat:'メイク', tax:0.10 },
+  { code:'272',  name:'エッセンス35 BBクリーム（ベージュ）',                      price:4200,  cat:'メイク', tax:0.10 },
+  // ── その他 ──────────────────────────────────
+  { code:'999',  name:'美顔器タンク洗浄剤',                                        price:300,   cat:'その他', tax:0.10 },
+  { code:'7552', name:'ヤマノアルコールハンドジェル 携帯用 60ml',                 price:980,   cat:'その他', tax:0.10 },
+  { code:'7553', name:'ヤマノアルコールハンドジェル 置き型 300ml',                price:2800,  cat:'その他', tax:0.10 },
+  // ── CS商品 ──────────────────────────────────
+  { code:'9003', name:'CS リフレッシュナー 290ml',                                  price:2100,  cat:'CS商品', tax:0.10 },
+  { code:'9005', name:'CS バイタライジングMC R 235g',                               price:5000,  cat:'CS商品', tax:0.10 },
+  { code:'9411', name:'CS ヤマノ バイタライジング マッサージクリスタル 270g',        price:5000,  cat:'CS商品', tax:0.10 },
+  { code:'9043', name:'CS ヤマノ肌 クレーオリジナル WH 280g',                       price:2200,  cat:'CS商品', tax:0.10 },
+  { code:'9044', name:'CS ヤマノ肌クレーオリジナル BK 370g',                        price:2200,  cat:'CS商品', tax:0.10 },
+  { code:'9052', name:'CS AW ドロンコパック WH 180g',                               price:6500,  cat:'CS商品', tax:0.10 },
+  { code:'9054', name:'CS コハクセンチュリーゼロ クラリファイイングローション 290ml', price:4400, cat:'CS商品', tax:0.10 },
+  { code:'9487', name:'CS Mu-2 ドロンコクレンジングミルク 290ml',                   price:4000,  cat:'CS商品', tax:0.10 },
+  { code:'9488', name:'CS Mu-2 コハクエモリエントローション 290ml',                 price:4500,  cat:'CS商品', tax:0.10 },
+  { code:'9502', name:'CS 薬用美道スキンローション 290ml',                           price:6200,  cat:'CS商品', tax:0.10 },
+  { code:'9503', name:'CS 薬用美道クレンジング 290ml',                               price:6000,  cat:'CS商品', tax:0.10 },
+  { code:'9504', name:'CS 薬用美道ナリッシングクリスタル 300g',                      price:6200,  cat:'CS商品', tax:0.10 },
+  { code:'9018', name:'ヤマノアルコールハンドジェル CS用 500ml',                    price:2000,  cat:'CS商品', tax:0.10 },
+  { code:'A116', name:'琥珀球２ケセット',                                            price:25000, cat:'CS商品', tax:0.10 },
+  { code:'9057', name:'オールパーパス マッサージオイル 200ml',                       price:3500,  cat:'CS商品', tax:0.10 },
+  { code:'9060', name:'プラスターオプションセット（3回分）',                          price:3500,  cat:'CS商品', tax:0.10 },
+  { code:'9278', name:'プラスターオプション 13袋セット',                              price:14000, cat:'CS商品', tax:0.10 },
+  { code:'9712', name:'ヤマノオリジナルユニフォーム LL（クリーム）',                  price:9500,  cat:'CS商品', tax:0.10 },
+  { code:'D972', name:'デミ フェイシャルタオルN',                                    price:290,   cat:'CS商品', tax:0.10 },
+  { code:'D973', name:'デミ バスタオルN',                                            price:3300,  cat:'CS商品', tax:0.10 },
+  { code:'D974', name:'デミ フィットシーツN',                                        price:4300,  cat:'CS商品', tax:0.10 },
+  { code:'D975', name:'デミ タオルケット',                                           price:5900,  cat:'CS商品', tax:0.10 },
+  { code:'D976', name:'デミ バスローブN',                                            price:5400,  cat:'CS商品', tax:0.10 },
+  { code:'9935', name:'スポンジキット ボディ 10枚入り',                               price:4900,  cat:'CS商品', tax:0.10 },
+  { code:'9939', name:'スポンジキット（フェイス）10枚入り',                           price:5200,  cat:'CS商品', tax:0.10 },
+  { code:'9894', name:'CS コットン N（4kg）',                                        price:11200, cat:'CS商品', tax:0.10 },
+  { code:'9633', name:'エステ看板2019',                                              price:5500,  cat:'CS商品', tax:0.10 },
+  { code:'9161', name:'フェイシャルベッド・マイティー（クリーム）',                   price:94000, cat:'CS商品', tax:0.10 },
+  { code:'9162', name:'フェイシャルベッド・マイティー（有孔フタ付・クリーム）',       price:101500,cat:'CS商品', tax:0.10 },
+  { code:'9769', name:'エステスツール 斜楽',                                         price:44900, cat:'CS商品', tax:0.10 },
+  { code:'9948', name:'ワゴン T3-A',                                                price:32000, cat:'CS商品', tax:0.10 },
+  { code:'9949', name:'CS 小型消毒器',                                               price:50400, cat:'CS商品', tax:0.10 },
+  { code:'9590', name:'CS ホットキャビ HC-10F（12〜15本用）',                        price:40000, cat:'CS商品', tax:0.10 },
+  { code:'9628', name:'純水器（タカラ製）',                                          price:9100,  cat:'CS商品', tax:0.10 },
+  { code:'9631', name:'純水器カートリッジ（タカラ製）',                              price:5600,  cat:'CS商品', tax:0.10 },
+  { code:'0999', name:'美顔器タンク洗浄剤',                                         price:300,   cat:'CS商品', tax:0.10 },
+  { code:'T562', name:'US-100L用浄水カートリッジ',                                   price:10360, cat:'CS商品', tax:0.10 },
+];
+
+const CATEGORIES = ['スキンケア', 'ヘアケア', '健康食品', 'メイク', 'その他', 'CS商品'];
+
+// ══════════════════════════════════════════
+// 状態
+// ══════════════════════════════════════════
+let currentUser   = null;  // fc_usersテーブルの行
+let cart          = [];    // [{product, qty}]
+let activeCategory = null;
+let inputQtyMap   = {};    // 商品ページの入力数量
+let lastOrderId   = null;
+let orderHistory  = [];
+
+// ══════════════════════════════════════════
+// 画面切り替え
+// ══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+}
+
+// ══════════════════════════════════════════
+// PHP API ヘルパー（asagiri_salesと同じパターン）
+// ══════════════════════════════════════════
+const API_BASE = 'api';
+async function getToken() {
+  const user = fbAuth.currentUser;
+  if (!user) return null;
+  return await user.getIdToken(false);
+}
+async function apiGet(endpoint) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!res.ok) {
+    let err = '';
+    try { err = (await res.json()).error || ''; } catch(e) {}
+    throw new Error(err || `APIエラー ${res.status}`);
+  }
+  return res.json();
+}
+async function apiPost(endpoint, data) {
+  const token = await getToken();
+  const res = await fetch(`${API_BASE}/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    let err = '';
+    try { err = (await res.json()).error || ''; } catch(e) {}
+    throw new Error(err || `APIエラー ${res.status}`);
+  }
+  return res.json();
+}
+
+// ══════════════════════════════════════════
+// Google 認証（asagiri_sales と同じパターン）
+// ══════════════════════════════════════════
+function doLogin() {
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = '認証中...';
+  const provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(err => {
+    document.getElementById('login-error').textContent = 'ログインに失敗しました: ' + err.message;
+    btn.disabled = false;
+    btn.innerHTML = 'Googleでログイン';
+  });
+}
+
+function doSignOut() {
+  if (confirm('ログアウトしますか？')) {
+    cart = [];
+    currentUser = null;
+    fbAuth.signOut();
+  }
+}
+
+// asagiri_salesと同じく style.display を直接操作
+fbAuth.onAuthStateChanged(async user => {
+  if (!user) {
+    document.getElementById('screen-login').style.display = 'flex';
+    document.getElementById('screen-loading').style.display = 'none';
+    return;
+  }
+  // FC登録確認（fc_usersテーブルをAPIで確認）
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-loading').style.display = 'flex';
+  try {
+    currentUser = await apiGet('auth.php');
+  } catch(e) {
+    document.getElementById('login-error').textContent = e.message || 'このアカウントは登録されていません';
+    document.getElementById('screen-login').style.display = 'flex';
+    document.getElementById('screen-loading').style.display = 'none';
+    fbAuth.signOut();
+    return;
+  }
+  document.getElementById('screen-loading').style.display = 'none';
+  await loadHomeData();
+  showScreen('home');
+});
+
+// ══════════════════════════════════════════
+// ホーム
+// ══════════════════════════════════════════
+async function loadHomeData() {
+  document.getElementById('home-contact').textContent = (currentUser.contact_name || 'ご担当者') + ' 様';
+  document.getElementById('home-fcname').textContent  = currentUser.fc_name || '';
+  try {
+    orderHistory = await apiGet('orders.php');
+    renderHomeOrders();
+  } catch(e) {
+    document.getElementById('home-orders').innerHTML = '<div class="empty-state">履歴の取得に失敗しました</div>';
+  }
+}
+
+function renderHomeOrders() {
+  const wrap = document.getElementById('home-orders');
+  if (!orderHistory.length) {
+    wrap.innerHTML = '<div class="empty-state">まだ注文がありません</div>';
+    return;
+  }
+  wrap.innerHTML = orderHistory.slice(0, 5).map(o => `
+    <div class="order-row">
+      <div>
+        <div class="meta">${o.order_date} &nbsp;受注番号: ${o.id}</div>
+        <div class="items">${o.items.length}品目</div>
+      </div>
+      <div>
+        <div class="total">¥${fmt(o.total)}</div>
+        <div class="total-sub">税込</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showOrderHistory() {
+  showScreen('history');
+  renderHistory();
+}
+
+// ══════════════════════════════════════════
+// CSVダウンロード（Shift-JIS / Excel対応）
+// ══════════════════════════════════════════
+function downloadOrdersCsv() {
+  if (!orderHistory.length) {
+    alert('ダウンロードする注文履歴がありません');
+    return;
+  }
+
+  // ヘッダー行
+  const rows = [
+    ['受注番号', '日付', 'FC名', '商品コード', '商品名', '単価', '個数', '金額', '合計(税込)', '備考']
+  ];
+
+  // 明細単位で1行
+  orderHistory.forEach(o => {
+    o.items.forEach(it => {
+      rows.push([
+        o.id,
+        o.order_date,
+        o.fc_name || '',
+        it.code,
+        it.name,
+        it.price,
+        it.qty,
+        it.amount,
+        o.total,
+        o.note || ''
+      ]);
+    });
+  });
+
+  // CSV文字列（カンマ・改行・ダブルクォートを含む値はクォートで囲む）
+  const csvStr = rows.map(row =>
+    row.map(v => {
+      const s = String(v ?? '');
+      return (s.includes(',') || s.includes('"') || s.includes('\n') || s.includes('\r'))
+        ? '"' + s.replace(/"/g, '""') + '"'
+        : s;
+    }).join(',')
+  ).join('\r\n');
+
+  // Shift-JIS 変換
+  const unicodeArray = Encoding.stringToCode(csvStr);
+  const sjisArray    = Encoding.convert(unicodeArray, { to: 'SJIS', from: 'UNICODE' });
+  const blob = new Blob([new Uint8Array(sjisArray)], { type: 'text/csv; charset=shift-jis' });
+
+  // ファイル名: orders_YYYYMMDD.csv
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const url   = URL.createObjectURL(blob);
+  const a     = document.createElement('a');
+  a.href      = url;
+  a.download  = `orders_${today}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderHistory() {
+  const body = document.getElementById('history-body');
+  if (!orderHistory.length) {
+    body.innerHTML = '<div class="empty-state">注文履歴はありません</div>';
+    return;
+  }
+  body.innerHTML = orderHistory.map(o => `
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <div>
+          <div style="font-size:12px; color:var(--stone-400);">${o.order_date}</div>
+          <div style="font-size:15px; font-weight:700; font-family:monospace; letter-spacing:.04em; margin-top:2px;">${o.id}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:700; color:var(--amber-dk);">¥${fmt(o.total)}</div>
+          <div style="font-size:11px; color:var(--stone-400);">税込</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--stone-100); padding-top:8px;">
+        ${o.items.map(it => `
+          <div style="display:flex; justify-content:space-between; font-size:13px; padding:3px 0;">
+            <span style="color:var(--stone-600, #57534e);">${it.name}</span>
+            <span style="color:var(--stone-500); flex-shrink:0; margin-left:8px;">×${it.qty} ¥${fmt(it.amount)}</span>
+          </div>
+        `).join('')}
+      </div>
+      ${o.note ? `<div style="margin-top:6px; font-size:12px; color:var(--stone-400);">備考: ${o.note}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+// 商品画面
+// ══════════════════════════════════════════
+function showProducts() {
+  renderCategoryFilter();
+  renderProducts();
+  showScreen('products');
+}
+
+function renderCategoryFilter() {
+  const wrap = document.getElementById('cat-filter');
+  wrap.innerHTML = ['すべて', ...CATEGORIES].map(c => {
+    const isAll = c === 'すべて';
+    const active = isAll ? !activeCategory : activeCategory === c;
+    return `<button class="cat-btn ${active ? 'active' : ''}" onclick="setCategory(${isAll ? 'null' : `'${c}'`})">${c}</button>`;
+  }).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  renderCategoryFilter();
+  renderProducts();
+}
+
+function renderProducts() {
+  const q   = (document.getElementById('search-input').value || '').trim().toLowerCase();
+  const filtered = PRODUCTS.filter(p => {
+    const catOk = !activeCategory || p.cat === activeCategory;
+    const qOk   = !q || p.name.toLowerCase().includes(q) || p.code.includes(q);
+    return catOk && qOk;
+  });
+
+  document.getElementById('product-count').textContent = filtered.length + '件';
+  const list = document.getElementById('product-list');
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="no-results">該当する商品がありません</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(p => {
+    const inCart = cart.find(c => c.product.code === p.code);
+    const qty    = inputQtyMap[p.code] ?? 1;
+    return `
+      <div class="product-row">
+        <div class="product-info">
+          <div class="product-code">${p.code}　<span style="background:var(--stone-100);padding:1px 6px;border-radius:6px;font-size:11px;">${p.tax === 0.08 ? '軽減8%' : '10%'}</span></div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-price">¥${fmt(p.price)}<span class="tax">（税抜）</span></div>
+          ${inCart ? `<div class="in-cart">カート: ${inCart.qty}個</div>` : ''}
+        </div>
+        <div class="product-ctrl">
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeInputQty('${p.code}',-1)">−</button>
+            <span class="qty-val" id="iqty-${p.code}">${qty}</span>
+            <button class="qty-btn" onclick="changeInputQty('${p.code}',1)">＋</button>
+          </div>
+          <button class="add-btn add-btn-normal" id="addbtn-${p.code}" onclick="addToCart('${p.code}')">カートへ</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateProductsFooter();
+}
+
+function changeInputQty(code, delta) {
+  inputQtyMap[code] = Math.max(1, (inputQtyMap[code] ?? 1) + delta);
+  const el = document.getElementById('iqty-' + code);
+  if (el) el.textContent = inputQtyMap[code];
+}
+
+function addToCart(code) {
+  const p   = PRODUCTS.find(p => p.code === code);
+  const qty = inputQtyMap[code] ?? 1;
+  const idx = cart.findIndex(c => c.product.code === code);
+  if (idx >= 0) cart[idx].qty += qty;
+  else           cart.push({ product: p, qty });
+
+  // ボタン一時変更
+  const btn = document.getElementById('addbtn-' + code);
+  if (btn) {
+    btn.textContent = '✓ 追加';
+    btn.className = 'add-btn add-btn-done';
+    setTimeout(() => {
+      btn.textContent = 'カートへ';
+      btn.className = 'add-btn add-btn-normal';
+      renderProducts();
+    }, 1200);
+  }
+  updateCartBadge();
+  updateProductsFooter();
+  showToast(`${p.name.slice(0, 16)}… をカートに追加`);
+}
+
+function updateCartBadge() {
+  const count = cart.reduce((s, c) => s + c.qty, 0);
+  const badge = document.getElementById('cart-badge');
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  badge.textContent   = count > 99 ? '99+' : count;
+}
+
+function updateProductsFooter() {
+  const footer = document.getElementById('products-footer');
+  const total  = cartGrandTotal();
+  const count  = cart.reduce((s, c) => s + c.qty, 0);
+  if (count > 0) {
+    footer.style.display = 'flex';
+    document.getElementById('products-footer-total').textContent = '¥' + fmt(total) + '（税込）';
+    document.getElementById('products-footer-count').textContent = count;
+  } else {
+    footer.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════
+// カート
+// ══════════════════════════════════════════
+function renderCart() {
+  const wrap  = document.getElementById('cart-items-wrap');
+  const footer= document.getElementById('cart-footer');
+  const label = document.getElementById('cart-count-label');
+  const total  = cart.reduce((s, c) => s + c.qty, 0);
+
+  label.textContent = total > 0 ? `${total}点` : '';
+
+  if (!cart.length) {
+    wrap.innerHTML = `
+      <div class="empty-state" style="padding:60px 0;">
+        <div style="font-size:36px; margin-bottom:12px;">🛒</div>
+        カートは空です<br>
+        <a style="color:var(--amber); cursor:pointer; margin-top:12px; display:inline-block;" onclick="showProducts()">商品を選ぶ</a>
+      </div>`;
+    footer.style.display = 'none';
+    return;
+  }
+
+  const itemsHtml = cart.map(c => {
+    const line = c.product.price * c.qty;
+    return `
+      <div class="cart-item">
+        <div class="cart-item-top">
+          <span class="cart-item-name">${c.product.name}</span>
+          <button class="del-btn" onclick="removeFromCart('${c.product.code}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+        <div style="font-size:12px; color:var(--stone-400); margin:3px 0 6px;">コード: ${c.product.code} ／ ¥${fmt(c.product.price)}（税抜）</div>
+        <div class="cart-item-bottom">
+          <div class="cart-qty-ctrl">
+            <button class="qty-btn" onclick="updateCartQty('${c.product.code}', ${c.qty - 1})">−</button>
+            <input class="cart-qty-input" type="number" min="1" value="${c.qty}"
+              onchange="updateCartQty('${c.product.code}', parseInt(this.value)||1)">
+            <button class="qty-btn" onclick="updateCartQty('${c.product.code}', ${c.qty + 1})">＋</button>
+          </div>
+          <div class="line-total">¥${fmt(line)}<span class="note">（税抜）</span></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const { subtotal, taxTotal, grandTotal } = calcTotals();
+  wrap.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      ${itemsHtml}
+      <div class="totals-card">
+        <div class="total-row"><span>小計（税抜）</span><span>¥${fmt(subtotal)}</span></div>
+        <div class="total-row"><span>消費税</span><span>¥${fmt(taxTotal)}</span></div>
+        <div class="total-row grand"><span>合計（税込）</span><span>¥${fmt(grandTotal)}</span></div>
+      </div>
+      <div class="add-more-link"><a onclick="showProducts()">＋ 商品を追加する</a></div>
+    </div>
+  `;
+  footer.style.display = 'flex';
+  document.getElementById('cart-footer-total').textContent = `¥${fmt(grandTotal)}（税込）`;
+}
+
+function removeFromCart(code) {
+  cart = cart.filter(c => c.product.code !== code);
+  renderCart();
+  updateCartBadge();
+  updateProductsFooter();
+}
+
+function updateCartQty(code, qty) {
+  if (qty <= 0) { removeFromCart(code); return; }
+  const idx = cart.findIndex(c => c.product.code === code);
+  if (idx >= 0) cart[idx].qty = qty;
+  renderCart();
+  updateCartBadge();
+  updateProductsFooter();
+}
+
+// ══════════════════════════════════════════
+// 確認画面
+// ══════════════════════════════════════════
+function renderConfirm() {
+  const { subtotal, taxTotal, grandTotal } = calcTotals();
+  const body = document.getElementById('confirm-body');
+  body.innerHTML = `
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px;">注文者情報</div>
+      <div class="info-rows">
+        <div class="info-row"><span class="info-lbl">FC名</span><span class="info-val">${currentUser.fc_name}</span></div>
+        <div class="info-row"><span class="info-lbl">担当者</span><span class="info-val">${currentUser.contact_name || '―'}様</span></div>
+        <div class="info-row"><span class="info-lbl">メール</span><span class="info-val">${currentUser.email}</span></div>
+        ${currentUser.address ? `<div class="info-row"><span class="info-lbl">住所</span><span class="info-val">${currentUser.address}</span></div>` : ''}
+      </div>
+    </div>
+
+    <div class="items-table">
+      <div class="items-table-hdr">注文明細</div>
+      ${cart.map(c => `
+        <div class="items-table-row">
+          <div class="item-info">
+            <div class="item-code">${c.product.code}</div>
+            <div class="item-name">${c.product.name}</div>
+          </div>
+          <div class="item-right">
+            <div class="item-qty">× ${c.qty}</div>
+            <div class="item-amt">¥${fmt(c.product.price * c.qty)}</div>
+          </div>
+        </div>
+      `).join('')}
+      <div style="padding:10px 14px; font-size:13px; color:var(--stone-500); border-top:1px solid var(--stone-100);">
+        <div style="display:flex; justify-content:space-between;">小計（税抜）<span>¥${fmt(subtotal)}</span></div>
+        <div style="display:flex; justify-content:space-between; margin-top:4px;">消費税<span>¥${fmt(taxTotal)}</span></div>
+      </div>
+      <div class="items-table-footer"><span>合計（税込）</span><span>¥${fmt(grandTotal)}</span></div>
+    </div>
+
+    <div class="card">
+      <label style="font-size:12px; font-weight:700; color:var(--stone-400); display:block; margin-bottom:6px;">備考（任意）</label>
+      <textarea class="note-area" id="order-note" rows="3" placeholder="配送希望日・特記事項など"></textarea>
+    </div>
+
+    <label class="agree-label" for="agree-check">
+      <input type="checkbox" id="agree-check" onchange="toggleSubmitBtn()">
+      <span style="font-size:14px; color:var(--stone-700); line-height:1.6;">注文内容を確認しました。上記の内容で注文を確定します。</span>
+    </label>
+  `;
+  document.getElementById('agree-check').onchange = toggleSubmitBtn;
+  toggleSubmitBtn();
+}
+
+function toggleSubmitBtn() {
+  const checked = document.getElementById('agree-check')?.checked;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = !checked;
+  btn.style.opacity = checked ? '1' : '.5';
+}
+
+// ══════════════════════════════════════════
+// 注文送信
+// ══════════════════════════════════════════
+async function submitOrder() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+
+  const { subtotal, taxTotal, grandTotal } = calcTotals();
+  const note = document.getElementById('order-note')?.value || '';
+
+  const payload = {
+    items: cart.map(c => ({
+      code:  c.product.code,
+      name:  c.product.name,
+      price: c.product.price,
+      qty:   c.qty,
+      tax:   c.product.tax,
+    })),
+    note,
+    subtotal,
+    tax_total: taxTotal,
+    total:     grandTotal,
+  };
+
+  try {
+    const res = await apiPost('orders.php', payload);
+    lastOrderId = res.id;
+    cart = [];
+    updateCartBadge();
+    // 履歴を再取得
+    try { orderHistory = await apiGet('orders.php'); } catch(e) {}
+    renderCompleteScreen();
+    showScreen('complete');
+  } catch(e) {
+    alert('注文の送信に失敗しました。\n' + (e.message || ''));
+    btn.disabled = false;
+    btn.textContent = '注文を確定する';
+    toggleSubmitBtn();
+  }
+}
+
+// ══════════════════════════════════════════
+// 完了画面
+// ══════════════════════════════════════════
+function renderCompleteScreen() {
+  const { grandTotal } = calcTotalsFromHistory();
+  const today = new Date().toLocaleDateString('ja-JP');
+  const body  = document.getElementById('complete-body');
+  body.innerHTML = `
+    <div class="complete-icon">✓</div>
+    <div class="complete-title">
+      <h1>注文が完了しました</h1>
+      <p>ご注文ありがとうございます</p>
+    </div>
+    <div class="order-number-card">
+      <div class="label">受 注 番 号</div>
+      <div class="number">${lastOrderId}</div>
+      <div class="date">${today} ／ ${currentUser.fc_name}</div>
+      ${orderHistory.length ? `<div class="amount">¥${fmt(orderHistory[0].total)} <span style="font-size:13px; font-weight:400; color:var(--stone-400);">（税込）</span></div>` : ''}
+    </div>
+    <div class="complete-actions">
+      <button class="btn btn-amber" onclick="showProducts()">新規注文</button>
+      <button class="btn btn-outline" onclick="showOrderHistory()">注文履歴を見る</button>
+      <button class="btn btn-ghost" onclick="showScreen('home')">ホームに戻る</button>
+    </div>
+  `;
+}
+
+function calcTotalsFromHistory() {
+  if (orderHistory.length) return { grandTotal: orderHistory[0].total };
+  return { grandTotal: 0 };
+}
+
+// ══════════════════════════════════════════
+// 集計ユーティリティ
+// ══════════════════════════════════════════
+function calcTotals() {
+  let subtotal = 0, taxTotal = 0;
+  cart.forEach(c => {
+    const line = c.product.price * c.qty;
+    subtotal += line;
+    taxTotal += Math.floor(line * c.product.tax);
+  });
+  return { subtotal, taxTotal, grandTotal: subtotal + taxTotal };
+}
+
+function cartGrandTotal() { return calcTotals().grandTotal; }
+
+function fmt(n) {
+  return Number(n).toLocaleString('ja-JP');
+}
+
+// ══════════════════════════════════════════
+// トースト通知
+// ══════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ══════════════════════════════════════════
+// 画面遷移ラッパー（render + showScreen を明示的にセット）
+// window.showScreen オーバーライドは使わない（onAuthStateChanged と競合するため）
+// ══════════════════════════════════════════
+function showCart() {
+  renderCart();
+  showScreen('cart');
+}
+function showConfirm() {
+  renderConfirm();
+  showScreen('confirm');
+}
+</script>
+</body>
+</html>

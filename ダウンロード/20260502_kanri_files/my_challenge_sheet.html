@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイチャレンジシート｜自分史上最高をつくる6ヶ月</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Maru Gothic',sans-serif;background:#FFF7FC;color:#4A2040;min-height:100vh;padding:16px;}
+.container{max-width:680px;margin:0 auto;padding-bottom:40px;}
+
+/* Hero */
+.hero{background:#FDF6FB;border:1.5px solid #F0C5DE;border-radius:20px;padding:28px 20px 20px;margin-bottom:16px;position:relative;overflow:hidden;text-align:center;}
+.hero-petal{position:absolute;border-radius:50% 0;opacity:0.18;}
+.hero-title{font-family:'Shippori Mincho',serif;font-size:22px;font-weight:600;color:#C0547A;margin-bottom:6px;position:relative;}
+.hero-sub{font-size:13px;color:#D4849F;letter-spacing:0.12em;position:relative;}
+.deco-dots{display:flex;justify-content:center;gap:6px;margin-top:12px;position:relative;}
+.deco-dot{width:7px;height:7px;border-radius:50%;background:#F0C5DE;}
+.deco-dot:nth-child(2){background:#C8A8D8;}
+.deco-dot:nth-child(3){background:#F0C5DE;}
+
+/* Section */
+.section{background:#FFFBFE;border:1px solid #F5D8EC;border-radius:16px;padding:20px;margin-bottom:14px;}
+.section-badge{display:inline-flex;align-items:center;gap:6px;background:#FDF0F8;border:1px solid #F0C5DE;border-radius:20px;padding:4px 14px;margin-bottom:14px;}
+.section-badge-dot{width:7px;height:7px;border-radius:50%;background:#D4539E;flex-shrink:0;}
+.section-badge-text{font-size:12px;font-weight:700;color:#B84080;letter-spacing:0.06em;}
+
+/* Fields */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.field-row.three{grid-template-columns:1fr 1fr 1fr;}
+.field-row.single{grid-template-columns:1fr;}
+label{font-size:12px;color:#B87FA0;display:block;margin-bottom:5px;font-weight:500;}
+input[type=text],input[type=number],textarea{width:100%;padding:10px 13px;font-size:14px;font-family:'Zen Maru Gothic',sans-serif;border:1.5px solid #F0C5DE;border-radius:10px;background:#FFFBFE;color:#6B3A5A;outline:none;transition:border-color 0.2s,background 0.2s;-webkit-appearance:none;}
+input:focus,textarea:focus{border-color:#D4539E;background:#FFF7FC;}
+textarea{resize:vertical;min-height:80px;line-height:1.7;}
+input::placeholder,textarea::placeholder{color:#E0B8CF;}
+
+/* Monthly challenge */
+.monthly-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:9px;}
+.month-pill{min-width:36px;height:28px;background:#F5D0E8;color:#993556;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:4px;}
+.monthly-input{flex:1;padding:8px 12px;font-size:13px;font-family:'Zen Maru Gothic',sans-serif;border:1.5px solid #F0C5DE;border-radius:10px;background:#FFFBFE;color:#6B3A5A;outline:none;transition:border-color 0.2s;}
+.monthly-input:focus{border-color:#D4539E;background:#FFF7FC;}
+.monthly-input::placeholder{color:#E0B8CF;}
+
+/* Month grid */
+.month-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+.month-cell{background:#FDF3F9;border:1px solid #F5D0E8;border-radius:10px;padding:10px 4px;text-align:center;}
+.month-label{font-size:11px;color:#C07090;margin-bottom:6px;font-weight:700;}
+.month-input{width:100%;text-align:center;padding:6px 2px;font-size:14px;font-weight:700;border:1px solid #F0C5DE;border-radius:7px;background:#FFFBFE;color:#8A4068;font-family:'Zen Maru Gothic',sans-serif;outline:none;-webkit-appearance:none;}
+.month-input:focus{border-color:#D4539E;}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;}
+.stat-card{background:#FDF0F8;border-radius:12px;padding:14px 10px;text-align:center;border:1px solid #F5D0E8;}
+.stat-label{font-size:11px;color:#C07090;margin-bottom:4px;font-weight:500;}
+.stat-value{font-size:20px;font-weight:700;color:#8A3868;line-height:1.2;}
+.stat-value.good{color:#1D9E75;}
+.stat-value.bad{color:#D85A30;}
+.progress-wrap{height:8px;background:#F5D8EC;border-radius:4px;margin-bottom:14px;overflow:hidden;}
+.progress-bar{height:100%;border-radius:4px;background:#D4539E;transition:width 0.5s ease;}
+.divider{height:1px;background:#F5D8EC;margin:14px 0;}
+
+/* Prize */
+.prize-banner{border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-top:12px;border:1.5px solid #F5D0E8;background:#FDF0F8;transition:all 0.3s;}
+.prize-banner.on{background:#EAF3DE;border-color:#97C459;}
+.prize-icon{font-size:20px;flex-shrink:0;}
+.prize-text{font-size:13px;color:#8A5060;font-weight:500;line-height:1.5;}
+.prize-text.on{color:#3B6D11;}
+
+/* Buttons */
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.btn-primary{background:#D4539E;color:#fff;border:none;padding:12px 26px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Zen Maru Gothic',sans-serif;letter-spacing:0.04em;transition:background 0.2s;}
+.btn-primary:hover{background:#B84080;}
+.btn-primary:active{transform:scale(0.98);}
+.btn-secondary{background:#FDF0F8;color:#B84080;border:1.5px solid #F0C5DE;padding:12px 20px;border-radius:22px;font-size:14px;cursor:pointer;font-family:'Zen Maru Gothic',sans-serif;font-weight:500;transition:background 0.2s;}
+.btn-secondary:hover{background:#F9E2F3;}
+.save-msg{font-size:13px;color:#1D9E75;margin-top:10px;font-weight:500;display:none;}
+
+/* Responsive */
+@media(max-width:480px){
+  .field-row.three{grid-template-columns:1fr 1fr;}
+  .field-row.three>div:last-child{grid-column:1/-1;}
+  .month-grid{grid-template-columns:repeat(3,1fr);}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .stats-row>div:last-child{grid-column:1/-1;}
+  .hero-title{font-size:18px;}
+  .btn-primary,.btn-secondary{flex:1;text-align:center;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-petal" style="width:50px;height:50px;background:#D4539E;top:10px;left:14px;transform:rotate(20deg);"></div>
+    <div class="hero-petal" style="width:36px;height:36px;background:#9F77DD;bottom:10px;right:24px;transform:rotate(-30deg);"></div>
+    <div class="hero-petal" style="width:28px;height:28px;background:#ED93B1;top:28px;right:70px;transform:rotate(45deg);"></div>
+    <div class="hero-petal" style="width:22px;height:22px;background:#C8A8D8;bottom:20px;left:70px;transform:rotate(10deg);"></div>
+    <div class="hero-title">マイチャレンジシート</div>
+    <div class="hero-sub">自分史上最高をつくる 6 ヶ月</div>
+    <div class="deco-dots">
+      <div class="deco-dot"></div><div class="deco-dot"></div><div class="deco-dot"></div><div class="deco-dot"></div><div class="deco-dot"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge"><div class="section-badge-dot"></div><div class="section-badge-text">基本情報</div></div>
+    <div class="field-row three">
+      <div><label>コード</label><input type="text" id="code" placeholder="FC-001"></div>
+      <div><label>センター名</label><input type="text" id="center" placeholder="朝霧ヤマノ"></div>
+      <div><label>氏名</label><input type="text" id="name" placeholder="有江健彦"></div>
+    </div>
+    <div class="field-row">
+      <div><label>前年合算実績（万円）5/21〜11/20</label><input type="number" id="prev_sales" placeholder="0" oninput="recalc()"></div>
+      <div><label>本年合算目標・半期（万円）</label><input type="number" id="target_sales" placeholder="0" oninput="recalc()"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge"><div class="section-badge-dot" style="background:#9F77DD;"></div><div class="section-badge-text" style="color:#534AB7;">6ヶ月後、どんな自分に？</div></div>
+    <p style="font-size:12px;color:#B87FA0;margin-bottom:12px;">"達成したい姿"ではなく、"なっていたい姿"を書いてください</p>
+    <textarea id="goal_quality" placeholder="例）お客様に自然と頼られて、毎月新しいご縁がうまれている。笑顔でいる時間が増えている。"></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-badge"><div class="section-badge-dot" style="background:#5DCAA5;"></div><div class="section-badge-text" style="color:#0F6E56;">月間マイチャレンジ</div></div>
+    <p style="font-size:12px;color:#B87FA0;margin-bottom:12px;">毎月、自分が動くアクションを書いてください</p>
+    <div class="monthly-row"><div class="month-pill">6月</div><input class="monthly-input" id="c6" placeholder="月間チャレンジを入力..."></div>
+    <div class="monthly-row"><div class="month-pill">7月</div><input class="monthly-input" id="c7" placeholder="月間チャレンジを入力..."></div>
+    <div class="monthly-row"><div class="month-pill">8月</div><input class="monthly-input" id="c8" placeholder="月間チャレンジを入力..."></div>
+    <div class="monthly-row"><div class="month-pill">9月</div><input class="monthly-input" id="c9" placeholder="月間チャレンジを入力..."></div>
+    <div class="monthly-row"><div class="month-pill">10月</div><input class="monthly-input" id="c10" placeholder="月間チャレンジを入力..."></div>
+    <div class="monthly-row"><div class="month-pill">11月</div><input class="monthly-input" id="c11" placeholder="月間チャレンジを入力..."></div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge"><div class="section-badge-dot" style="background:#EF9F27;"></div><div class="section-badge-text" style="color:#854F0B;">月次実績（万円）</div></div>
+    <div class="month-grid">
+      <div class="month-cell"><div class="month-label">6月</div><input class="month-input" type="number" id="m6" placeholder="0" oninput="recalc()"></div>
+      <div class="month-cell"><div class="month-label">7月</div><input class="month-input" type="number" id="m7" placeholder="0" oninput="recalc()"></div>
+      <div class="month-cell"><div class="month-label">8月</div><input class="month-input" type="number" id="m8" placeholder="0" oninput="recalc()"></div>
+      <div class="month-cell"><div class="month-label">9月</div><input class="month-input" type="number" id="m9" placeholder="0" oninput="recalc()"></div>
+      <div class="month-cell"><div class="month-label">10月</div><input class="month-input" type="number" id="m10" placeholder="0" oninput="recalc()"></div>
+      <div class="month-cell"><div class="month-label">11月</div><input class="month-input" type="number" id="m11" placeholder="0" oninput="recalc()"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge"><div class="section-badge-dot" style="background:#D4539E;"></div><div class="section-badge-text">達成状況</div></div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">累計実績</div><div class="stat-value" id="total-actual">0 万円</div></div>
+      <div class="stat-card"><div class="stat-label">目標</div><div class="stat-value" id="total-target">—</div></div>
+      <div class="stat-card"><div class="stat-label">達成率</div><div class="stat-value" id="achieve-rate">—%</div></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+    <div class="divider"></div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">前年実績</div><div class="stat-value" id="prev-disp">—</div></div>
+      <div class="stat-card"><div class="stat-label">対前年比</div><div class="stat-value" id="yoy-rate">—%</div></div>
+      <div class="stat-card"><div class="stat-label">対前年差</div><div class="stat-value" id="yoy-diff">—</div></div>
+    </div>
+    <div class="prize-banner" id="prize-banner">
+      <span class="prize-icon">&#10024;</span>
+      <span class="prize-text" id="prize-text">前年比110%達成で上代1%の化粧品・健康食品プレゼント</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="saveData()">保存する</button>
+    <button class="btn-secondary" onclick="clearAll()">リセット</button>
+  </div>
+  <div class="save-msg" id="save-msg">&#10003; 保存しました</div>
+
+</div>
+
+<script>
+const MONTHS=['m6','m7','m8','m9','m10','m11'];
+const CHALLENGES=['c6','c7','c8','c9','c10','c11'];
+
+function getNum(id){return parseFloat(document.getElementById(id).value)||0;}
+
+function recalc(){
+  const prev=getNum('prev_sales'),target=getNum('target_sales');
+  const actual=MONTHS.reduce((s,m)=>s+getNum(m),0);
+  document.getElementById('total-actual').textContent=actual.toFixed(1)+' 万円';
+  document.getElementById('total-target').textContent=target>0?target.toFixed(1)+' 万円':'—';
+  document.getElementById('prev-disp').textContent=prev>0?prev.toFixed(1)+' 万円':'—';
+  if(target>0){
+    const rate=Math.round((actual/target)*100);
+    const el=document.getElementById('achieve-rate');
+    el.textContent=rate+'%';
+    el.className='stat-value '+(rate>=100?'good':rate<70?'bad':'');
+    const bar=document.getElementById('prog-bar');
+    bar.style.width=Math.min(rate,100)+'%';
+    bar.style.background=rate>=100?'#1D9E75':rate<70?'#D85A30':'#D4539E';
+  }else{
+    document.getElementById('achieve-rate').textContent='—%';
+    document.getElementById('prog-bar').style.width='0%';
+  }
+  if(prev>0&&actual>0){
+    const yoy=((actual/prev)*100).toFixed(1);
+    const diff=(actual-prev).toFixed(1);
+    const yEl=document.getElementById('yoy-rate');
+    yEl.textContent=yoy+'%';
+    yEl.className='stat-value '+(parseFloat(yoy)>=110?'good':parseFloat(yoy)>=100?'':'bad');
+    const dEl=document.getElementById('yoy-diff');
+    dEl.textContent=(parseFloat(diff)>=0?'+':'')+diff+' 万円';
+    dEl.className='stat-value '+(parseFloat(diff)>=0?'good':'bad');
+    const banner=document.getElementById('prize-banner');
+    const txt=document.getElementById('prize-text');
+    if(parseFloat(yoy)>=110){
+      banner.className='prize-banner on';
+      txt.className='prize-text on';
+      txt.textContent='おめでとうございます！対前年比 '+yoy+'% 達成で景品対象です';
+    }else{
+      banner.className='prize-banner';
+      txt.className='prize-text';
+      const need=(prev*1.1-actual).toFixed(1);
+      txt.textContent='景品（上代1%）まであと '+need+' 万円。一緒にがんばりましょう！';
+    }
+  }else{
+    document.getElementById('yoy-rate').textContent='—%';
+    document.getElementById('yoy-diff').textContent='—';
+  }
+}
+
+function saveData(){
+  const data={
+    code:document.getElementById('code').value,
+    center:document.getElementById('center').value,
+    name:document.getElementById('name').value,
+    prev_sales:document.getElementById('prev_sales').value,
+    target_sales:document.getElementById('target_sales').value,
+    goal_quality:document.getElementById('goal_quality').value,
+    monthly_sales:MONTHS.map(m=>document.getElementById(m).value),
+    monthly_challenges:CHALLENGES.map(c=>document.getElementById(c).value),
+    saved_at:new Date().toLocaleString('ja-JP')
+  };
+  localStorage.setItem('challenge_sheet',JSON.stringify(data));
+  const msg=document.getElementById('save-msg');
+  msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',2500);
+}
+
+function clearAll(){
+  if(!confirm('入力内容をすべてリセットしますか？'))return;
+  ['code','center','name','prev_sales','target_sales','goal_quality',...MONTHS,...CHALLENGES].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  recalc();
+}
+
+(function loadSaved(){
+  try{
+    const d=JSON.parse(localStorage.getItem('challenge_sheet')||'{}');
+    if(d.code)document.getElementById('code').value=d.code;
+    if(d.center)document.getElementById('center').value=d.center;
+    if(d.name)document.getElementById('name').value=d.name;
+    if(d.prev_sales)document.getElementById('prev_sales').value=d.prev_sales;
+    if(d.target_sales)document.getElementById('target_sales').value=d.target_sales;
+    if(d.goal_quality)document.getElementById('goal_quality').value=d.goal_quality;
+    if(d.monthly_sales)d.monthly_sales.forEach((v,i)=>{if(MONTHS[i]&&v)document.getElementById(MONTHS[i]).value=v;});
+    if(d.monthly_challenges)d.monthly_challenges.forEach((v,i)=>{if(CHALLENGES[i]&&v)document.getElementById(CHALLENGES[i]).value=v;});
+    recalc();
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

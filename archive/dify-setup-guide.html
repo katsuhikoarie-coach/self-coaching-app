@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dify設定手順書｜朝霧ヤマノ AIカウンセラー</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --amber: #C8924A;
+  --amber-d: #9B6E32;
+  --amber-l: #E8C48A;
+  --amber-xl: #F7EEE0;
+  --mud: #6B5240;
+  --mud-l: #8B7060;
+  --cream: #FAF6EF;
+  --warm: #FDF9F4;
+  --white: #fff;
+  --text: #2C1F14;
+  --text-m: #5C4535;
+  --text-l: #A08878;
+  --green: #3A7A55;
+  --green-l: #EAF5EE;
+  --blue: #3A6A9B;
+  --blue-l: #EAF0F8;
+  --red: #B04040;
+  --red-l: #FAF0F0;
+  --shadow: rgba(107,82,64,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.8;
+}
+
+/* ヘッダー */
+.top{
+  background:linear-gradient(150deg,var(--mud) 0%,#3E2A1C 50%,var(--amber-d) 100%);
+  padding:48px 24px 56px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.top::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at 80% 20%, rgba(200,146,74,0.2) 0%, transparent 55%);
+}
+.top-label{
+  display:inline-block;
+  border:1px solid rgba(200,146,74,0.45);
+  color:var(--amber-l);
+  font-size:10.5px;
+  letter-spacing:4px;
+  padding:5px 18px;
+  border-radius:20px;
+  margin-bottom:20px;
+  position:relative;
+}
+.top h1{
+  font-family:'Noto Serif JP',serif;
+  font-weight:200;
+  font-size:clamp(22px,4vw,32px);
+  color:#fff;
+  letter-spacing:2px;
+  line-height:1.6;
+  position:relative;
+  margin-bottom:10px;
+}
+.top p{
+  color:rgba(255,255,255,0.55);
+  font-size:12.5px;
+  letter-spacing:0.5px;
+  position:relative;
+}
+
+/* 所要時間バー */
+.time-bar{
+  background:var(--white);
+  max-width:680px;
+  margin:-28px auto 0;
+  border-radius:16px;
+  box-shadow:0 8px 32px var(--shadow);
+  padding:18px 28px;
+  display:flex;
+  gap:24px;
+  align-items:center;
+  border:1px solid rgba(200,146,74,0.15);
+  flex-wrap:wrap;
+  position:relative;
+  z-index:2;
+}
+.time-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:12.5px;color:var(--text-m);
+}
+.time-item strong{color:var(--amber-d);font-size:16px;}
+
+/* コンテナ */
+.wrap{
+  max-width:680px;
+  margin:0 auto;
+  padding:32px 20px 80px;
+}
+
+/* セクション見出し */
+.sec-title{
+  display:flex;align-items:center;gap:12px;
+  margin:36px 0 16px;
+}
+.sec-num{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--amber),var(--amber-d));
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:500;
+  flex-shrink:0;
+  box-shadow:0 3px 10px rgba(200,146,74,0.4);
+}
+.sec-title h2{
+  font-family:'Noto Serif JP',serif;
+  font-weight:300;
+  font-size:18px;
+  color:var(--mud);
+  letter-spacing:1px;
+}
+.sec-title .est{
+  margin-left:auto;
+  font-size:11px;
+  color:var(--text-l);
+  background:var(--amber-xl);
+  padding:3px 12px;
+  border-radius:10px;
+  flex-shrink:0;
+}
+
+/* カード */
+.card{
+  background:var(--white);
+  border-radius:16px;
+  box-shadow:0 3px 18px var(--shadow);
+  border:1px solid rgba(200,146,74,0.12);
+  overflow:hidden;
+  margin-bottom:14px;
+}
+.card-body{padding:18px 20px;}
+.card-body p{font-size:13.5px;color:var(--text-m);line-height:1.85;}
+.card-body p+p{margin-top:10px;}
+
+/* ステップ行 */
+.op-step{
+  display:flex;gap:14px;
+  padding:12px 0;
+  border-bottom:1px solid rgba(200,146,74,0.08);
+  align-items:flex-start;
+}
+.op-step:last-child{border-bottom:none;}
+.op-sn{
+  width:24px;height:24px;
+  border-radius:50%;
+  background:var(--amber-xl);
+  color:var(--amber-d);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:500;
+  flex-shrink:0;margin-top:1px;
+}
+.op-txt strong{color:var(--mud);display:block;font-size:13.5px;margin-bottom:3px;}
+.op-txt p{font-size:13px;color:var(--text-m);}
+.op-txt code{
+  background:var(--amber-xl);
+  color:var(--amber-d);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:12px;
+  font-family:monospace;
+}
+
+/* 画面イメージ（SVGモック） */
+.screen-mock{
+  background:var(--warm);
+  border:1.5px solid rgba(200,146,74,0.2);
+  border-radius:12px;
+  margin:14px 0;
+  overflow:hidden;
+}
+.mock-bar{
+  background:linear-gradient(90deg,var(--mud),var(--amber-d));
+  padding:8px 14px;
+  display:flex;align-items:center;gap:8px;
+}
+.mock-dot{width:10px;height:10px;border-radius:50%;}
+.mock-body{padding:14px 16px;}
+.mock-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;
+  border-radius:8px;
+  margin-bottom:6px;
+  font-size:12.5px;
+}
+.mock-row.highlight{background:rgba(200,146,74,0.12);border:1.5px solid rgba(200,146,74,0.3);}
+.mock-row .arrow{color:var(--amber);font-size:16px;font-weight:700;}
+.mock-row span{color:var(--text-m);}
+.mock-btn{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--amber),var(--amber-d));
+  color:#fff;
+  padding:6px 18px;
+  border-radius:8px;
+  font-size:12px;
+  margin-top:4px;
+}
+
+/* プロンプトボックス */
+.prompt-box{
+  background:#18120D;
+  border-radius:12px;
+  overflow:hidden;
+  margin:14px 0;
+  border:1px solid rgba(200,146,74,0.2);
+}
+.pb-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;
+  background:rgba(200,146,74,0.1);
+  border-bottom:1px solid rgba(200,146,74,0.15);
+}
+.pb-bar span{font-size:10.5px;color:var(--amber-l);letter-spacing:2px;}
+.pb-copy{
+  background:var(--amber);color:#fff;border:none;
+  border-radius:10px;padding:4px 14px;
+  font-size:11.5px;font-family:'Noto Sans JP',sans-serif;
+  cursor:pointer;transition:all .2s;
+}
+.pb-copy:hover{background:var(--amber-d);}
+.pb-copy.ok{background:var(--green);}
+.pb-text{
+  padding:14px 16px;
+  font-size:12px;color:#B8D8A0;
+  line-height:1.85;font-family:monospace;
+  white-space:pre-wrap;word-break:break-word;
+  max-height:300px;overflow-y:auto;
+}
+.pb-text::-webkit-scrollbar{width:3px;}
+.pb-text::-webkit-scrollbar-thumb{background:rgba(200,146,74,0.4);border-radius:2px;}
+
+/* 注意・ヒントボックス */
+.note{
+  border-radius:10px;padding:13px 16px;margin:12px 0;
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:13px;line-height:1.75;
+}
+.note.info{background:var(--blue-l);border:1px solid rgba(58,106,155,0.2);}
+.note.info .ni{color:var(--blue);}
+.note.warn{background:var(--amber-xl);border:1px solid rgba(200,146,74,0.3);}
+.note.warn .ni{color:var(--amber-d);}
+.note.good{background:var(--green-l);border:1px solid rgba(58,122,85,0.2);}
+.note.good .ni{color:var(--green);}
+.note .ni{font-size:18px;flex-shrink:0;margin-top:1px;}
+.note p{color:var(--text-m);}
+.note strong{color:var(--mud);}
+
+/* タグ */
+.tag{
+  display:inline-block;
+  padding:2px 10px;border-radius:10px;
+  font-size:11px;font-weight:500;
+  margin-right:6px;
+}
+.tag.free{background:var(--green-l);color:var(--green);}
+.tag.easy{background:var(--blue-l);color:var(--blue);}
+
+/* リンクボタン */
+.link-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,var(--mud),var(--amber-d));
+  color:#fff;text-decoration:none;
+  border-radius:12px;font-size:13.5px;
+  letter-spacing:0.5px;
+  transition:all .25s;
+  box-shadow:0 5px 18px rgba(107,82,64,0.28);
+  margin:14px 0;
+  border:none;cursor:pointer;
+}
+.link-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(107,82,64,0.38);}
+.link-btn small{display:block;opacity:.65;font-size:11px;margin-top:2px;letter-spacing:0.2px;}
+
+/* チェックリスト */
+.checklist{list-style:none;padding:0;}
+.checklist li{
+  padding:9px 4px;
+  border-bottom:1px solid rgba(200,146,74,0.08);
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:var(--text-m);
+}
+.checklist li::before{content:'□';color:var(--amber);font-size:16px;flex-shrink:0;line-height:1.2;}
+
+/* 完成図 */
+.done-box{
+  background:linear-gradient(135deg,var(--mud),var(--amber-d));
+  border-radius:16px;padding:28px 24px;
+  text-align:center;color:#fff;
+  margin-top:32px;
+}
+.done-box h3{
+  font-family:'Noto Serif JP',serif;
+  font-weight:200;font-size:20px;
+  letter-spacing:2px;margin-bottom:12px;
+}
+.done-box p{font-size:13px;opacity:.75;line-height:1.8;}
+.url-mock{
+  background:rgba(0,0,0,0.25);
+  border-radius:8px;padding:10px 18px;
+  font-family:monospace;font-size:13px;
+  color:var(--amber-l);margin:14px auto;
+  display:inline-block;letter-spacing:0.5px;
+  border:1px solid rgba(200,146,74,0.3);
+}
+
+/* トースト */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--mud);color:#fff;
+  padding:9px 22px;border-radius:20px;
+  font-size:13px;opacity:0;
+  transition:all .3s;pointer-events:none;
+  z-index:999;white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:480px){
+  .time-bar{gap:14px;}
+  .card-body{padding:14px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-label">SETUP GUIDE</div>
+  <h1>Dify で作る<br>朝霧ヤマノ AIカウンセラー<br>設定手順書</h1>
+  <p>URLを送るだけ。テスターはコピペ不要でAIと話せます。</p>
+</div>
+
+<div class="wrap">
+
+<!-- 所要時間 -->
+<div class="time-bar">
+  <div class="time-item">⏱ 所要時間<strong>約30分</strong></div>
+  <div class="time-item">💴 費用<strong>無料</strong></div>
+  <div class="time-item">🛠 難易度<strong>かんたん</strong></div>
+  <div class="time-item">📱 テスター側<strong>登録不要</strong></div>
+</div>
+
+<!-- 全体の流れ -->
+<div class="sec-title">
+  <div class="sec-num">📋</div>
+  <h2>全体の流れ</h2>
+</div>
+<div class="card">
+  <div class="card-body">
+    <div class="op-step">
+      <div class="op-sn">1</div>
+      <div class="op-txt"><strong>Dify.ai に登録する</strong><p>Googleアカウントで1分で完了</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">2</div>
+      <div class="op-txt"><strong>チャットボットを新規作成する</strong><p>「スタジオ」から作成ボタンを押すだけ</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">3</div>
+      <div class="op-txt"><strong>プロンプトを貼り付ける</strong><p>このページにある完成プロンプトをコピーして貼るだけ</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">4</div>
+      <div class="op-txt"><strong>公開してURLを発行する</strong><p>ボタン1つで専用URLが発行されます</p></div>
+    </div>
+    <div class="op-step" style="border:none">
+      <div class="op-sn">5</div>
+      <div class="op-txt"><strong>テスターにURLをLINEで送る</strong><p>開くだけでAIカウンセラーが起動！</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="sec-title">
+  <div class="sec-num">1</div>
+  <h2>Dify.ai に登録する</h2>
+  <span class="est">約3分</span>
+</div>
+<div class="card">
+  <div class="card-body">
+    <div class="op-step">
+      <div class="op-sn">①</div>
+      <div class="op-txt"><strong>dify.ai にアクセスする</strong><p>下のボタンから開きます</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">②</div>
+      <div class="op-txt"><strong>「Get Started」をクリック</strong><p>右上または中央のボタンを押します</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">③</div>
+      <div class="op-txt"><strong>「Continue with Google」を選ぶ</strong><p>Googleアカウントでそのままログインが一番かんたんです</p></div>
+    </div>
+    <div class="op-step" style="border:none">
+      <div class="op-sn">④</div>
+      <div class="op-txt"><strong>ダッシュボードが表示されたら登録完了</strong><p>「スタジオ」や「アプリ」という画面が出れば成功です 🎉</p></div>
+    </div>
+
+    <a class="link-btn" href="https://dify.ai" target="_blank" rel="noopener">
+      🌐 dify.ai を開く
+      <small>新しいタブで開きます</small>
+    </a>
+
+    <div class="note info">
+      <span class="ni">ℹ️</span>
+      <p><strong>無料プランの制限：</strong>月200回の会話まで無料。テスト用途なら十分です。20人×10回会話＝200回でちょうど収まります。</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="sec-title">
+  <div class="sec-num">2</div>
+  <h2>チャットボットを新規作成する</h2>
+  <span class="est">約5分</span>
+</div>
+<div class="card">
+  <div class="card-body">
+
+    <div class="op-step">
+      <div class="op-sn">①</div>
+      <div class="op-txt"><strong>左メニューの「スタジオ」をクリック</strong><p>英語表示の場合は「Studio」</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">②</div>
+      <div class="op-txt"><strong>右上の「＋ 新規作成」ボタンを押す</strong><p>または「アプリを作成」ボタン</p></div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">③</div>
+      <div class="op-txt">
+        <strong>「チャットボット」を選ぶ</strong>
+        <p>4つくらい選択肢が出ます。<code>チャットボット</code>（または Chatbot）を選んでください</p>
+      </div>
+    </div>
+    <div class="op-step" style="border:none">
+      <div class="op-sn">④</div>
+      <div class="op-txt">
+        <strong>名前を入力して「作成」を押す</strong>
+        <p>名前の例：<code>朝霧ヤマノ AIカウンセラー</code></p>
+      </div>
+    </div>
+
+    <!-- 画面モック -->
+    <div class="screen-mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#FF6B6B"></div>
+        <div class="mock-dot" style="background:#FFD93D"></div>
+        <div class="mock-dot" style="background:#6BCB77"></div>
+        <span style="color:rgba(255,255,255,0.6);font-size:11px;margin-left:8px;">dify.ai — スタジオ</span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-row"><span style="color:var(--text-l);font-size:12px;">📁 マイアプリ</span></div>
+        <div class="mock-row highlight">
+          <span class="arrow">→</span>
+          <span>＋ 新規作成 / アプリを作成</span>
+          <span class="mock-btn">クリック</span>
+        </div>
+        <div class="mock-row" style="padding-left:24px;"><span style="font-size:12px;color:var(--text-l);">💬 チャットボット ← これを選ぶ</span></div>
+        <div class="mock-row" style="padding-left:24px;"><span style="font-size:12px;color:var(--text-l);">🤖 エージェント</span></div>
+        <div class="mock-row" style="padding-left:24px;"><span style="font-size:12px;color:var(--text-l);">🔁 ワークフロー</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="sec-title">
+  <div class="sec-num">3</div>
+  <h2>プロンプトを設定する</h2>
+  <span class="est">約10分</span>
+</div>
+<div class="card">
+  <div class="card-body">
+
+    <div class="op-step">
+      <div class="op-sn">①</div>
+      <div class="op-txt">
+        <strong>「オーケストレーション」画面が開く</strong>
+        <p>作成後、自動でこの画面に移ります</p>
+      </div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">②</div>
+      <div class="op-txt">
+        <strong>「指示」欄を探してクリック</strong>
+        <p>画面左側に「指示」「システムプロンプト」などと書かれた入力欄があります。英語表示なら「Instructions」</p>
+      </div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">③</div>
+      <div class="op-txt">
+        <strong>下のプロンプトを全文コピーして貼り付ける</strong>
+        <p>「コピー」ボタンを押して、入力欄にペーストしてください</p>
+      </div>
+    </div>
+
+    <!-- プロンプト -->
+    <div class="prompt-box">
+      <div class="pb-bar">
+        <span>完成プロンプト</span>
+        <button class="pb-copy" id="pcBtn" onclick="copyPrompt()">📋 全文コピー</button>
+      </div>
+      <div class="pb-text" id="promptContent">あなたは朝霧ヤマノの専任スキンケアカウンセラーです。
+お客様に寄り添い、やさしく丁寧にヒアリングしながら、最適なヤマノ製品を提案します。
+
+【会話の基本ルール】
+・1回のメッセージは2〜3文以内で簡潔に
+・必ず質問または提案で会話を終える
+・絵文字を1〜2個/メッセージで自然に使う
+・押しつけがましくならず、寄り添う姿勢を大切に
+・専門用語はやさしく言い換える
+
+【ヒアリングの順序】
+① お客様の年代を確認する
+② 現在の洗顔・スキンケア方法を聞く
+③ 主なお肌のお悩みを聞く（乾燥・毛穴・ハリ・くすみ・敏感など）
+④ ご予算感を確認する
+⑤ お悩みに合った製品を具体的に提案する
+
+【朝霧ヤマノの強み（自然に会話に織り込む）】
+・どろんこ（泥）洗顔：毛穴の汚れを吸着しながら潤いを守る独自処方
+・琥珀（コハク）保湿：50代以降のハリ・乾燥に特化したエイジングケア成分
+・低刺激・アルコールフリー処方：敏感肌の方にも安心して使える
+
+【年代別のアドバイス指針】
+・30代：毛穴・くすみ対策、予防的エイジングケアの入り口を提案
+・40代：乾燥・ハリ低下への本格対応、日焼け止め＋保湿のバランス
+・50代以上：バリア機能の回復、琥珀成分でのエイジングケアを優先
+
+【予算別の提案方針】
+・〜5,000円：洗顔1点から始めるシンプルスタート
+・〜10,000円：洗顔＋化粧水か洗顔＋クリームの2点セット
+・10,000円〜：フルルーティンを段階的に提案
+
+【製品提案の軸】
+まず「落とすケア（クレンジング・洗顔）」から整えることを優先する。
+100円石鹸からの移行には、クレイ系の優しい洗顔料を最初に勧める。
+
+【最初のメッセージ】
+必ず以下の文章から会話を始めてください：
+「こんにちは！朝霧ヤマノのAIスキンケアカウンセラーです🌿 お肌のお悩みを一緒に解決していきましょう。まず、お客様の年代を教えていただけますか？」</div>
+    </div>
+
+    <div class="op-step" style="margin-top:14px;">
+      <div class="op-sn">④</div>
+      <div class="op-txt">
+        <strong>AIモデルを確認する（任意）</strong>
+        <p>画面右上あたりに「モデル」の選択欄があります。<code>Claude</code> や <code>GPT-4o</code> などが選べます。無料で使えるものを選んでください。</p>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="ni">⚠️</span>
+      <p><strong>モデルが選べない場合：</strong>DifyはデフォルトでOpenAIのモデルが使えます。Claudeを使いたい場合は後から「設定 → モデルプロバイダー」でAnthropicのAPIキーを追加できます。まずはデフォルトのまま進めてOKです。</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="sec-title">
+  <div class="sec-num">4</div>
+  <h2>動作確認して公開する</h2>
+  <span class="est">約5分</span>
+</div>
+<div class="card">
+  <div class="card-body">
+
+    <div class="op-step">
+      <div class="op-sn">①</div>
+      <div class="op-txt">
+        <strong>右側のプレビューで動作確認する</strong>
+        <p>画面右にチャット欄があります。「50代です」などと入力して、AIが正しく返答するか確認してください</p>
+      </div>
+    </div>
+
+    <div class="op-step">
+      <div class="op-sn">②</div>
+      <div class="op-txt">
+        <strong>右上の「公開」ボタンを押す</strong>
+        <p>英語表示なら「Publish」。押すと確認画面が出るので「確認」を押します</p>
+      </div>
+    </div>
+
+    <div class="op-step" style="border:none">
+      <div class="op-sn">③</div>
+      <div class="op-txt">
+        <strong>「共有」からURLをコピーする</strong>
+        <p>「共有」または「Share」ボタンを押すと、専用URLが表示されます。このURLをコピーしてください。</p>
+      </div>
+    </div>
+
+    <!-- 画面モック -->
+    <div class="screen-mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#FF6B6B"></div>
+        <div class="mock-dot" style="background:#FFD93D"></div>
+        <div class="mock-dot" style="background:#6BCB77"></div>
+        <span style="color:rgba(255,255,255,0.6);font-size:11px;margin-left:8px;">dify.ai — 朝霧ヤマノ AIカウンセラー</span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-row" style="justify-content:flex-end;gap:8px;margin-bottom:10px;">
+          <div class="mock-row highlight" style="margin:0;padding:6px 14px;">
+            <span class="arrow">→</span>
+            <span class="mock-btn" style="margin:0">公開 / Publish</span>
+          </div>
+          <div style="background:var(--amber-xl);border:1.5px solid var(--amber);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--amber-d);">共有 / Share</div>
+        </div>
+        <div style="background:rgba(200,146,74,0.08);border:1px dashed rgba(200,146,74,0.4);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:11px;color:var(--text-l);margin-bottom:4px;">公開URL（テスターに送るURL）</div>
+          <div style="font-family:monospace;font-size:12px;color:var(--amber-d);">https://udify.app/chat/xxxxxxxxxx</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note good">
+      <span class="ni">✅</span>
+      <p><strong>このURLを送るだけで完了！</strong>テスターはアカウント登録不要。URLを開いた瞬間からAIカウンセラーと話せます。</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="sec-title">
+  <div class="sec-num">5</div>
+  <h2>テスターにURLを送る</h2>
+  <span class="est">約2分</span>
+</div>
+<div class="card">
+  <div class="card-body">
+    <p>LINEやメールで下記のような文章と一緒にURLを送ってください。</p>
+
+    <div class="prompt-box" style="margin-top:14px;">
+      <div class="pb-bar">
+        <span>送付メッセージ例</span>
+        <button class="pb-copy" id="msgBtn" onclick="copyMsg()">📋 コピー</button>
+      </div>
+      <div class="pb-text" id="msgContent">【朝霧ヤマノ AIカウンセラー テストのお願い】
+
+いつもありがとうございます！
+AIスキンケアカウンセラーのテストにご協力いただけますか？
+
+▼ 下のURLを開くだけで始められます
+https://udify.app/chat/（あなたのURL）
+
+📌 操作はとても簡単です
+・URLを開く
+・「50代です、石鹸で洗顔しています」など、
+　実際のお客様を想定して話しかけてみてください
+
+⏱ 所要時間：5〜10分程度
+🆓 登録・費用は一切不要です
+
+体験後、感想を一言でも教えていただけると嬉しいです🌿
+よろしくお願いします！</div>
+    </div>
+
+    <div class="note info">
+      <span class="ni">💡</span>
+      <p><strong>フィードバックを集めるには：</strong>Googleフォームを別途作成して、URLと一緒に送ると便利です。「5段階で評価してください」「気になった点を教えてください」の2問だけでも十分です。</p>
+    </div>
+  </div>
+</div>
+
+<!-- チェックリスト -->
+<div class="sec-title">
+  <div class="sec-num">✅</div>
+  <h2>完了チェックリスト</h2>
+</div>
+<div class="card">
+  <div class="card-body">
+    <ul class="checklist">
+      <li>dify.ai にGoogleアカウントで登録した</li>
+      <li>「チャットボット」を新規作成した</li>
+      <li>プロンプトを「指示」欄に貼り付けた</li>
+      <li>プレビューでAIが正しく返答することを確認した</li>
+      <li>「公開」ボタンを押してURLを発行した</li>
+      <li>自分でURLを開いて動作確認した</li>
+      <li>テスターにURLとメッセージを送った</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 完成！ -->
+<div class="done-box">
+  <h3>🌿 完成イメージ</h3>
+  <p>テスターがこのURLを開くと…</p>
+  <div class="url-mock">https://udify.app/chat/yamano-xxxx</div>
+  <p>↓ すぐにAIカウンセラーの画面が開いて<br>「こんにちは！年代を教えてください🌿」と話しかけてくれます。<br><br>コピペ不要・登録不要・完全無料でテスト開始！</p>
+</div>
+
+<!-- よくある質問 -->
+<div class="sec-title" style="margin-top:36px;">
+  <div class="sec-num">❓</div>
+  <h2>よくある質問</h2>
+</div>
+<div class="card">
+  <div class="card-body">
+    <div class="op-step">
+      <div class="op-sn">Q</div>
+      <div class="op-txt">
+        <strong>モデルの選択で迷ったら？</strong>
+        <p>最初は「gpt-4o-mini」か「gpt-3.5-turbo」を選ぶとDifyの無料枠で使えます。Claudeを使いたい場合は後でAnthropicのAPIキーを追加します。</p>
+      </div>
+    </div>
+    <div class="op-step">
+      <div class="op-sn">Q</div>
+      <div class="op-txt">
+        <strong>20人に送ったら無料枠を超える？</strong>
+        <p>1人10回会話＝20人で200回。無料枠（月200回）にちょうど収まります。念のため1人5〜7回を目安にしてもらうと安心です。</p>
+      </div>
+    </div>
+    <div class="op-step" style="border:none">
+      <div class="op-sn">Q</div>
+      <div class="op-txt">
+        <strong>テスト後に非公開にできる？</strong>
+        <p>はい。Difyの管理画面から「非公開」にすればURLからアクセスできなくなります。テスト期間が終わったら閉じましょう。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2200);
+}
+function copyPrompt(){
+  const text=document.getElementById('promptContent').innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.getElementById('pcBtn');
+    b.textContent='✅ コピーしました';b.classList.add('ok');
+    showToast('プロンプトをコピーしました！');
+    setTimeout(()=>{b.textContent='📋 全文コピー';b.classList.remove('ok');},2500);
+  });
+}
+function copyMsg(){
+  const text=document.getElementById('msgContent').innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.getElementById('msgBtn');
+    b.textContent='✅ コピーしました';b.classList.add('ok');
+    showToast('メッセージをコピーしました！');
+    setTimeout(()=>{b.textContent='📋 コピー';b.classList.remove('ok');},2500);
+  });
+}
+</script>
+</body>
+</html>

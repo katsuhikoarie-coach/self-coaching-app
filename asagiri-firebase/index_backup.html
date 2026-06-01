@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朝霧店 売上・顧客管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11; --bg2: #16161a; --bg3: #1e1e24;
+    --border: #2a2a35;
+    --accent: #c8a96e; --accent2: #e8c98e; --accent-soft: rgba(200,169,110,0.12);
+    --text: #e8e6e0; --text2: #9a9890; --text3: #5a5856;
+    --red: #e06060; --green: #60c090; --blue: #6090e0;
+    --radius: 10px; --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* サイドバー */
+  .sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+  .sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo .store-name { font-size: 17px; font-weight: 700; color: var(--accent); letter-spacing: 0.05em; }
+  .sidebar-logo .store-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'DM Mono', monospace; }
+  .nav { padding: 12px 0; flex: 1; }
+  .nav-section { font-size: 10px; color: var(--text3); letter-spacing: 0.1em; padding: 12px 20px 4px; font-family: 'DM Mono', monospace; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; color: var(--text2); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; font-size: 13px; }
+  .nav-item:hover { color: var(--text); background: var(--accent-soft); }
+  .nav-item.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); }
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
+
+  /* メイン */
+  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 28px; height: 54px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 15px; font-weight: 500; }
+  .topbar-right { display: flex; gap: 12px; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(200,169,110,0.25); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-family: 'DM Mono', monospace; }
+  .content { padding: 24px 28px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* カード */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; }
+  .card-title { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .card-value { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  .card-value span { font-size: 13px; color: var(--text3); font-weight: 400; margin-left: 4px; }
+  .card-sub { margin-top: 5px; font-size: 12px; color: var(--text3); }
+  .card-sub .up { color: var(--green); }
+  .card-sub .down { color: var(--red); }
+
+  /* グリッド */
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+  /* テーブル */
+  .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .table-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .table-head h3 { font-size: 13px; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--bg3); padding: 9px 14px; text-align: left; font-size: 11px; color: var(--text3); letter-spacing: 0.06em; font-family: 'DM Mono', monospace; font-weight: 500; }
+  tbody tr { border-top: 1px solid var(--border); transition: background 0.12s; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody td { padding: 10px 14px; font-size: 13px; color: var(--text); }
+  tbody td.mono { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text2); }
+  tbody td.amount { font-family: 'DM Mono', monospace; text-align: right; }
+
+  /* ステータス */
+  .status { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-family: 'DM Mono', monospace; }
+  .status.done { background: rgba(96,192,144,0.15); color: var(--green); }
+  .status.pending { background: rgba(200,169,110,0.15); color: var(--accent); }
+  .status.low { background: rgba(224,96,96,0.15); color: var(--red); }
+
+  /* ボタン */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; transition: all 0.15s; font-family: 'Noto Sans JP', sans-serif; }
+  .btn-primary { background: var(--accent); color: #0f0f11; font-weight: 500; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  /* 検索 */
+  .search-bar { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+  input[type=text], input[type=date], input[type=number], select, textarea {
+    background: var(--bg2); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 12px; border-radius: 6px; font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color 0.15s;
+  }
+  input[type=text]:focus, input[type=date]:focus, input[type=number]:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select option { background: var(--bg3); }
+  textarea { resize: vertical; }
+
+  /* フォーム */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 11px; color: var(--text3); letter-spacing: 0.06em; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  /* モーダル */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; width: 600px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: slideUp 0.2s ease; }
+  .modal.wide { width: 780px; }
+  @keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg2); z-index: 1; }
+  .modal-header h3 { font-size: 14px; font-weight: 500; }
+  .modal-close { cursor: pointer; color: var(--text3); font-size: 18px; background: none; border: none; }
+  .modal-body { padding: 18px 22px; }
+  .modal-footer { padding: 12px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* バーチャート */
+  .bar-chart { padding: 2px 0; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .bar-label { width: 65px; font-size: 12px; color: var(--text2); text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; background: var(--bg3); border-radius: 3px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.6s ease; }
+  .bar-amount { width: 90px; font-size: 12px; color: var(--text2); font-family: 'DM Mono', monospace; text-align: right; }
+
+  /* 在庫バー */
+  .stock-bar { height: 5px; background: var(--bg3); border-radius: 3px; margin-top: 3px; overflow: hidden; }
+  .stock-fill { height: 100%; border-radius: 3px; }
+
+  /* タブ */
+  .tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .tab { padding: 8px 16px; font-size: 13px; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* アラート */
+  .alert { display: flex; gap: 10px; align-items: flex-start; padding: 11px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
+  .alert-warn { background: rgba(200,169,110,0.1); border: 1px solid rgba(200,169,110,0.25); color: var(--accent); }
+  .alert-danger { background: rgba(224,96,96,0.1); border: 1px solid rgba(224,96,96,0.25); color: var(--red); }
+
+  /* チップ */
+  .chip { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+  .chip.gold { background: rgba(200,169,110,0.12); color: var(--accent); border-color: rgba(200,169,110,0.25); }
+  .chip.blue { background: rgba(96,144,224,0.12); color: var(--blue); border-color: rgba(96,144,224,0.25); }
+  .chip.green { background: rgba(96,192,144,0.12); color: var(--green); border-color: rgba(96,192,144,0.25); }
+
+  /* ページネーション */
+  .pagination { display: flex; align-items: center; gap: 6px; padding: 12px 18px; border-top: 1px solid var(--border); justify-content: flex-end; }
+  .page-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: 'DM Mono', monospace; }
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .page-btn.active { background: var(--accent); color: #0f0f11; border-color: var(--accent); }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .flex { display: flex; align-items: center; }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; }
+  .mt-4 { margin-top: 4px; } .mt-8 { margin-top: 8px; } .mt-16 { margin-top: 16px; }
+  .text-muted { color: var(--text3); font-size: 12px; }
+  .text-accent { color: var(--accent); }
+
+  /* 顧客詳細 */
+  .cust-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cust-detail-item label { font-size: 10px; color: var(--text3); letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
+  .cust-detail-item span { font-size: 13px; }
+
+  /* 新規伝票明細 */
+  #detail-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  #detail-table th { background: var(--bg3); padding: 8px 10px; font-size: 11px; color: var(--text3); letter-spacing: 0.05em; font-family: 'DM Mono', monospace; }
+  #detail-table td { padding: 6px 8px; border-top: 1px solid var(--border); }
+
+  /* 売上グラフ */
+  .chart-canvas { width: 100%; }
+
+  /* ローディング */
+  .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: var(--text3); font-size: 14px; gap: 10px; }
+
+  /* レスポンシブ */
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* 印刷エリア（通常時は非表示） */
+  #print-area { display: none; }
+
+  @media print {
+    @page { size: A4 portrait; margin: 15mm; }
+    .layout, #login-overlay, #app-loading, #offline-banner, .modal-overlay { display: none !important; }
+    #print-area { display: block !important; font-family: 'Noto Sans JP', sans-serif; color: #000; background: #fff; }
+  }
+</style>
+
+  <!-- ★ Firebase SDK v9 compat ★ -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<!-- ★ ログインオーバーレイ ★ -->
+<div id="login-overlay" style="
+  position:fixed;inset:0;background:#0f0f11;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;">
+  <div style="text-align:center">
+    <div style="font-size:28px;font-weight:700;color:#c8a96e;letter-spacing:.05em;margin-bottom:6px">朝霧店</div>
+    <div style="font-size:13px;color:#5a5856;font-family:'DM Mono',monospace;letter-spacing:.1em">SALES MANAGEMENT SYSTEM</div>
+  </div>
+  <div style="background:#16161a;border:1px solid #2a2a35;border-radius:14px;padding:32px 36px;width:340px;text-align:center">
+    <div style="font-size:15px;font-weight:500;margin-bottom:6px">ログインが必要です</div>
+    <div style="font-size:12px;color:#5a5856;margin-bottom:24px">Googleアカウントでログインしてください</div>
+    <button id="login-btn" onclick="doLogin()" style="
+      width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+      background:#c8a96e;color:#0f0f11;border:none;border-radius:8px;
+      padding:11px 20px;font-size:14px;font-weight:500;cursor:pointer;
+      font-family:'Noto Sans JP',sans-serif;transition:background .15s;">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Googleでログイン
+    </button>
+    <div id="login-error" style="color:#e06060;font-size:12px;margin-top:12px;display:none"></div>
+  </div>
+  <div style="font-size:11px;color:#3a3836">朝霧店スタッフ専用システム</div>
+</div>
+
+<!-- ★ ローディング画面 ★ -->
+<div id="app-loading" style="
+  position:fixed;inset:0;background:rgba(15,15,17,.85);z-index:8999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  backdrop-filter:blur(4px);">
+  <div style="width:36px;height:36px;border:3px solid #2a2a35;border-top-color:#c8a96e;
+    border-radius:50%;animation:spin .7s linear infinite;"></div>
+  <div style="font-size:13px;color:#9a9890" id="loading-msg">データを読み込み中...</div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+
+<!-- ★ オフラインバナー ★ -->
+<div id="offline-banner" style="
+  display:none;position:fixed;top:0;left:0;right:0;z-index:7000;
+  background:#c8a96e;color:#0f0f11;text-align:center;padding:7px;
+  font-size:12px;font-weight:500;">
+  ⚠ オフライン中 — データは次回オンライン時に同期されます
+</div>
+
+<div class="layout">
+
+  <!-- サイドバー -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="store-name">朝霧店</div>
+      <div class="store-sub">SALES MANAGEMENT v2.0</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">OVERVIEW</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">◈</span> ダッシュボード</div>
+
+      <div class="nav-section">売上管理</div>
+      <div class="nav-item" onclick="showPage('sales',this)"><span class="icon">◉</span> 売上伝票一覧</div>
+      <div class="nav-item" onclick="showPage('new-sales',this)"><span class="icon">◎</span> 新規伝票入力</div>
+      <div class="nav-item" onclick="showPage('report',this)"><span class="icon">◆</span> 月次レポート</div>
+
+      <div class="nav-section">顧客管理</div>
+      <div class="nav-item" onclick="showPage('customers',this)"><span class="icon">◑</span> 顧客一覧</div>
+      <div class="nav-item" onclick="showPage('new-customer',this)"><span class="icon">◐</span> 顧客新規登録</div>
+
+      <div class="nav-section">在庫・商品</div>
+      <div class="nav-item" onclick="showPage('inventory',this)"><span class="icon">◍</span> 在庫管理</div>
+      <div class="nav-item" onclick="showPage('products',this)"><span class="icon">○</span> 商品マスタ</div>
+    </nav>
+    
+      <div class="nav-section">BACKUP</div>
+      <div class="nav-item" onclick="downloadSalesCSV()"><span class="icon">⬇</span> 売上CSVダウンロード</div>
+      <div class="nav-item" onclick="downloadCustomersCSV()"><span class="icon">⬇</span> 顧客CSVダウンロード</div>
+      <div class="nav-section">ACCOUNT</div>
+      <div class="nav-item" onclick="doSignOut()"><span class="icon">⏻</span> ログアウト</div>
+      <div style="padding:8px 20px 4px;font-size:11px;color:var(--text3)" id="firebase-user"></div>
+
+    <div style="padding:16px 20px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">DATA</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px" id="db-stats"></div>
+    </div>
+  </aside>
+
+  <!-- メイン -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="page-title">ダッシュボード</div>
+      <div class="topbar-right">
+        <span class="badge">● LIVE</span>
+        <span style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace" id="current-date"></span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ダッシュボード -->
+      <div id="page-dashboard" class="page active">
+        <div class="grid-4" id="dash-kpi"></div>
+        <div class="grid-2">
+          <div class="table-wrap">
+            <div class="table-head"><h3>月別売上推移（直近12ヶ月）</h3></div>
+            <div style="padding:16px 18px 14px"><div class="bar-chart" id="monthly-chart"></div></div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head"><h3>最近の伝票</h3></div>
+            <table><thead><tr><th>伝票番号</th><th>顧客名</th><th>日付</th><th>金額（税込）</th></tr></thead>
+            <tbody id="recent-sales"></tbody></table>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="table-wrap">
+            <div class="table-head"><h3>顧客別売上TOP10</h3></div>
+            <div style="padding:14px 18px 12px"><div class="bar-chart" id="top-cust-chart"></div></div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head"><h3>在庫アラート</h3></div>
+            <div style="padding:14px 18px" id="stock-alerts"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 売上伝票一覧 -->
+      <div id="page-sales" class="page">
+        <div class="search-bar">
+          <input type="text" style="width:240px" placeholder="伝票番号・顧客名で検索..." id="sales-search" oninput="filterSales()">
+          <input type="date" id="sales-from" onchange="filterSales()">
+          <span style="color:var(--text3);font-size:12px">〜</span>
+          <input type="date" id="sales-to" onchange="filterSales()">
+          <button class="btn btn-ghost btn-sm" onclick="clearSalesFilter()">クリア</button>
+          <span style="margin-left:auto;font-size:12px;color:var(--text3)" id="sales-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>伝票番号</th><th>受付日</th><th>顧客No</th><th>顧客名</th><th>明細数</th><th style="text-align:right">金額（税込）</th><th></th></tr></thead>
+            <tbody id="sales-tbody"></tbody>
+          </table>
+          <div class="pagination" id="sales-pager"></div>
+        </div>
+      </div>
+
+      <!-- 新規伝票入力 -->
+      <div id="page-new-sales" class="page">
+        <div style="max-width:760px">
+          <div class="card">
+            <div class="card-title">伝票情報</div>
+            <div class="form-grid" style="margin-top:10px">
+              <div class="form-group">
+                <label>伝票番号</label>
+                <input type="text" id="ns-no" placeholder="自動生成">
+              </div>
+              <div class="form-group">
+                <label>受付日</label>
+                <input type="date" id="ns-date">
+              </div>
+              <div class="form-group full">
+                <label>顧客</label>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <input type="text" id="ns-cust-no" placeholder="顧客番号" style="width:110px" oninput="onCustNoInput()">
+                  <span style="font-size:12px;color:var(--text3)">または</span>
+                  <select id="ns-customer" onchange="onCustomerSelect()" style="flex:1;min-width:200px">
+                    <option value="">顧客を選択...</option>
+                  </select>
+                </div>
+                <div id="ns-cust-no-result" style="font-size:12px;color:var(--red);margin-top:4px;display:none">該当なし</div>
+              </div>
+              <div class="form-group full" id="ns-cust-info" style="display:none">
+                <div style="background:var(--bg3);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--text2)" id="ns-cust-detail"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <div class="flex-between">
+              <div class="card-title" style="margin:0">明細</div>
+              <button class="btn btn-ghost btn-sm" onclick="addDetailRow()">＋ 行追加</button>
+            </div>
+            <table id="detail-table" style="margin-top:12px">
+              <thead><tr><th>商品コード</th><th>商品</th><th>数量</th><th>単価</th><th>掛率</th><th>下代</th><th>税率</th><th style="text-align:right">金額</th><th></th></tr></thead>
+              <tbody id="detail-tbody"></tbody>
+            </table>
+            <div class="divider"></div>
+            <div id="ns-tax10-block">
+              <div class="flex-between" style="padding:0 4px">
+                <span style="font-size:12px;color:var(--text3)">10%対象　下代小計</span>
+                <span style="font-family:'DM Mono',monospace;font-size:13px" id="ns-sub10">¥0</span>
+              </div>
+              <div class="flex-between" style="padding:2px 4px">
+                <span style="font-size:12px;color:var(--text3)">　消費税（10%）</span>
+                <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)" id="ns-tax10">¥0</span>
+              </div>
+            </div>
+            <div id="ns-tax8-block" style="margin-top:4px">
+              <div class="flex-between" style="padding:0 4px">
+                <span style="font-size:12px;color:var(--text3)">8%対象　下代小計</span>
+                <span style="font-family:'DM Mono',monospace;font-size:13px" id="ns-sub8">¥0</span>
+              </div>
+              <div class="flex-between" style="padding:2px 4px">
+                <span style="font-size:12px;color:var(--text3)">　消費税（8%）</span>
+                <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)" id="ns-tax8">¥0</span>
+              </div>
+            </div>
+            <div class="flex-between" style="padding:8px 4px 0;border-top:1px solid var(--border);margin-top:8px">
+              <span style="font-size:14px;font-weight:500">税込合計</span>
+              <span style="font-family:'DM Mono',monospace;font-size:20px;color:var(--accent);font-weight:700" id="ns-total">¥0</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button class="btn btn-primary" onclick="saveSales()">伝票を登録</button>
+            <button class="btn btn-ghost" onclick="printSlipPreview()">🖨 印刷プレビュー</button>
+            <button class="btn btn-ghost" onclick="clearNewSales()">クリア</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 月次レポート -->
+      <div id="page-report" class="page">
+        <div class="search-bar">
+          <select id="report-year" onchange="renderReport()">
+          </select>
+          <span style="font-size:13px;color:var(--text3)">年</span>
+        </div>
+        <div class="grid-3" id="report-kpi"></div>
+        <div class="table-wrap" style="margin-bottom:20px">
+          <div class="table-head"><h3>月別売上詳細</h3></div>
+          <div style="padding:16px 18px 14px"><div class="bar-chart" id="report-chart"></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="table-wrap">
+            <div class="table-head"><h3>月別伝票数</h3></div>
+            <table><thead><tr><th>月</th><th>伝票数</th><th style="text-align:right">売上（税込）</th><th style="text-align:right">平均単価</th></tr></thead>
+            <tbody id="report-tbody"></tbody></table>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head"><h3>年間 顧客別売上TOP10</h3></div>
+            <table><thead><tr><th>顧客名</th><th>件数</th><th style="text-align:right">金額（税込）</th></tr></thead>
+            <tbody id="report-cust-tbody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 顧客一覧 -->
+      <div id="page-customers" class="page">
+        <div class="search-bar">
+          <input type="text" style="width:240px" placeholder="名前・フリガナ・住所で検索..." id="cust-search" oninput="filterCustomers()">
+          <select id="cust-rank" onchange="filterCustomers()">
+            <option value="">全ランク</option>
+          </select>
+          <select id="cust-staff" onchange="filterCustomers()">
+            <option value="">全担当</option>
+          </select>
+          <span style="margin-left:auto;font-size:12px;color:var(--text3)" id="cust-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>No</th><th>名前</th><th>フリガナ</th><th>電話番号</th><th>住所</th><th>ランク</th><th>担当</th><th>購入実績</th><th></th></tr></thead>
+            <tbody id="cust-tbody"></tbody>
+          </table>
+          <div class="pagination" id="cust-pager"></div>
+        </div>
+      </div>
+
+      <!-- 顧客新規登録 -->
+      <div id="page-new-customer" class="page">
+        <div style="max-width:600px">
+          <div class="card">
+            <div class="card-title">基本情報</div>
+            <div class="form-grid" style="margin-top:10px">
+              <div class="form-group"><label>名前</label><input type="text" id="nc-name"></div>
+              <div class="form-group"><label>フリガナ</label><input type="text" id="nc-kana"></div>
+              <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel"></div>
+              <div class="form-group"><label>携帯電話</label><input type="text" id="nc-mobile"></div>
+              <div class="form-group full"><label>メールアドレス</label><input type="text" id="nc-email"></div>
+              <div class="form-group"><label>郵便番号</label><input type="text" id="nc-zip"></div>
+              <div class="form-group"><label>生年月日</label><input type="date" id="nc-bday"></div>
+              <div class="form-group full"><label>住所</label><input type="text" id="nc-addr"></div>
+              <div class="form-group"><label>顧客ランク</label><select id="nc-rank"><option value="">選択...</option></select></div>
+              <div class="form-group"><label>担当スタッフ</label><select id="nc-staff"><option value="">選択...</option></select></div>
+              <div class="form-group full"><label>備考</label><textarea id="nc-note" rows="3"></textarea></div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="saveCustomer()">登録</button>
+            <button class="btn btn-ghost" onclick="showPage('customers',null)">キャンセル</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 在庫管理 -->
+      <div id="page-inventory" class="page">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('inv','stock',this)">在庫一覧</div>
+          <div class="tab" onclick="switchTab('inv','alert',this)">アラート</div>
+        </div>
+        <div id="inv-tab-stock">
+          <div class="search-bar">
+            <input type="text" placeholder="商品コード・商品名で検索..." id="inv-search" oninput="filterInventory()">
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>商品コード</th><th>商品名</th><th style="text-align:right">単価</th><th>在庫数</th><th>状態</th><th></th></tr></thead>
+              <tbody id="inv-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="inv-tab-alert" style="display:none">
+          <div id="inv-alert-list"></div>
+        </div>
+      </div>
+
+      <!-- 商品マスタ -->
+      <div id="page-products" class="page">
+        <div class="search-bar">
+          <input type="text" style="width:240px" placeholder="コード・商品名で検索..." id="prod-search" oninput="filterProducts()">
+          <select id="prod-genre" onchange="filterProducts()">
+            <option value="">全ジャンル</option>
+          </select>
+          <select id="prod-status" onchange="filterProducts()">
+            <option value="">全ステータス</option>
+            <option value="active">販売中</option>
+            <option value="disc">終息</option>
+          </select>
+          <span style="margin-left:auto;font-size:12px;color:var(--text3)" id="prod-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>商品コード</th><th>商品名</th><th>ジャンル</th><th style="text-align:right">上代価格</th><th>ステータス</th></tr></thead>
+            <tbody id="prod-tbody"></tbody>
+          </table>
+          <div class="pagination" id="prod-pager"></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- モーダル：伝票詳細 -->
+<div class="modal-overlay" id="slip-modal">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h3 id="slip-modal-title">伝票詳細</h3>
+      <button class="modal-close" onclick="closeModal('slip-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="slip-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="printCurrentSlip()">🖨 印刷</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('slip-modal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル：顧客詳細 -->
+<div class="modal-overlay" id="cust-modal">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h3 id="cust-modal-title">顧客詳細</h3>
+      <button class="modal-close" onclick="closeModal('cust-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="cust-modal-body"></div>
+  </div>
+</div>
+
+<!-- モーダル：入出庫 -->
+<div class="modal-overlay" id="inout-modal">
+  <div class="modal" style="width:400px">
+    <div class="modal-header">
+      <h3 id="inout-modal-title">入庫登録</h3>
+      <button class="modal-close" onclick="closeModal('inout-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:14px">
+        <label>商品</label>
+        <select id="inout-product"></select>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>数量</label>
+        <input type="number" id="inout-qty" min="1" style="width:100px">
+      </div>
+      <div class="form-group">
+        <label>備考</label>
+        <input type="text" id="inout-note">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('inout-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveInout()">登録</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────
+// データ埋め込みプレースホルダー
+// ─────────────────────────────────────────────────────
+</script>
+<script id="data-script">
+const DB={sales:[],customers:[],products:[],stock:[],staff:{},ranks:{}};
+</script>
+<script>
+// ─────────────────────────────────────────────────────
+// ストア
+// ─────────────────────────────────────────────────────
+const store = {
+  sales: DB.sales,
+  customers: DB.customers,
+  products: DB.products,
+  stock: DB.stock,
+  staff: DB.staff,
+  ranks: DB.ranks,
+  inout: []
+};
+
+// 顧客売上合計キャッシュ
+const custTotalCache = {};
+store.sales.forEach(s => {
+  if (!custTotalCache[s.cid]) custTotalCache[s.cid] = { total: 0, count: 0 };
+  custTotalCache[s.cid].total += s.total;
+  custTotalCache[s.cid].count++;
+});
+
+// ─────────────────────────────────────────────────────
+// ユーティリティ
+// ─────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────
+// 軽減税率8%対象コード
+// ─────────────────────────────────────────────────────
+const TAX_REDUCED_CODES = new Set([
+  '0329','0330','0670','1659','2646','3025','3304',
+  '6224','6225','6226','6228','6250','6251','6252','6253','6254',
+  '6278','6282','6288','6289','6291','6292',
+  '6303','6304','6305','6306','6307','6308','630u',
+  '6311','6312','6313','6314','6315','6316','6317','631u',
+  '6323','6325','6329','6335','6336','6337','6515',
+  '7628','7629','7630',
+  'Y001','Y002','Y007','Y008','Y059','Y067','Y068','Y085',
+  'Y628','Y629','Y633','Y635','Y636',
+  'Z025','Z601','z101','z102','ｚ101','ｚ102'
+]);
+
+function isReducedTax(code) {
+  if (!code) return false;
+  return TAX_REDUCED_CODES.has(code);
+}
+
+let newSalesDetailRows = [];
+let currentInoutType = 'in';
+
+// ページネーション状態
+const pageState = { sales: 1, customers: 1, products: 1 };
+const PAGE_SIZE = 50;
+
+function fmtMoney(n) { return '¥' + Math.round(n || 0).toLocaleString(); }
+function fmtDate(s) { return s ? s.replace(/-/g, '/') : '—'; }
+function fmtTax(n) { return fmtMoney(Math.round(n * 1.1)); }
+
+function getCustomer(id) { return store.customers.find(c => c.id === String(id)); }
+function getProduct(code) { return store.products.find(p => p.code.toLowerCase() === String(code).toLowerCase()); }
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─────────────────────────────────────────────────────
+// ページ切替
+// ─────────────────────────────────────────────────────
+function showPage(name, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  const titles = {
+    dashboard: 'ダッシュボード', sales: '売上伝票一覧', 'new-sales': '新規伝票入力',
+    report: '月次レポート', customers: '顧客一覧', 'new-customer': '顧客新規登録',
+    inventory: '在庫管理', products: '商品マスタ'
+  };
+  document.getElementById('page-title').textContent = titles[name] || '';
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'sales') { pageState.sales = 1; renderSales(); }
+  if (name === 'report') renderReport();
+  if (name === 'customers') { pageState.customers = 1; renderCustomers(); }
+  if (name === 'new-sales') initNewSales();
+  if (name === 'new-customer') initNewCustomer();
+  if (name === 'inventory') renderInventory();
+  if (name === 'products') { pageState.products = 1; renderProducts(); }
+}
+
+function switchTab(prefix, tab, el) {
+  document.querySelectorAll(`[id^=${prefix}-tab-]`).forEach(t => t.style.display = 'none');
+  document.getElementById(`${prefix}-tab-${tab}`).style.display = '';
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (tab === 'alert') renderInvAlert();
+}
+
+// ─────────────────────────────────────────────────────
+// ダッシュボード
+// ─────────────────────────────────────────────────────
+function renderDashboard() {
+  const now = new Date();
+  const thisYm = now.toISOString().slice(0,7);
+  const lastDate = new Date(now.getFullYear(), now.getMonth(), 0);
+  const lastYm = lastDate.toISOString().slice(0,7);
+
+  const monthMap = {};
+  store.sales.forEach(s => {
+    if (!monthMap[s.ym]) monthMap[s.ym] = { total: 0, count: 0 };
+    monthMap[s.ym].total += s.total;
+    monthMap[s.ym].count++;
+  });
+
+  const thisMo = monthMap[thisYm] || { total: 0, count: 0 };
+  const lastMo = monthMap[lastYm] || { total: 0, count: 1 };
+  const diff = lastMo.total > 0 ? ((thisMo.total - lastMo.total) / lastMo.total * 100).toFixed(1) : 0;
+  const diffSign = diff >= 0 ? '+' : '';
+
+  const allYears = [...new Set(store.sales.filter(s=>s.d).map(s=>s.d.slice(0,4)))];
+  const thisYear = String(now.getFullYear());
+  const yearSales = store.sales.filter(s => s.d && s.d.startsWith(thisYear)).reduce((a,s) => a + s.total, 0);
+
+  const stockAlerts = store.stock.filter(i => i.qty <= 3).length;
+
+  document.getElementById('dash-kpi').innerHTML = `
+    <div class="card">
+      <div class="card-title">今月売上（税込）</div>
+      <div class="card-value">${fmtTax(thisMo.total)}</div>
+      <div class="card-sub"><span class="${diff >= 0 ? 'up' : 'down'}">${diffSign}${diff}%</span> 先月比</div>
+    </div>
+    <div class="card">
+      <div class="card-title">今月伝票数</div>
+      <div class="card-value">${thisMo.count}<span>件</span></div>
+      <div class="card-sub">先月：${lastMo.count}件</div>
+    </div>
+    <div class="card">
+      <div class="card-title">年間売上（${thisYear}年・税込）</div>
+      <div class="card-value" style="font-size:20px">${fmtTax(yearSales)}</div>
+      <div class="card-sub">顧客数：${store.customers.filter(c=>c.name).length}名</div>
+    </div>
+    <div class="card">
+      <div class="card-title">在庫アラート</div>
+      <div class="card-value" style="color:${stockAlerts > 0 ? 'var(--red)' : 'var(--green)'}">${stockAlerts}<span>品目</span></div>
+      <div class="card-sub">${stockAlerts > 0 ? '<span class="down">要確認</span>' : '<span class="up">問題なし</span>'}</div>
+    </div>`;
+
+  // 月別バーチャート（直近12ヶ月）
+  const sortedMonths = Object.keys(monthMap).filter(m=>m).sort().slice(-12);
+  const maxVal = Math.max(...sortedMonths.map(m => monthMap[m].total), 1);
+  document.getElementById('monthly-chart').innerHTML = sortedMonths.map(m => {
+    const v = monthMap[m].total;
+    const label = m.slice(0,4) === thisYear ? m.slice(5) + '月' : m.replace('-', '/');
+    return `<div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${v/maxVal*100}%"></div></div>
+      <div class="bar-amount">${fmtMoney(v)}</div>
+    </div>`;
+  }).join('');
+
+  // 最近の伝票
+  const recent = [...store.sales].filter(s=>s.d).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);
+  document.getElementById('recent-sales').innerHTML = recent.map(s => `<tr>
+    <td class="mono" style="cursor:pointer;color:var(--accent)" onclick="viewSlip('${s.id}')">${s.id}</td>
+    <td>${s.cn || '—'}</td>
+    <td class="mono">${fmtDate(s.d)}</td>
+    <td class="amount">${fmtTax(s.total)}</td>
+  </tr>`).join('');
+
+  // 顧客別TOP10
+  const custRank = Object.entries(custTotalCache)
+    .map(([id, v]) => ({ id, ...v, name: (getCustomer(id) || {}).name || '不明' }))
+    .sort((a, b) => b.total - a.total).slice(0, 10);
+  const maxCust = Math.max(...custRank.map(c => c.total), 1);
+  document.getElementById('top-cust-chart').innerHTML = custRank.map(c => `
+    <div class="bar-row">
+      <div class="bar-label" style="width:90px;font-size:11px">${c.name.slice(0,6)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${c.total/maxCust*100}%"></div></div>
+      <div class="bar-amount">${fmtMoney(c.total)}</div>
+    </div>`).join('');
+
+  // 在庫アラート
+  const alerts = store.stock.filter(i => i.qty <= 3);
+  document.getElementById('stock-alerts').innerHTML = alerts.length
+    ? alerts.map(i => `<div class="alert ${i.qty===0?'alert-danger':'alert-warn'}">
+        ⚠ <div><strong>${i.name}</strong>（${i.code}）— 残り ${i.qty} 個</div></div>`).join('')
+    : '<div style="color:var(--text3);font-size:13px;padding:4px 0">アラート対象なし</div>';
+}
+
+// ─────────────────────────────────────────────────────
+// 売上伝票一覧
+// ─────────────────────────────────────────────────────
+let filteredSales = null;
+
+function filterSales() {
+  const q = document.getElementById('sales-search').value.toLowerCase().trim();
+  const from = document.getElementById('sales-from').value;
+  const to = document.getElementById('sales-to').value;
+  filteredSales = store.sales.filter(s => {
+    if (q && !s.id.toLowerCase().includes(q) && !s.cn.includes(q) && !s.ck.includes(q)) return false;
+    if (from && s.d < from) return false;
+    if (to && s.d > to) return false;
+    return true;
+  }).sort((a,b) => b.d.localeCompare(a.d));
+  pageState.sales = 1;
+  renderSales();
+}
+
+function clearSalesFilter() {
+  document.getElementById('sales-search').value = '';
+  document.getElementById('sales-from').value = '';
+  document.getElementById('sales-to').value = '';
+  filteredSales = null;
+  pageState.sales = 1;
+  renderSales();
+}
+
+function renderSales() {
+  const list = (filteredSales || [...store.sales].sort((a,b)=>b.d.localeCompare(a.d)));
+  const total = list.length;
+  const start = (pageState.sales - 1) * PAGE_SIZE;
+  const page = list.slice(start, start + PAGE_SIZE);
+  document.getElementById('sales-count').textContent = `${total.toLocaleString()}件`;
+  document.getElementById('sales-tbody').innerHTML = page.map(s => `<tr>
+    <td class="mono" style="cursor:pointer;color:var(--accent)" onclick="viewSlip('${s.id}')">${s.id}</td>
+    <td class="mono">${fmtDate(s.d)}</td>
+    <td class="mono">${s.cid}</td>
+    <td>${s.cn || '—'}</td>
+    <td style="text-align:center">${s.items.length}</td>
+    <td class="amount">${fmtTax(s.total)}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="viewSlip('${s.id}')">詳細</button></td>
+  </tr>`).join('');
+  renderPager('sales-pager', total, pageState.sales, p => { pageState.sales = p; renderSales(); });
+}
+
+let _currentSlip = null;
+
+function viewSlip(id) {
+  const s = store.sales.find(x => x.id === id);
+  if (!s) return;
+  _currentSlip = s;
+  const c = getCustomer(s.cid);
+
+  let sub10 = 0, sub8 = 0;
+  s.items.forEach(it => {
+    if (isReducedTax(it.c)) sub8 += it.a;
+    else sub10 += it.a;
+  });
+  const tax10 = Math.round(sub10 * 0.1);
+  const tax8  = Math.round(sub8  * 0.08);
+  const grandTotal = sub10 + tax10 + sub8 + tax8;
+
+  document.getElementById('slip-modal-title').textContent = `伝票番号：${s.id}`;
+  document.getElementById('slip-modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div><div class="text-muted">受付日</div><div style="font-family:'DM Mono',monospace;margin-top:2px">${fmtDate(s.d)}</div></div>
+      <div><div class="text-muted">顧客</div><div style="margin-top:2px">${s.cn || '—'} <span class="text-muted">(No.${s.cid})</span></div></div>
+      ${c ? `<div><div class="text-muted">電話</div><div style="font-family:'DM Mono',monospace;margin-top:2px">${c.tel||c.mobile||'—'}</div></div>
+      <div><div class="text-muted">担当</div><div style="margin-top:2px">${c.staff||'—'}</div></div>` : ''}
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+      <thead><tr style="background:var(--bg3)">
+        <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--text3)">商品コード</th>
+        <th style="padding:8px 10px;text-align:left;font-size:11px;color:var(--text3)">商品名</th>
+        <th style="padding:8px 10px;text-align:center;font-size:11px;color:var(--text3)">数量</th>
+        <th style="padding:8px 10px;text-align:center;font-size:11px;color:var(--text3)">掛率</th>
+        <th style="padding:8px 10px;text-align:center;font-size:11px;color:var(--text3)">税率</th>
+        <th style="padding:8px 10px;text-align:right;font-size:11px;color:var(--text3)">金額</th>
+      </tr></thead>
+      <tbody>
+        ${s.items.map(it => {
+          const rate = it.r || 100;
+          const taxLabel = isReducedTax(it.c) ? '<span style="color:var(--green)">8%</span>' : '<span style="color:var(--text2)">10%</span>';
+          return `<tr style="border-top:1px solid var(--border)">
+            <td style="padding:8px 10px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${it.c}</td>
+            <td style="padding:8px 10px;font-size:13px">${it.n}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:'DM Mono',monospace">${it.q}</td>
+            <td style="padding:8px 10px;text-align:center;font-size:12px">${rate}%</td>
+            <td style="padding:8px 10px;text-align:center;font-size:12px">${taxLabel}</td>
+            <td style="padding:8px 10px;text-align:right;font-family:'DM Mono',monospace">${fmtMoney(it.a)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <div style="border-top:1px solid var(--border);padding-top:12px">
+      ${sub10 > 0 ? `
+      <div class="flex-between" style="margin-bottom:3px"><span class="text-muted">10%対象　下代小計</span><span style="font-family:'DM Mono',monospace">${fmtMoney(sub10)}</span></div>
+      <div class="flex-between" style="margin-bottom:6px"><span class="text-muted">　消費税（10%）</span><span style="font-family:'DM Mono',monospace;color:var(--text3)">${fmtMoney(tax10)}</span></div>` : ''}
+      ${sub8 > 0 ? `
+      <div class="flex-between" style="margin-bottom:3px"><span class="text-muted">8%対象　下代小計</span><span style="font-family:'DM Mono',monospace">${fmtMoney(sub8)}</span></div>
+      <div class="flex-between" style="margin-bottom:6px"><span class="text-muted">　消費税（8%）</span><span style="font-family:'DM Mono',monospace;color:var(--text3)">${fmtMoney(tax8)}</span></div>` : ''}
+      <div class="flex-between" style="margin-top:4px;padding-top:8px;border-top:1px solid var(--border)">
+        <span style="font-weight:500">税込合計</span>
+        <span style="font-family:'DM Mono',monospace;font-size:18px;color:var(--accent);font-weight:700">${fmtMoney(grandTotal)}</span>
+      </div>
+    </div>`;
+  document.getElementById('slip-modal').classList.add('open');
+}
+
+// ─────────────────────────────────────────────────────
+// 新規伝票入力
+// ─────────────────────────────────────────────────────
+function initNewSales() {
+  const today = new Date().toISOString().slice(0,10);
+  const newNo = 'u' + String(Math.max(...store.sales.map(s => parseInt(s.id.replace(/\D/g,''))||0)) + 1).padStart(5,'0');
+  document.getElementById('ns-no').value = newNo;
+  document.getElementById('ns-date').value = today;
+
+  const sel = document.getElementById('ns-customer');
+  sel.innerHTML = '<option value="">顧客を選択...</option>' +
+    store.customers.filter(c=>c.name).map(c => `<option value="${c.id}">${c.id}. ${c.name}</option>`).join('');
+
+  newSalesDetailRows = [];
+  renderDetailRows();
+  addDetailRow();
+  updateTotal();
+  document.getElementById('ns-cust-info').style.display = 'none';
+  document.getElementById('ns-cust-no').value = '';
+  document.getElementById('ns-cust-no-result').style.display = 'none';
+}
+
+function onCustNoInput() {
+  const no = document.getElementById('ns-cust-no').value.trim();
+  const resultEl = document.getElementById('ns-cust-no-result');
+  if (!no) {
+    resultEl.style.display = 'none';
+    return;
+  }
+  const c = store.customers.find(x => x.id === no);
+  if (c && c.name) {
+    resultEl.style.display = 'none';
+    // プルダウンも連動
+    document.getElementById('ns-customer').value = c.id;
+    showCustDetail(c.id);
+  } else {
+    resultEl.style.display = '';
+    document.getElementById('ns-cust-info').style.display = 'none';
+  }
+}
+
+function onCustomerSelect() {
+  const id = document.getElementById('ns-customer').value;
+  // 顧客番号欄も連動
+  document.getElementById('ns-cust-no').value = id || '';
+  document.getElementById('ns-cust-no-result').style.display = 'none';
+  showCustDetail(id);
+}
+
+function showCustDetail(id) {
+  const c = getCustomer(id);
+  const info = document.getElementById('ns-cust-info');
+  if (c && c.name) {
+    const ct = custTotalCache[id] || { total: 0, count: 0 };
+    document.getElementById('ns-cust-detail').innerHTML =
+      `<strong>${c.name}</strong>　📞 ${c.tel||c.mobile||'—'}　累計購入: ${fmtMoney(ct.total)}（${ct.count}件）`;
+    info.style.display = '';
+  } else {
+    info.style.display = 'none';
+  }
+}
+
+function addDetailRow() {
+  newSalesDetailRows.push({ id: Date.now(), code: '', qty: 1, rate: 100 });
+  renderDetailRows();
+}
+
+function renderDetailRows() {
+  const RATES = [100,90,80,75,70,65,60];
+  document.getElementById('detail-tbody').innerHTML = newSalesDetailRows.map((r, i) => {
+    const p = r.code ? getProduct(r.code) : null;
+    const price = p ? p.price : 0;
+    const rate = r.rate || 100;
+    const downPrice = Math.round(price * rate / 100);
+    const amt = downPrice * r.qty;
+    const reduced = isReducedTax(r.code);
+    const taxLabel = r.code ? (reduced ? '<span style="color:var(--green);font-size:11px">8%</span>' : '<span style="color:var(--text2);font-size:11px">10%</span>') : '—';
+    const codeNotFound = r.code && !p ? '<div style="font-size:10px;color:var(--red)">該当なし</div>' : '';
+    const rateOpts = RATES.map(v => `<option value="${v}" ${rate===v?'selected':''}>${v}%</option>`).join('');
+    return `<tr>
+      <td style="white-space:nowrap">
+        <input type="text" value="${r.code||''}" placeholder="コード" style="width:80px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 7px;border-radius:4px;font-size:12px;font-family:'DM Mono',monospace"
+          onblur="updateDetailRowCode(${i},this.value)"
+          onkeydown="if(event.key==='Enter'){updateDetailRowCode(${i},this.value)}">
+        ${codeNotFound}
+      </td>
+      <td>
+        <select style="width:190px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:4px;font-size:12px"
+          onchange="updateDetailRow(${i},'code',this.value)">
+          <option value="">商品を選択</option>
+          ${(() => {
+            const active = store.products.filter(p=>!p.disc);
+            const list = active.slice(0,300);
+            if (r.code && !list.find(p => p.code === r.code)) {
+              // 終息商品も含めて全商品から検索（コード直入力の場合）
+              const sel = store.products.find(p => p.code === r.code);
+              if (sel) list.push(sel);
+            }
+            return list.map(p => `<option value="${p.code}" ${r.code===p.code?'selected':''}>${p.name.slice(0,28)}${p.disc?' [終息]':''}</option>`).join('');
+          })()}
+        </select>
+      </td>
+      <td><input type="number" value="${r.qty}" min="1" style="width:55px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:4px;font-size:13px"
+        onchange="updateDetailRow(${i},'qty',this.value)"></td>
+      <td class="mono" style="color:var(--text2)">${price > 0 ? fmtMoney(price) : '—'}</td>
+      <td>
+        <select style="width:70px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:4px;font-size:12px"
+          onchange="updateDetailRow(${i},'rate',+this.value)">${rateOpts}</select>
+      </td>
+      <td class="mono" style="color:var(--accent)">${downPrice > 0 ? fmtMoney(downPrice) : '—'}</td>
+      <td style="text-align:center">${taxLabel}</td>
+      <td class="amount">${amt > 0 ? fmtMoney(amt) : '—'}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="removeDetailRow(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+  updateTotal();
+}
+
+function updateDetailRow(i, field, val) {
+  if (field === 'qty') newSalesDetailRows[i].qty = parseInt(val) || 1;
+  else if (field === 'rate') newSalesDetailRows[i].rate = +val || 100;
+  else newSalesDetailRows[i][field] = val;
+  renderDetailRows();
+}
+
+function updateDetailRowCode(i, val) {
+  const trimmed = val.trim();
+  const p = getProduct(trimmed);
+  // 商品が見つかった場合はDBの正式コードに正規化（プルダウン選択を一致させるため）
+  newSalesDetailRows[i].code = p ? p.code : trimmed;
+  renderDetailRows();
+}
+
+function removeDetailRow(i) {
+  newSalesDetailRows.splice(i, 1);
+  renderDetailRows();
+}
+
+function updateTotal() {
+  let sub10 = 0, sub8 = 0;
+  newSalesDetailRows.forEach(r => {
+    const p = r.code ? getProduct(r.code) : null;
+    if (p) {
+      const rate = r.rate || 100;
+      const amt = Math.round(p.price * rate / 100) * r.qty;
+      if (isReducedTax(r.code)) sub8 += amt;
+      else sub10 += amt;
+    }
+  });
+  document.getElementById('ns-sub10').textContent = fmtMoney(sub10);
+  document.getElementById('ns-tax10').textContent = fmtMoney(sub10 * 0.1);
+  document.getElementById('ns-sub8').textContent = fmtMoney(sub8);
+  document.getElementById('ns-tax8').textContent = fmtMoney(sub8 * 0.08);
+  document.getElementById('ns-total').textContent = fmtMoney(sub10 * 1.1 + sub8 * 1.08);
+  // 該当なしの場合は非表示
+  document.getElementById('ns-tax10-block').style.display = sub10 > 0 || sub8 === 0 ? '' : 'none';
+  document.getElementById('ns-tax8-block').style.display = sub8 > 0 ? '' : 'none';
+}
+
+function saveSales() {
+  const no = document.getElementById('ns-no').value.trim();
+  const date = document.getElementById('ns-date').value;
+  const cid = document.getElementById('ns-customer').value;
+  if (!no || !date || !cid) { alert('伝票番号・日付・顧客は必須です'); return; }
+  const items = newSalesDetailRows.filter(r => r.code).map(r => {
+    const p = getProduct(r.code);
+    return { c: r.code, n: p ? p.name : r.code, q: r.qty, a: p ? p.price * r.qty : 0 };
+  });
+  if (items.length === 0) { alert('明細を1件以上入力してください'); return; }
+  const total = items.reduce((s, it) => s + it.a, 0);
+  const c = getCustomer(cid);
+  const ym = date.slice(0,7);
+  store.sales.unshift({ id: no, d: date, ym, cid, cn: c?.name||'', ck: c?.kana||'', total, items });
+  if (!custTotalCache[cid]) custTotalCache[cid] = { total: 0, count: 0 };
+  custTotalCache[cid].total += total;
+  custTotalCache[cid].count++;
+  alert('伝票を登録しました：' + no);
+  showPage('sales', null);
+}
+
+function clearNewSales() {
+  newSalesDetailRows = [];
+  renderDetailRows();
+  addDetailRow();
+  document.getElementById('ns-customer').value = '';
+  document.getElementById('ns-cust-no').value = '';
+  document.getElementById('ns-cust-no-result').style.display = 'none';
+  document.getElementById('ns-cust-info').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────
+// 月次レポート
+// ─────────────────────────────────────────────────────
+function renderReport() {
+  const years = [...new Set(store.sales.filter(s=>s.d).map(s=>s.d.slice(0,4)))].sort().reverse();
+  const sel = document.getElementById('report-year');
+  if (sel.options.length === 0) {
+    years.forEach(y => { const o = new Option(y, y); sel.appendChild(o); });
+  }
+  const year = sel.value || years[0];
+
+  const salesInYear = store.sales.filter(s => s.d && s.d.startsWith(year));
+  const totalSales = salesInYear.reduce((s,x) => s + x.total, 0);
+  const totalCount = salesInYear.length;
+  const avgPerSlip = totalCount > 0 ? totalSales / totalCount : 0;
+
+  document.getElementById('report-kpi').innerHTML = `
+    <div class="card"><div class="card-title">年間売上（税込）</div>
+      <div class="card-value" style="font-size:22px">${fmtTax(totalSales)}</div></div>
+    <div class="card"><div class="card-title">年間伝票数</div>
+      <div class="card-value">${totalCount.toLocaleString()}<span>件</span></div></div>
+    <div class="card"><div class="card-title">伝票平均単価（税込）</div>
+      <div class="card-value" style="font-size:22px">${fmtTax(avgPerSlip)}</div></div>`;
+
+  // 月別集計
+  const monthMap = {};
+  for (let m = 1; m <= 12; m++) {
+    const ym = `${year}-${String(m).padStart(2,'0')}`;
+    monthMap[ym] = { total: 0, count: 0 };
+  }
+  salesInYear.forEach(s => {
+    if (monthMap[s.ym]) {
+      monthMap[s.ym].total += s.total;
+      monthMap[s.ym].count++;
+    }
+  });
+
+  const months = Object.keys(monthMap).sort();
+  const maxVal = Math.max(...months.map(m => monthMap[m].total), 1);
+
+  document.getElementById('report-chart').innerHTML = months.map(m => {
+    const v = monthMap[m].total;
+    return `<div class="bar-row">
+      <div class="bar-label">${parseInt(m.slice(5))}月</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${v/maxVal*100}%"></div></div>
+      <div class="bar-amount">${fmtMoney(v)}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('report-tbody').innerHTML = months.map(m => {
+    const v = monthMap[m];
+    const avg = v.count > 0 ? v.total / v.count : 0;
+    return `<tr>
+      <td>${parseInt(m.slice(5))}月</td>
+      <td style="text-align:center">${v.count}</td>
+      <td class="amount">${fmtTax(v.total)}</td>
+      <td class="amount">${fmtTax(avg)}</td>
+    </tr>`;
+  }).join('');
+
+  // 顧客別TOP10
+  const custYear = {};
+  salesInYear.forEach(s => {
+    if (!custYear[s.cid]) custYear[s.cid] = { total: 0, count: 0, name: s.cn };
+    custYear[s.cid].total += s.total;
+    custYear[s.cid].count++;
+  });
+  const top10 = Object.entries(custYear).sort((a,b)=>b[1].total-a[1].total).slice(0,10);
+  document.getElementById('report-cust-tbody').innerHTML = top10.map(([id, v]) => `<tr>
+    <td>${v.name||'—'}</td>
+    <td style="text-align:center">${v.count}</td>
+    <td class="amount">${fmtTax(v.total)}</td>
+  </tr>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// 顧客一覧
+// ─────────────────────────────────────────────────────
+let filteredCustomers = null;
+
+function initCustomerFilters() {
+  const rankSel = document.getElementById('cust-rank');
+  const staffSel = document.getElementById('cust-staff');
+  if (rankSel.options.length <= 1) {
+    const ranks = [...new Set(store.customers.map(c=>c.rank).filter(Boolean))].sort();
+    ranks.forEach(r => rankSel.appendChild(new Option(r, r)));
+  }
+  if (staffSel.options.length <= 1) {
+    const staffs = [...new Set(store.customers.map(c=>c.staff).filter(Boolean))].sort();
+    staffs.forEach(s => staffSel.appendChild(new Option(s, s)));
+  }
+}
+
+function filterCustomers() {
+  const q = document.getElementById('cust-search').value.toLowerCase().trim();
+  const rank = document.getElementById('cust-rank').value;
+  const staff = document.getElementById('cust-staff').value;
+  filteredCustomers = store.customers.filter(c => {
+    if (!c.name) return false;
+    if (q && !c.name.includes(q) && !c.kana.includes(q) && !c.addr.includes(q) && !c.id.includes(q)) return false;
+    if (rank && c.rank !== rank) return false;
+    if (staff && c.staff !== staff) return false;
+    return true;
+  });
+  pageState.customers = 1;
+  renderCustomers();
+}
+
+function renderCustomers() {
+  initCustomerFilters();
+  const list = filteredCustomers || store.customers.filter(c=>c.name);
+  const total = list.length;
+  const start = (pageState.customers - 1) * PAGE_SIZE;
+  const page = list.slice(start, start + PAGE_SIZE);
+  document.getElementById('cust-count').textContent = `${total.toLocaleString()}名`;
+  document.getElementById('cust-tbody').innerHTML = page.map(c => {
+    const ct = custTotalCache[c.id] || { total: 0, count: 0 };
+    const rankClass = c.rid === '3' || c.rid === '2' ? 'gold' : c.rid === '1' ? 'blue' : '';
+    return `<tr>
+      <td class="mono" style="cursor:pointer;color:var(--accent)" onclick="viewCustomer('${c.id}')">${c.id}</td>
+      <td style="cursor:pointer;font-weight:500" onclick="viewCustomer('${c.id}')">${c.name}</td>
+      <td class="mono" style="font-size:12px">${c.kana}</td>
+      <td class="mono" style="font-size:12px">${c.tel||c.mobile||'—'}</td>
+      <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.addr||'—'}</td>
+      <td>${c.rank ? `<span class="chip ${rankClass}">${c.rank}</span>` : '—'}</td>
+      <td style="font-size:12px">${c.staff||'—'}</td>
+      <td class="amount">${ct.total > 0 ? fmtMoney(ct.total) : '—'}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="viewCustomer('${c.id}')">詳細</button></td>
+    </tr>`;
+  }).join('');
+  renderPager('cust-pager', total, pageState.customers, p => { pageState.customers = p; renderCustomers(); });
+}
+
+function viewCustomer(id) {
+  const c = getCustomer(id);
+  if (!c) return;
+  const ct = custTotalCache[id] || { total: 0, count: 0 };
+  const slips = store.sales.filter(s => s.cid === id).sort((a,b) => b.d.localeCompare(a.d));
+  const rankClass = c.rid === '3' || c.rid === '2' ? 'gold' : c.rid === '1' ? 'blue' : '';
+
+  document.getElementById('cust-modal-title').textContent = c.name || '顧客詳細';
+  document.getElementById('cust-modal-body').innerHTML = `
+    <div class="cust-detail-grid" style="margin-bottom:16px">
+      <div class="cust-detail-item"><label>顧客番号</label><span style="font-family:'DM Mono',monospace">${c.id}</span></div>
+      <div class="cust-detail-item"><label>フリガナ</label><span>${c.kana||'—'}</span></div>
+      <div class="cust-detail-item"><label>電話番号</label><span style="font-family:'DM Mono',monospace">${c.tel||'—'}</span></div>
+      <div class="cust-detail-item"><label>携帯電話</label><span style="font-family:'DM Mono',monospace">${c.mobile||'—'}</span></div>
+      <div class="cust-detail-item"><label>メール</label><span style="font-size:12px">${c.email||'—'}</span></div>
+      <div class="cust-detail-item"><label>生年月日</label><span>${c.bday||'—'}</span></div>
+      <div class="cust-detail-item" style="grid-column:1/-1"><label>住所</label><span>${c.zip ? '〒'+c.zip+' ' : ''}${c.addr||'—'}</span></div>
+      <div class="cust-detail-item"><label>顧客ランク</label><span class="chip ${rankClass}">${c.rank||'—'}</span></div>
+      <div class="cust-detail-item"><label>担当スタッフ</label><span>${c.staff||'—'}</span></div>
+    </div>
+    ${c.note ? `<div class="alert alert-warn" style="margin-bottom:14px">📝 ${c.note}</div>` : ''}
+    <div class="divider"></div>
+    <div class="flex-between" style="margin-bottom:12px">
+      <span style="font-size:13px;color:var(--text3)">購入実績（税抜計）</span>
+      <div style="text-align:right">
+        <div style="font-family:'DM Mono',monospace;color:var(--accent);font-size:18px;font-weight:700">${fmtMoney(ct.total)}</div>
+        <div style="font-size:11px;color:var(--text3)">伝票 ${ct.count} 件 / 税込 ${fmtTax(ct.total)}</div>
+      </div>
+    </div>
+    ${slips.length > 0 ? `
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">直近の購入履歴</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:var(--bg3)">
+        <th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--text3)">伝票番号</th>
+        <th style="padding:7px 10px;font-size:11px;text-align:left;color:var(--text3)">日付</th>
+        <th style="padding:7px 10px;font-size:11px;text-align:right;color:var(--text3)">金額（税込）</th>
+      </tr></thead>
+      <tbody>
+        ${slips.slice(0,10).map(s => `<tr style="border-top:1px solid var(--border)">
+          <td style="padding:8px 10px;font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);cursor:pointer" onclick="closeModal('cust-modal');setTimeout(()=>viewSlip('${s.id}'),100)">${s.id}</td>
+          <td style="padding:8px 10px;font-family:'DM Mono',monospace;font-size:12px">${fmtDate(s.d)}</td>
+          <td style="padding:8px 10px;text-align:right;font-family:'DM Mono',monospace;font-size:12px">${fmtTax(s.total)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">購入履歴なし</div>'}`;
+  document.getElementById('cust-modal').classList.add('open');
+}
+
+// ─────────────────────────────────────────────────────
+// 顧客新規登録
+// ─────────────────────────────────────────────────────
+function initNewCustomer() {
+  const sel = document.getElementById('nc-rank');
+  if (sel.options.length <= 1) {
+    Object.entries(store.ranks).forEach(([id, name]) => sel.appendChild(new Option(name, id)));
+  }
+  const ssel = document.getElementById('nc-staff');
+  if (ssel.options.length <= 1) {
+    Object.entries(store.staff).forEach(([code, name]) => ssel.appendChild(new Option(name, code)));
+  }
+}
+
+function saveCustomer() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) { alert('名前は必須です'); return; }
+  const newId = String(Math.max(...store.customers.map(c => parseInt(c.id)||0)) + 1);
+  store.customers.push({
+    id: newId,
+    name,
+    kana: document.getElementById('nc-kana').value,
+    tel: document.getElementById('nc-tel').value,
+    mobile: document.getElementById('nc-mobile').value,
+    email: document.getElementById('nc-email').value,
+    zip: document.getElementById('nc-zip').value,
+    addr: document.getElementById('nc-addr').value,
+    bday: document.getElementById('nc-bday').value,
+    rid: document.getElementById('nc-rank').value,
+    rank: store.ranks[document.getElementById('nc-rank').value] || '',
+    staff: store.staff[document.getElementById('nc-staff').value] || document.getElementById('nc-staff').value,
+    note: document.getElementById('nc-note').value,
+    hc: '0', kp: '0'
+  });
+  alert(name + '（No.' + newId + '）を登録しました');
+  filteredCustomers = null;
+  showPage('customers', null);
+}
+
+// ─────────────────────────────────────────────────────
+// 在庫管理
+// ─────────────────────────────────────────────────────
+function renderInventory(list) {
+  list = list || store.stock;
+  document.getElementById('inv-tbody').innerHTML = list.map(i => {
+    const pct = Math.min(i.qty / 20 * 100, 100);
+    const color = i.qty <= 2 ? 'var(--red)' : i.qty <= 5 ? 'var(--accent)' : 'var(--green)';
+    const statusText = i.qty === 0 ? '在庫なし' : i.qty <= 2 ? '要補充' : i.qty <= 5 ? '少ない' : '良好';
+    const statusClass = i.qty <= 2 ? 'low' : i.qty <= 5 ? 'pending' : 'done';
+    return `<tr>
+      <td class="mono">${i.code}</td>
+      <td>${i.name}</td>
+      <td class="amount">${fmtMoney(i.price)}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600;color:${color}">${i.qty}</td>
+      <td style="width:150px"><span class="status ${statusClass}">${statusText}</span>
+        <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${color}"></div></div>
+      </td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openInoutModal('in','${i.code}')">入庫</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:4px" onclick="openInoutModal('out','${i.code}')">出庫</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterInventory() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  renderInventory(store.stock.filter(i => i.code.toLowerCase().includes(q) || i.name.includes(q)));
+}
+
+function renderInvAlert() {
+  const alerts = store.stock.filter(i => i.qty <= 5);
+  document.getElementById('inv-alert-list').innerHTML = alerts.length
+    ? alerts.map(i => `<div class="alert ${i.qty<=2?'alert-danger':'alert-warn'}">
+        ⚠ <div><strong>${i.name}</strong>（${i.code}）— 現在庫 <strong>${i.qty}</strong> 個${i.qty===0?' — 在庫切れ！':i.qty<=2?' — 要補充':' — 残り少'}</div>
+      </div>`).join('')
+    : '<div style="color:var(--green);padding:12px">✓ すべての商品が適正在庫です</div>';
+}
+
+function openInoutModal(type, code) {
+  currentInoutType = type;
+  document.getElementById('inout-modal-title').textContent = type === 'in' ? '入庫登録' : '出庫登録';
+  document.getElementById('inout-product').innerHTML = store.stock.map(i =>
+    `<option value="${i.code}" ${i.code===code?'selected':''}>${i.name}（残${i.qty}）</option>`).join('');
+  document.getElementById('inout-qty').value = '';
+  document.getElementById('inout-note').value = '';
+  document.getElementById('inout-modal').classList.add('open');
+}
+
+function saveInout() {
+  const code = document.getElementById('inout-product').value;
+  const qty = parseInt(document.getElementById('inout-qty').value) || 0;
+  if (!qty) { alert('数量を入力してください'); return; }
+  const inv = store.stock.find(i => i.code === code);
+  if (!inv) return;
+  if (currentInoutType === 'in') inv.qty += qty;
+  else { if (inv.qty < qty) { alert('在庫不足です'); return; } inv.qty -= qty; }
+  closeModal('inout-modal');
+  renderInventory();
+}
+
+// ─────────────────────────────────────────────────────
+// 商品マスタ
+// ─────────────────────────────────────────────────────
+let filteredProducts = null;
+
+function initProductGenre() {
+  const sel = document.getElementById('prod-genre');
+  if (sel.options.length <= 1) {
+    const genres = [...new Set(store.products.map(p=>p.genre))].sort();
+    genres.forEach(g => sel.appendChild(new Option(g, g)));
+  }
+}
+
+function filterProducts() {
+  const q = document.getElementById('prod-search').value.toLowerCase().trim();
+  const genre = document.getElementById('prod-genre').value;
+  const status = document.getElementById('prod-status').value;
+  filteredProducts = store.products.filter(p => {
+    if (q && !p.code.toLowerCase().includes(q) && !p.name.includes(q)) return false;
+    if (genre && p.genre !== genre) return false;
+    if (status === 'active' && p.disc) return false;
+    if (status === 'disc' && !p.disc) return false;
+    return true;
+  });
+  pageState.products = 1;
+  renderProducts();
+}
+
+function renderProducts() {
+  initProductGenre();
+  const list = filteredProducts || store.products;
+  const total = list.length;
+  const start = (pageState.products - 1) * PAGE_SIZE;
+  const page = list.slice(start, start + PAGE_SIZE);
+  document.getElementById('prod-count').textContent = `${total.toLocaleString()}品`;
+  document.getElementById('prod-tbody').innerHTML = page.map(p => `<tr>
+    <td class="mono">${p.code}</td>
+    <td>${p.name}</td>
+    <td><span class="chip">${p.genre}</span></td>
+    <td class="amount">${fmtMoney(p.price)}</td>
+    <td><span class="status ${p.disc?'low':'done'}">${p.disc?'終息':'販売中'}</span></td>
+  </tr>`).join('');
+  renderPager('prod-pager', total, pageState.products, p => { pageState.products = p; renderProducts(); });
+}
+
+// ─────────────────────────────────────────────────────
+// ページネーション
+// ─────────────────────────────────────────────────────
+function renderPager(containerId, total, current, callback) {
+  const pages = Math.ceil(total / PAGE_SIZE);
+  if (pages <= 1) { document.getElementById(containerId).innerHTML = ''; return; }
+  const html = [];
+  html.push(`<span style="font-size:12px;color:var(--text3);margin-right:8px">${((current-1)*PAGE_SIZE+1)}〜${Math.min(current*PAGE_SIZE,total)} / ${total}</span>`);
+  if (current > 1) html.push(`<button class="page-btn" onclick="(${callback})(${current-1})">‹</button>`);
+  const start = Math.max(1, current - 2);
+  const end = Math.min(pages, current + 2);
+  if (start > 1) html.push(`<button class="page-btn" onclick="(${callback})(1)">1</button>${start > 2 ? '<span style="color:var(--text3)">…</span>' : ''}`);
+  for (let i = start; i <= end; i++) {
+    html.push(`<button class="page-btn ${i===current?'active':''}" onclick="(${callback})(${i})">${i}</button>`);
+  }
+  if (end < pages) html.push(`${end < pages-1 ? '<span style="color:var(--text3)">…</span>' : ''}<button class="page-btn" onclick="(${callback})(${pages})">${pages}</button>`);
+  if (current < pages) html.push(`<button class="page-btn" onclick="(${callback})(${current+1})">›</button>`);
+  document.getElementById(containerId).innerHTML = html.join('');
+}
+
+// ─────────────────────────────────────────────────────
+// 初期化
+// ─────────────────────────────────────────────────────
+// ★ Firebase版: 初期化はloadDataFromFirebase()内で実行
+// (上記コードはFirebase初期化スクリプト内のrefreshUI()に移動)
+</script>
+
+<!-- ★ Firebase 初期化 ★ -->
+<script>
+// ──────────────────────────────────────────────────────────────
+// ★ アクセス許可アカウント（スタッフ追加時はここにメールを追加）★
+// ──────────────────────────────────────────────────────────────
+const ALLOWED_EMAILS = [
+  "katsuhiko.arie@gmail.com",   // 管理者
+  "ya.asagiriten@gmail.com",    // スタッフ
+];
+
+// ──────────────────────────────────────────────────────────────
+// ★ Firebaseプロジェクト設定 ★
+// Firebaseコンソール → プロジェクト設定 → マイアプリ から取得して入力してください
+// ──────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            "AIzaSyDZtuZa4RvofqIB375zbmPb9X-UwOUTMC0",
+  authDomain:        "asagiri-sale.firebaseapp.com",
+  databaseURL:       "https://asagiri-sale-default-rtdb.firebaseio.com",
+  projectId:         "asagiri-sale",
+  storageBucket:     "asagiri-sale.firebasestorage.app",
+  messagingSenderId: "800075177148",
+  appId:             "1:800075177148:web:f343f8daaf31bcc301c4b9"
+};
+
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+const fbDb   = firebase.database();
+
+// ── ログイン ──────────────────────────────────────────────────
+function doLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  document.getElementById('login-btn').disabled = true;
+  document.getElementById('login-btn').textContent = '認証中...';
+  fbAuth.signInWithPopup(provider).catch(err => {
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = 'ログインに失敗しました: ' + err.message;
+    errEl.style.display = '';
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-btn').innerHTML = 'Googleでログイン';
+  });
+}
+
+// ── 認証状態監視 ──────────────────────────────────────────────
+fbAuth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // ホワイトリストチェック
+    if (!ALLOWED_EMAILS.includes(user.email)) {
+      await fbAuth.signOut();
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = 'このアカウントはアクセス権限がありません: ' + user.email;
+      errEl.style.display = '';
+      document.getElementById('login-overlay').style.display = 'flex';
+      document.getElementById('app-loading').style.display = 'none';
+      return;
+    }
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('login-error').style.display = 'none';
+    // ユーザー名をサイドバーに表示
+    const userEl = document.getElementById('firebase-user');
+    if (userEl) userEl.textContent = user.displayName || user.email;
+    await loadDataFromFirebase();
+  } else {
+    document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('app-loading').style.display = 'none';
+  }
+});
+
+// ── サインアウト ───────────────────────────────────────────────
+function doSignOut() {
+  if (confirm('ログアウトしますか？')) fbAuth.signOut();
+}
+
+// ── オフライン検知 ────────────────────────────────────────────
+fbDb.ref('.info/connected').on('value', snap => {
+  const banner = document.getElementById('offline-banner');
+  if (!snap.val()) {
+    banner.style.display = '';
+  } else {
+    banner.style.display = 'none';
+  }
+});
+
+// ── データ読み込み ────────────────────────────────────────────
+let _realtimeInitialized = false;
+
+async function loadDataFromFirebase() {
+  showLoading('データを読み込み中...');
+
+  // まずlocalStorageキャッシュがあれば即時表示
+  const cached = loadCachedData();
+  if (cached) {
+    applyData(cached);
+    refreshUI('キャッシュから起動 — 最新データを同期中...');
+  }
+
+  try {
+    const [salesSnap, custSnap, prodSnap, stockSnap, staffSnap, ranksSnap] = await Promise.all([
+      fbDb.ref('/sales').once('value'),
+      fbDb.ref('/customers').once('value'),
+      fbDb.ref('/products').once('value'),
+      fbDb.ref('/stock').once('value'),
+      fbDb.ref('/staff').once('value'),
+      fbDb.ref('/ranks').once('value'),
+    ]);
+
+    const data = {
+      sales:     salesSnap.val()  ? Object.values(salesSnap.val())  : [],
+      customers: custSnap.val()   ? Object.values(custSnap.val())   : [],
+      products:  prodSnap.val()   ? Object.values(prodSnap.val())   : [],
+      stock:     stockSnap.val()  ? Object.values(stockSnap.val())  : [],
+      staff:     staffSnap.val()  || {},
+      ranks:     ranksSnap.val()  || {},
+    };
+
+    applyData(data);
+    saveCachedData(data);
+
+    if (!_realtimeInitialized) {
+      setupRealtimeSync();
+      _realtimeInitialized = true;
+    }
+  } catch (err) {
+    console.error('Firebase読み込みエラー:', err);
+    if (!cached) {
+      alert('データの読み込みに失敗しました。\n' + err.message);
+    }
+  } finally {
+    hideLoading();
+    refreshUI();
+  }
+}
+
+function applyData(data) {
+  store.sales     = data.sales;
+  store.customers = data.customers;
+  store.products  = data.products;
+  store.stock     = data.stock;
+  if (data.staff) store.staff   = data.staff;
+  if (data.ranks) store.ranks   = data.ranks;
+
+  // custTotalCacheを再構築
+  Object.keys(custTotalCache).forEach(k => delete custTotalCache[k]);
+  store.sales.forEach(s => {
+    if (!custTotalCache[s.cid]) custTotalCache[s.cid] = { total: 0, count: 0 };
+    custTotalCache[s.cid].total += s.total;
+    custTotalCache[s.cid].count++;
+  });
+}
+
+function refreshUI(msg) {
+  if (msg) showLoading(msg);
+  document.getElementById('current-date').textContent =
+    new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  document.getElementById('db-stats').innerHTML =
+    `売上 ${store.sales.length.toLocaleString()}件<br>顧客 ${store.customers.filter(c=>c.name).length}名`;
+
+  // レポート年リスト更新
+  const reportSel = document.getElementById('report-year');
+  reportSel.innerHTML = '';
+  const reportYears = [...new Set(store.sales.filter(s=>s.d).map(s=>s.d.slice(0,4)))].sort().reverse();
+  reportYears.forEach(y => reportSel.appendChild(new Option(y + '年', y)));
+
+  renderDashboard();
+}
+
+// ── リアルタイム同期 ──────────────────────────────────────────
+function setupRealtimeSync() {
+  // 新規伝票のリアルタイム更新
+  fbDb.ref('/sales').on('child_added', snap => {
+    const sale = snap.val();
+    if (!store.sales.find(s => s.id === sale.id)) {
+      store.sales.unshift(sale);
+      if (!custTotalCache[sale.cid]) custTotalCache[sale.cid] = { total: 0, count: 0 };
+      custTotalCache[sale.cid].total += sale.total;
+      custTotalCache[sale.cid].count++;
+      document.getElementById('db-stats').innerHTML =
+        `売上 ${store.sales.length.toLocaleString()}件<br>顧客 ${store.customers.filter(c=>c.name).length}名`;
+    }
+  });
+
+  // 新規顧客のリアルタイム更新
+  fbDb.ref('/customers').on('child_added', snap => {
+    const cust = snap.val();
+    if (!store.customers.find(c => c.id === cust.id)) {
+      store.customers.push(cust);
+      document.getElementById('db-stats').innerHTML =
+        `売上 ${store.sales.length.toLocaleString()}件<br>顧客 ${store.customers.filter(c=>c.name).length}名`;
+    }
+  });
+
+  // 在庫変更のリアルタイム更新
+  fbDb.ref('/stock').on('child_changed', snap => {
+    const updated = snap.val();
+    const idx = store.stock.findIndex(i => i.code === updated.code);
+    if (idx >= 0) store.stock[idx] = updated;
+  });
+}
+
+// ── Firebase書き込み（saveSalesをオーバーライド） ────────────
+const _origSaveSales = saveSales;
+saveSales = async function() {
+  const no   = document.getElementById('ns-no').value.trim();
+  const date = document.getElementById('ns-date').value;
+  const cid  = document.getElementById('ns-customer').value;
+  if (!no || !date || !cid) { alert('伝票番号・日付・顧客は必須です'); return; }
+  const items = newSalesDetailRows.filter(r => r.code).map(r => {
+    const p = getProduct(r.code);
+    const rate = r.rate || 100;
+    const upPrice = p ? p.price : 0;                          // 単価（上代）
+    const downPrice = Math.round(upPrice * rate / 100);        // 下代単価
+    return { c: r.code, n: p ? p.name : r.code, q: r.qty, p: upPrice, r: rate, a: downPrice * r.qty };
+  });
+  if (items.length === 0) { alert('明細を1件以上入力してください'); return; }
+  const total = items.reduce((s, it) => s + it.a, 0);
+  const c = getCustomer(cid);
+  const ym = date.slice(0, 7);
+  const saleObj = { id: no, d: date, ym, cid, cn: c?.name||'', ck: c?.kana||'', total, items };
+
+  try {
+    await fbDb.ref('/sales/' + no).set(saleObj);
+    store.sales.unshift(saleObj);
+    if (!custTotalCache[cid]) custTotalCache[cid] = { total: 0, count: 0 };
+    custTotalCache[cid].total += total;
+    custTotalCache[cid].count++;
+    alert('伝票を登録しました：' + no);
+    showPage('sales', null);
+  } catch (err) {
+    alert('Firebase保存エラー: ' + err.message);
+  }
+};
+
+// ── Firebase書き込み（saveCustomerをオーバーライド） ──────────
+const _origSaveCustomer = saveCustomer;
+saveCustomer = async function() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) { alert('名前は必須です'); return; }
+  const newId = String(Math.max(...store.customers.map(c => parseInt(c.id)||0)) + 1);
+  const custObj = {
+    id: newId, name,
+    kana:   document.getElementById('nc-kana').value,
+    tel:    document.getElementById('nc-tel').value,
+    mobile: document.getElementById('nc-mobile').value,
+    email:  document.getElementById('nc-email').value,
+    zip:    document.getElementById('nc-zip').value,
+    addr:   document.getElementById('nc-addr').value,
+    bday:   document.getElementById('nc-bday').value,
+    rid:    document.getElementById('nc-rank').value,
+    rank:   store.ranks[document.getElementById('nc-rank').value] || '',
+    staff:  store.staff[document.getElementById('nc-staff').value] || document.getElementById('nc-staff').value,
+    note:   document.getElementById('nc-note').value,
+    hc: '0', kp: '0'
+  };
+
+  try {
+    await fbDb.ref('/customers/' + newId).set(custObj);
+    store.customers.push(custObj);
+    alert(name + '（No.' + newId + '）を登録しました');
+    filteredCustomers = null;
+    showPage('customers', null);
+  } catch (err) {
+    alert('Firebase保存エラー: ' + err.message);
+  }
+};
+
+// ── Firebase書き込み（saveInoutをオーバーライド） ─────────────
+const _origSaveInout = saveInout;
+saveInout = async function() {
+  const code = document.getElementById('inout-product').value;
+  const qty  = parseInt(document.getElementById('inout-qty').value) || 0;
+  if (!qty) { alert('数量を入力してください'); return; }
+  const inv = store.stock.find(i => i.code === code);
+  if (!inv) return;
+  const newQty = currentInoutType === 'in' ? inv.qty + qty : Math.max(0, inv.qty - qty);
+
+  try {
+    await fbDb.ref('/stock/' + code).update({ qty: newQty });
+    inv.qty = newQty;
+    closeModal('inout-modal');
+    renderInventory();
+    renderInvAlert();
+    alert((currentInoutType === 'in' ? '入庫' : '出庫') + '登録しました（在庫: ' + newQty + '個）');
+  } catch (err) {
+    alert('Firebase保存エラー: ' + err.message);
+  }
+};
+
+// ── CSVバックアップ ──────────────────────────────────────────
+function downloadSalesCSV() {
+  const rows = [['伝票番号','日付','年月','顧客ID','顧客名','フリガナ','合計（税抜）','合計（税込）','明細数']];
+  store.sales.slice().sort((a,b) => a.d.localeCompare(b.d)).forEach(s => {
+    rows.push([
+      s.id, s.d, s.ym, s.cid, s.cn, s.ck,
+      s.total, Math.round(s.total * 1.1), s.items.length
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v||'').replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = '朝霧店_売上データ_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadCustomersCSV() {
+  const rows = [['顧客ID','名前','フリガナ','電話','携帯','メール','郵便番号','住所','生年月日','ランク','担当','備考']];
+  store.customers.filter(c=>c.name).forEach(c => {
+    rows.push([c.id, c.name, c.kana, c.tel, c.mobile, c.email, c.zip, c.addr, c.bday, c.rank, c.staff, c.note]);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v||'').replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = '朝霧店_顧客データ_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── localStorage キャッシュ ───────────────────────────────────
+const CACHE_KEY = 'asagiri_cache_v1';
+
+function saveCachedData(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      sales:     data.sales,
+      customers: data.customers,
+      products:  data.products,
+      stock:     data.stock,
+      staff:     data.staff,
+      ranks:     data.ranks,
+    }));
+  } catch (e) { /* localStorage容量超過時は無視 */ }
+}
+
+function loadCachedData() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    // 7日以上古いキャッシュは無視
+    if (Date.now() - cached.ts > 7 * 24 * 60 * 60 * 1000) return null;
+    return cached;
+  } catch (e) { return null; }
+}
+
+// ── ローディング表示 ─────────────────────────────────────────
+function showLoading(msg) {
+  const el = document.getElementById('app-loading');
+  el.style.display = 'flex';
+  if (msg) document.getElementById('loading-msg').textContent = msg;
+}
+
+function hideLoading() {
+  document.getElementById('app-loading').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────
+// 印刷機能
+// ─────────────────────────────────────────────────────
+function printSlip(s, custObj) {
+  let sub10 = 0, sub8 = 0;
+  (s.items || []).forEach(it => {
+    if (isReducedTax(it.c)) sub8 += it.a;
+    else sub10 += it.a;
+  });
+  const tax10 = Math.round(sub10 * 0.1);
+  const tax8  = Math.round(sub8  * 0.08);
+  const grandTotal = sub10 + tax10 + sub8 + tax8;
+
+  document.getElementById('print-area').innerHTML = `
+    <div style="max-width:680px;margin:0 auto">
+      <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:14px;margin-bottom:18px">
+        <div style="font-size:22px;font-weight:700;letter-spacing:.05em">朝霧店　売上伝票</div>
+        <div style="font-size:13px;margin-top:6px;letter-spacing:.03em">
+          伝票番号：${s.id}　／　日付：${fmtDate(s.d)}
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:22px">
+        <div>
+          <div style="font-size:12px;color:#555">顧客番号：${s.cid}</div>
+          <div style="font-size:18px;font-weight:700;margin-top:4px">${s.cn || '—'} 様</div>
+          ${custObj ? `<div style="font-size:12px;color:#555;margin-top:3px">TEL: ${custObj.tel||custObj.mobile||'—'}</div>` : ''}
+        </div>
+        <div style="text-align:right;font-size:12px;color:#555">
+          朝霧店<br>発行日: ${new Date().toLocaleDateString('ja-JP')}
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:22px">
+        <thead>
+          <tr style="background:#f0f0f0;border-top:1.5px solid #000;border-bottom:1.5px solid #000">
+            <th style="padding:7px 10px;text-align:left">商品名</th>
+            <th style="padding:7px 6px;text-align:left;font-size:11px;color:#555">コード</th>
+            <th style="padding:7px 6px;text-align:center">数量</th>
+            <th style="padding:7px 6px;text-align:right">単価</th>
+            <th style="padding:7px 6px;text-align:center">掛率</th>
+            <th style="padding:7px 6px;text-align:right">下代</th>
+            <th style="padding:7px 6px;text-align:center">税率</th>
+            <th style="padding:7px 10px;text-align:right">金額</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(s.items || []).map(it => {
+            const rate = it.r || 100;
+            const downUnit = Math.round(it.a / it.q);
+            const upUnit = it.p || downUnit;
+            const taxRate = isReducedTax(it.c) ? '8%' : '10%';
+            return `<tr style="border-bottom:1px solid #ddd">
+              <td style="padding:6px 10px">${it.n}</td>
+              <td style="padding:6px 6px;font-size:11px;color:#666">${it.c}</td>
+              <td style="padding:6px 6px;text-align:center">${it.q}</td>
+              <td style="padding:6px 6px;text-align:right">¥${upUnit.toLocaleString()}</td>
+              <td style="padding:6px 6px;text-align:center">${rate}%</td>
+              <td style="padding:6px 6px;text-align:right">¥${downUnit.toLocaleString()}</td>
+              <td style="padding:6px 6px;text-align:center">${taxRate}</td>
+              <td style="padding:6px 10px;text-align:right">¥${it.a.toLocaleString()}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div style="width:280px;margin-left:auto;font-size:13px">
+        ${sub10 > 0 ? `
+        <div style="display:flex;justify-content:space-between;padding:4px 0">
+          <span>10%対象　下代小計</span><span>¥${sub10.toLocaleString()}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:#555">
+          <span>　消費税（10%）</span><span>¥${tax10.toLocaleString()}</span>
+        </div>` : ''}
+        ${sub8 > 0 ? `
+        <div style="display:flex;justify-content:space-between;padding:4px 0">
+          <span>8%対象　下代小計</span><span>¥${sub8.toLocaleString()}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:#555">
+          <span>　消費税（8%）</span><span>¥${tax8.toLocaleString()}</span>
+        </div>` : ''}
+        <div style="display:flex;justify-content:space-between;padding:9px 0 5px;border-top:2px solid #000;margin-top:6px;font-weight:700;font-size:16px">
+          <span>税込合計</span><span>¥${grandTotal.toLocaleString()}</span>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:50px;padding-top:16px;border-top:1px solid #ccc;font-size:12px;color:#777">
+        朝霧店
+      </div>
+    </div>`;
+  window.print();
+}
+
+function printCurrentSlip() {
+  if (!_currentSlip) return;
+  const c = getCustomer(_currentSlip.cid);
+  printSlip(_currentSlip, c);
+}
+
+function printSlipPreview() {
+  const no   = document.getElementById('ns-no').value.trim() || '（未登録）';
+  const date = document.getElementById('ns-date').value || new Date().toISOString().slice(0,10);
+  const cid  = document.getElementById('ns-customer').value;
+  const c    = getCustomer(cid);
+  const items = newSalesDetailRows.filter(r => r.code).map(r => {
+    const p = getProduct(r.code);
+    const rate = r.rate || 100;
+    const upPrice  = p ? p.price : 0;
+    const downPrice = Math.round(upPrice * rate / 100);
+    return { c: r.code, n: p ? p.name : r.code, q: r.qty, p: upPrice, r: rate, a: downPrice * r.qty };
+  });
+  if (items.length === 0) { alert('明細を1件以上入力してください'); return; }
+  printSlip({ id: no, d: date, cid: cid || '—', cn: c?.name || '（顧客未選択）', items }, c);
+}
+</script>
+
+<!-- ★ 印刷エリア ★ -->
+<div id="print-area"></div>
+
+</body>
+</html>

@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朝霧店管理システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f4f6f8;
+    --bg2:     #ffffff;
+    --bg3:     #eef0f3;
+    --border:  #d0d4da;
+    --accent:  #2563b0;
+    --accent2: #1a4f9a;
+    --accent-soft: rgba(37,99,176,0.08);
+    --text:    #1a1c20;
+    --text2:   #4a5060;
+    --text3:   #8a90a0;
+    --red:     #c0392b;
+    --green:   #1a8a50;
+    --blue:    #2563b0;
+    --yellow:  #b06010;
+    --radius:  10px;
+    --shadow:  0 2px 12px rgba(0,0,0,0.10);
+    --font-base: 21px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: var(--font-base);
+    overflow-x: hidden;
+  }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── サイドバー ── */
+  .sidebar {
+    width: 248px;
+    background: var(--bg2);
+    border-right: 2px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top:0; left:0; bottom:0; z-index:100;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+  }
+  .sidebar-logo {
+    padding: 22px 20px 16px;
+    border-bottom: 2px solid var(--border);
+    background: var(--accent);
+  }
+  .sidebar-logo .store-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
+  .sidebar-logo .store-sub  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .nav { padding: 10px 0; flex: 1; overflow-y: auto; }
+  .nav-section { font-size: 12px; color: var(--text3); letter-spacing: 0.08em; padding: 14px 18px 5px; font-weight: 700; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; color: var(--text2); cursor: pointer;
+    transition: all 0.12s; border-left: 3px solid transparent; font-size: 15px;
+  }
+  .nav-item:hover { color: var(--accent); background: var(--accent-soft); }
+  .nav-item.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+  .nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+
+  /* ── メイン ── */
+  .main { margin-left: 248px; flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+  .topbar {
+    background: var(--bg2); border-bottom: 2px solid var(--border);
+    padding: 0 28px; height: 62px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top:0; z-index:50;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .topbar-title { font-size: 22px; font-weight: 600; }
+  .topbar-right { font-size: 15px; color: var(--text3); }
+  .content { padding: 28px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ════ ホームメニュー ════ */
+  .home-title {
+    text-align: center; font-size: 30px; font-weight: 700;
+    margin-bottom: 32px; letter-spacing: 0.04em; color: var(--text);
+  }
+  .home-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 12px; max-width: 1040px; margin: 0 auto;
+  }
+  .home-btn {
+    background: var(--bg2); border: 2px solid var(--border); border-radius: 8px;
+    padding: 16px 8px; text-align: center; cursor: pointer;
+    font-size: 14px; font-family: 'Noto Sans JP', sans-serif; font-weight: 500; color: var(--text);
+    transition: all 0.14s; line-height: 1.5; box-shadow: var(--shadow);
+  }
+  .home-btn:hover {
+    background: var(--accent); color: #fff; border-color: var(--accent2);
+    transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37,99,176,0.20);
+  }
+  .home-btn .hicon { font-size: 22px; display: block; margin-bottom: 5px; }
+  .home-section-label {
+    grid-column: 1 / -1; font-size: 13px; color: var(--text3); font-weight: 700;
+    letter-spacing: 0.08em; border-bottom: 1px solid var(--border);
+    padding-bottom: 5px; margin-top: 10px;
+  }
+
+  /* ── カード ── */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); }
+  .card-title { font-size: 13px; color: var(--text3); font-weight: 600; margin-bottom: 8px; }
+  .card-value { font-size: 30px; font-weight: 700; }
+  .card-value span { font-size: 16px; color: var(--text3); font-weight: 400; margin-left: 4px; }
+  .card-sub { margin-top: 6px; font-size: 13px; color: var(--text3); }
+  .card-sub .up { color: var(--green); } .card-sub .down { color: var(--red); }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+  /* ── テーブル ── */
+  .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .table-head {
+    padding: 14px 20px; border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3);
+  }
+  .table-head h3 { font-size: 17px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--bg3); padding: 10px 14px; text-align: left; font-size: 13px; color: var(--text2); font-weight: 700; border-bottom: 1px solid var(--border); }
+  tbody tr { border-top: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: var(--accent-soft); }
+  tbody td { padding: 11px 14px; font-size: 15px; color: var(--text); }
+  tbody td.mono { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text2); }
+  tbody td.amount { font-family: 'DM Mono', monospace; text-align: right; }
+  tfoot tr { border-top: 2px solid var(--border); background: var(--bg3); }
+  tfoot td { padding: 11px 14px; font-size: 15px; font-weight: 700; font-family: 'DM Mono', monospace; }
+
+  /* ── ステータス ── */
+  .status { display: inline-block; border-radius: 4px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
+  .status.done    { background: #d4f0e4; color: var(--green); }
+  .status.pending { background: #fef3cd; color: var(--yellow); }
+  .status.low     { background: #fde8e8; color: var(--red); }
+
+  /* ── ボタン ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border-radius: 7px; font-size: 15px;
+    cursor: pointer; border: none; transition: all 0.14s;
+    font-family: 'Noto Sans JP', sans-serif; font-weight: 500;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: #fff; color: var(--text2); border: 2px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: #fde8e8; color: var(--red); border: 1px solid #f5c6c6; }
+  .btn-danger:hover { background: var(--red); color: #fff; }
+
+  /* ── 入力系 ── */
+  .search-bar { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+  input[type=text], input[type=date], input[type=number], select, textarea {
+    background: #fff; border: 2px solid var(--border); color: var(--text);
+    padding: 9px 13px; border-radius: 7px; font-size: 15px;
+    font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color 0.14s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input[type=text] { flex: 1; min-width: 160px; }
+
+  /* ── フォーム ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 13px; color: var(--text2); font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  /* ── モーダル ── */
+  .modal-overlay {
+    position: fixed; inset:0; background: rgba(0,0,0,0.45);
+    z-index:200; display:none; align-items:center; justify-content:center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    width: 580px; max-width: 96vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    animation: slideUp 0.18s ease;
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-header {
+    padding: 18px 22px 14px; border-bottom: 2px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background: var(--bg3); border-radius: 14px 14px 0 0;
+  }
+  .modal-header h3 { font-size: 18px; font-weight: 600; }
+  .modal-close { cursor:pointer; font-size:20px; background:none; border:none; color:var(--text3); }
+  .modal-close:hover { color: var(--red); }
+  .modal-body { padding: 20px 22px; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+  /* ── サジェスト ── */
+  .suggest-wrap { position: relative; }
+  .suggest-list {
+    position:absolute; top:100%; left:0; right:0;
+    background:#fff; border: 2px solid var(--accent); border-top:none;
+    border-radius: 0 0 8px 8px; max-height: 220px; overflow-y:auto;
+    z-index:300; box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  .suggest-item { padding: 10px 14px; font-size: 15px; cursor:pointer; border-bottom: 1px solid var(--border); }
+  .suggest-item:hover { background: var(--accent-soft); color: var(--accent); }
+  .suggest-item .sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* ── バーチャート ── */
+  .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .bar-label { width:52px; font-size:13px; color:var(--text2); text-align:right; flex-shrink:0; }
+  .bar-track { flex:1; background:var(--bg3); border-radius:3px; height:10px; overflow:hidden; }
+  .bar-fill { height:100%; background:var(--accent); border-radius:3px; transition:width .5s ease; }
+  .bar-amount { width:90px; font-size:13px; color:var(--text2); font-family:'DM Mono',monospace; }
+
+  /* ── 在庫バー ── */
+  .stock-bar { height:7px; background:var(--bg3); border-radius:3px; margin-top:5px; overflow:hidden; }
+  .stock-fill { height:100%; border-radius:3px; }
+
+  /* ── タブ ── */
+  .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom: 2px solid var(--border); }
+  .tab { padding:9px 18px; font-size:15px; color:var(--text3); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .14s; }
+  .tab:hover { color:var(--accent); }
+  .tab.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+
+  /* ── アラート ── */
+  .alert { display:flex; gap:10px; align-items:flex-start; padding:12px 16px; border-radius:8px; margin-bottom:10px; font-size:15px; }
+  .alert-warn   { background:#fff8e8; border:1px solid #f0d070; color:var(--yellow); }
+  .alert-danger { background:#fde8e8; border:1px solid #f5a0a0; color:var(--red); }
+  .alert-info   { background:var(--accent-soft); border:1px solid rgba(37,99,176,0.2); color:var(--accent); }
+
+  /* ── チップ ── */
+  .chip { display:inline-block; padding:2px 10px; border-radius:20px; font-size:13px; background:var(--bg3); color:var(--text2); border:1px solid var(--border); }
+  .chip.gold { background:#fff8e8; color:#a07020; border-color:#e0c060; }
+
+  .divider { height:1px; background:var(--border); margin:18px 0; }
+  .flex-between { display:flex; align-items:center; justify-content:space-between; }
+
+  /* ── 売上伝票カード（モバイル用） ── */
+  #sales-card-list { display: none; }
+  .sales-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    margin-bottom: 10px; box-shadow: var(--shadow);
+  }
+  .sales-card-top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+  }
+  .sales-card-date {
+    font-family: 'DM Mono', monospace; font-size: 14px;
+    color: var(--text3); flex-shrink: 0;
+  }
+  .sales-card-name {
+    font-weight: 600; font-size: 16px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sales-card-amount {
+    font-family: 'DM Mono', monospace; font-size: 20px;
+    font-weight: 700; color: var(--accent); margin-bottom: 10px;
+  }
+  .sales-card-amount span {
+    font-size: 13px; color: var(--text3);
+    font-weight: 400; margin-left: 4px;
+  }
+  .sales-card-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* ── CSVプレビュー ── */
+  .csv-preview-box {
+    margin-top:14px; padding:12px 14px; background:var(--bg3);
+    border-radius:6px; font-size:13px; color:var(--text2);
+    border: 1px solid var(--border); line-height: 1.8;
+    display:none;
+  }
+
+  /* ── ハンバーガーボタン ── */
+  .hamburger-btn {
+    display: none;
+    background: none; border: none;
+    font-size: 24px; cursor: pointer;
+    color: var(--text); padding: 6px 10px;
+    border-radius: 6px; line-height: 1; flex-shrink: 0;
+  }
+  .hamburger-btn:hover { background: var(--accent-soft); }
+
+  /* ── サイドバーオーバーレイ ── */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 150;
+  }
+  .sidebar-overlay.open { display: block; }
+
+  /* ════ モバイル対応 ════ */
+  @media (max-width: 768px) {
+    /* サイドバー: デフォルト非表示、スライドイン */
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 200;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    /* ハンバーガーボタン表示 */
+    .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+
+    /* メインコンテンツ全幅 */
+    .main { margin-left: 0; }
+
+    /* トップバー */
+    .topbar { padding: 0 12px; gap: 8px; }
+    .topbar-title { font-size: 16px; }
+    .topbar-right { font-size: 13px; gap: 8px; }
+
+    /* コンテンツパディング縮小・幅固定 */
+    .content { padding: 14px; width: 100%; max-width: 100%; }
+
+    /* KPIカード: 2列 */
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+
+    /* ホームグリッド: 2列・画面幅に収める */
+    .home-grid {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 100%;
+      margin: 0;
+      width: 100%;
+    }
+    .home-title { font-size: 20px; margin-bottom: 16px; }
+
+    /* 日付・ユーザー名: スマホでは非表示 */
+    #current-date { display: none; }
+    #firebase-user { display: none; }
+
+    /* ボタン操作性: 44px以上 */
+    .btn { min-height: 44px; padding: 10px 14px; font-size: 15px; }
+
+    /* 入力欄: 16px以上（iOSズーム防止）・44px以上 */
+    input[type=text], input[type=date], input[type=number], select, textarea {
+      font-size: 16px !important;
+      min-height: 44px;
+      padding: 10px 13px;
+    }
+
+    /* 検索バー: 縦積み */
+    .search-bar { flex-direction: column; align-items: stretch; }
+    .search-bar input[type=text] { min-width: unset; }
+    .search-bar span { display: none; }
+
+    /* フォームグリッド: 1列 */
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+
+    /* テーブルラッパー */
+    .table-wrap { overflow-x: auto; }
+
+    /* 売上伝票一覧: テーブルを非表示、カードを表示 */
+    #sales-table-wrap { display: none; }
+    #sales-card-list { display: block; }
+
+    /* 顧客一覧: 顧客番号・フリガナ・ランク・担当を非表示 */
+    #page-customers table th:nth-child(1),
+    #page-customers table td:nth-child(1),
+    #page-customers table th:nth-child(3),
+    #page-customers table td:nth-child(3),
+    #page-customers table th:nth-child(5),
+    #page-customers table td:nth-child(5),
+    #page-customers table th:nth-child(6),
+    #page-customers table td:nth-child(6) { display: none; }
+
+    /* 商品マスタ: 商品コード・ジャンル・仕入先・操作を非表示 */
+    #page-products table th:nth-child(1),
+    #page-products table td:nth-child(1),
+    #page-products table th:nth-child(3),
+    #page-products table td:nth-child(3),
+    #page-products table th:nth-child(5),
+    #page-products table td:nth-child(5),
+    #page-products table th:nth-child(7),
+    #page-products table td:nth-child(7) { display: none; }
+
+    /* 明細テーブル: モバイルはJS側でカード形式レンダリング。theadを非表示 */
+    #page-new-sales .detail-table-head { display: none; }
+    #detail-tbody td { border: none; }
+  }
+</style>
+  <!-- Firebase SDK v9 compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<!-- ★ ログインオーバーレイ ★ -->
+<div id="login-overlay" style="
+  position:fixed;inset:0;background:#f4f6f8;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;">
+  <div style="text-align:center">
+    <div style="font-size:30px;font-weight:700;color:#2563b0;letter-spacing:.04em;margin-bottom:6px">朝霧店</div>
+    <div style="font-size:13px;color:#8a90a0;letter-spacing:.1em">売上・顧客管理システム</div>
+  </div>
+  <div style="background:#fff;border:2px solid #d0d4da;border-radius:14px;padding:36px 40px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
+    <div style="font-size:16px;font-weight:500;margin-bottom:6px;color:#1a1c20">ログインが必要です</div>
+    <div style="font-size:13px;color:#8a90a0;margin-bottom:28px">Googleアカウントでログインしてください</div>
+    <button id="login-btn" onclick="doLogin()" style="
+      width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+      background:#2563b0;color:#fff;border:none;border-radius:8px;
+      padding:12px 20px;font-size:15px;font-weight:500;cursor:pointer;
+      font-family:'Noto Sans JP',sans-serif;transition:background .15s;">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Googleでログイン
+    </button>
+    <div id="login-error" style="color:#c0392b;font-size:13px;margin-top:14px;min-height:18px"></div>
+  </div>
+  <div style="font-size:12px;color:#8a90a0">朝霧店スタッフ専用システム</div>
+</div>
+
+<!-- ★ ローディング画面 ★ -->
+<div id="app-loading" style="
+  position:fixed;inset:0;background:rgba(244,246,248,.9);z-index:8999;
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  backdrop-filter:blur(4px);">
+  <div style="width:40px;height:40px;border:3px solid #d0d4da;border-top-color:#2563b0;
+    border-radius:50%;animation:spin .8s linear infinite;"></div>
+  <div style="font-size:14px;color:#4a5060" id="loading-msg">データを読み込み中...</div>
+</div>
+
+<!-- ★ オフラインバナー ★ -->
+<div id="offline-banner" style="
+  display:none;position:fixed;top:0;left:0;right:0;z-index:7000;
+  background:#b06010;color:#fff;text-align:center;padding:8px;
+  font-size:13px;font-weight:500;">
+  ⚠ オフライン中 — データは次回オンライン時に同期されます
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+
+<!-- サイドバー -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="store-name">朝霧店</div>
+    <div class="store-sub">管理システム</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">メニュー</div>
+    <div class="nav-item active" onclick="showPage('home',this)"><span class="icon">🏠</span>ホーム</div>
+    <div class="nav-section">売上管理</div>
+    <div class="nav-item" onclick="showPage('sales',this)"><span class="icon">📋</span>売上伝票一覧</div>
+    <div class="nav-item" onclick="showPage('new-sales',this)"><span class="icon">✏️</span>売上伝票の入力</div>
+    <div class="nav-item" onclick="showPage('daily',this)"><span class="icon">📊</span>売上日計表</div>
+    <div class="nav-item" onclick="showPage('monthly',this)"><span class="icon">📈</span>月次レポート</div>
+    <div class="nav-section">顧客管理</div>
+    <div class="nav-item" onclick="showPage('customers',this)"><span class="icon">👥</span>顧客一覧表</div>
+    <div class="nav-item" onclick="showPage('new-customer',this)"><span class="icon">➕</span>顧客マスタの登録</div>
+    <div class="nav-item" onclick="showPage('unvisited',this)"><span class="icon">📅</span>今月未来店顧客</div>
+    <div class="nav-section">在庫・商品</div>
+    <div class="nav-item" onclick="showPage('inventory',this)"><span class="icon">📦</span>在庫管理</div>
+    <div class="nav-item" onclick="showPage('products',this)"><span class="icon">🗂️</span>商品マスタの登録</div>
+    <div class="nav-section">エステ</div>
+    <div class="nav-item" onclick="showPage('este-visit',this)"><span class="icon">💆</span>エステ来店入力</div>
+    <div class="nav-item" onclick="showPage('este-list',this)"><span class="icon">📋</span>エステ来店一覧</div>
+    <div class="nav-item" onclick="showPage('keep-items',this)"><span class="icon">💎</span>キープ商品・回数券</div>
+    <div class="nav-item" onclick="showPage('este-menus',this)"><span class="icon">📝</span>コースマスタ</div>
+  </nav>
+</aside>
+
+<!-- メイン -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;overflow:hidden;min-width:0">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="メニュー">☰</button>
+      <div class="topbar-title" id="page-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">朝霧店管理メインメニュー</div>
+    </div>
+    <div class="topbar-right" style="display:flex;gap:16px;align-items:center">
+      <span id="current-date" style="font-size:15px;color:var(--text3)"></span>
+      <span id="firebase-user" style="font-size:13px;color:var(--text3)"></span>
+      <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="doSignOut()">ログアウト</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ═══ ホーム ═══ -->
+    <div id="page-home" class="page active">
+      <div class="home-title">朝霧店管理メインメニュー</div>
+      <div class="home-grid">
+
+        <div class="home-section-label">顧客</div>
+        <div class="home-btn" onclick="showPage('customers',null)"><span class="hicon">👤</span>顧客情報</div>
+        <div class="home-btn" onclick="showPage('new-customer',null)"><span class="hicon">➕</span>顧客マスタの登録</div>
+        <div class="home-btn" onclick="goCustSearch()"><span class="hicon">🔍</span>お客様検索</div>
+        <div class="home-btn" onclick="showPage('customers',null)"><span class="hicon">📋</span>顧客一覧表</div>
+        <div class="home-btn" onclick="showPage('customers',null)"><span class="hicon">📜</span>お客様売上履歴</div>
+
+        <div class="home-section-label">売上・伝票</div>
+        <div class="home-btn" onclick="showPage('new-sales',null)"><span class="hicon">✏️</span>売上伝票の入力</div>
+        <div class="home-btn" onclick="showPage('sales',null)"><span class="hicon">🖨️</span>売上伝票印刷</div>
+        <div class="home-btn" onclick="showPage('daily',null)"><span class="hicon">📊</span>売上日計表の表示</div>
+        <div class="home-btn" onclick="showPage('monthly',null)"><span class="hicon">📈</span>月次レポート</div>
+        <div class="home-btn" onclick="showPage('sales',null)"><span class="hicon">🔎</span>購入価格別解析</div>
+
+        <div class="home-section-label">商品・在庫</div>
+        <div class="home-btn" onclick="showPage('products',null)"><span class="hicon">🗂️</span>商品マスタの登録</div>
+        <div class="home-btn" onclick="showPage('products',null)"><span class="hicon">🔍</span>商品検索</div>
+        <div class="home-btn" onclick="showPage('inventory',null)"><span class="hicon">📦</span>月別商品売上集計</div>
+        <div class="home-btn" onclick="showPage('customers',null)"><span class="hicon">🛒</span>顧客購入商品検索</div>
+        <div class="home-btn" onclick="showPage('customers',null)"><span class="hicon">📈</span>お客様商品別売上検索</div>
+
+        <div class="home-section-label">エステ・その他</div>
+        <div class="home-btn" onclick="showPage('este-visit',null)"><span class="hicon">💆</span>エステ来店入力</div>
+        <div class="home-btn" onclick="showPage('keep-items',null)"><span class="hicon">💎</span>エステキープ商品・回数券売上</div>
+        <div class="home-btn" onclick="showPage('este-list',null)"><span class="hicon">📋</span>エステ来店一覧表＆金額</div>
+        <div class="home-btn" onclick="showPage('unvisited',null)"><span class="hicon">📅</span>今月未来店顧客表示</div>
+        <div class="home-btn" onclick="showPage('birthday',null)"><span class="hicon">🎂</span>誕生日DM</div>
+
+        <div class="home-section-label">データ管理</div>
+        <div class="home-btn" onclick="openCSVImport()"><span class="hicon">📥</span>CSVインポート<br><small style="font-size:11px;opacity:.7">顧客・商品マスタ</small></div>
+        <div class="home-btn" onclick="exportSalesCSV()"><span class="hicon">📤</span>売上CSVエクスポート</div>
+        <div class="home-btn" onclick="confirmResetStore()"><span class="hicon">🔄</span>サンプルデータに<br>リセット</div>
+        <div style="visibility:hidden"></div>
+        <div style="visibility:hidden"></div>
+
+      </div>
+    </div>
+
+    <!-- ═══ 売上伝票一覧 ═══ -->
+    <div id="page-sales" class="page">
+      <div class="search-bar">
+        <input type="text" placeholder="伝票番号・顧客名で検索..." id="sales-search" oninput="filterSales()">
+        <input type="date" id="date-from">
+        <span style="color:var(--text3)">〜</span>
+        <input type="date" id="date-to">
+        <button class="btn btn-ghost" onclick="filterSales()">絞り込み</button>
+        <button class="btn btn-ghost" onclick="exportSalesCSV()">📤 CSVエクスポート</button>
+        <button class="btn btn-primary" onclick="showPage('new-sales',null)">＋ 新規伝票</button>
+      </div>
+      <div class="table-wrap" id="sales-table-wrap">
+        <div class="table-head">
+          <h3>売上伝票一覧</h3>
+          <span style="font-size:14px;color:var(--text3)" id="sales-count"></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th>伝票番号</th><th>受付日</th><th>納品日</th><th>顧客名</th><th>商品数</th><th>合計金額（税込）</th><th>操作</th>
+          </tr></thead>
+          <tbody id="sales-tbody"></tbody>
+        </table>
+      </div>
+      <div id="sales-card-list"></div>
+    </div>
+
+    <!-- ═══ 売上伝票入力 ═══ -->
+    <div id="page-new-sales" class="page">
+      <div style="max-width:780px">
+
+        <div class="table-wrap" style="margin-bottom:20px">
+          <div class="table-head"><h3>伝票ヘッダー</h3></div>
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>伝票番号</label>
+                <input type="text" id="new-slip-no" readonly style="background:var(--bg3);color:var(--text3)">
+              </div>
+              <div class="form-group">
+                <label>受付日</label>
+                <input type="date" id="new-order-date">
+              </div>
+              <div class="form-group">
+                <label>納品日</label>
+                <input type="date" id="new-delivery-date">
+              </div>
+              <!-- 顧客インクリメンタル検索 -->
+              <div class="form-group">
+                <label>顧客（番号・名前・フリガナで検索）</label>
+                <div class="suggest-wrap" id="cust-sw">
+                  <input type="text" id="cust-q" placeholder="例: 594　または　山田　または　ヤマダ"
+                    autocomplete="off" oninput="suggestCust()" onfocus="suggestCust()">
+                  <div class="suggest-list" id="cust-sug" style="display:none"></div>
+                </div>
+                <div id="cust-selected-info" style="font-size:13px;color:var(--accent);margin-top:4px;min-height:18px"></div>
+                <input type="hidden" id="cust-selected-no">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-bottom:20px">
+          <div class="table-head">
+            <h3>明細</h3>
+            <button class="btn btn-ghost" style="padding:6px 14px;font-size:14px" onclick="addRow()">＋ 行追加</button>
+          </div>
+          <table>
+            <thead class="detail-table-head"><tr>
+              <th style="width:26%">商品（コード・商品名で検索）</th>
+              <th style="width:6%">数量</th>
+              <th style="width:10%">上代</th>
+              <th style="width:13%">掛率</th>
+              <th style="width:10%">下代</th>
+              <th style="width:9%">税率</th>
+              <th style="width:10%">金額</th>
+              <th style="width:6%"></th>
+            </tr></thead>
+            <tbody id="detail-tbody"></tbody>
+          </table>
+          <div style="padding:14px 18px;border-top:2px solid var(--border);background:var(--bg3)">
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <div><span style="color:var(--text3);font-size:14px">10%対象 下代小計：</span><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--text2);min-width:90px;display:inline-block;text-align:right" id="sub10">¥0</span></div>
+              <div><span style="color:var(--text3);font-size:14px">消費税（10%）：</span><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--text2);min-width:90px;display:inline-block;text-align:right" id="tax10">¥0</span></div>
+              <div><span style="color:var(--text3);font-size:14px">8%対象 下代小計：</span><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--text2);min-width:90px;display:inline-block;text-align:right" id="sub8">¥0</span></div>
+              <div><span style="color:var(--text3);font-size:14px">消費税（8%）：</span><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--text2);min-width:90px;display:inline-block;text-align:right" id="tax8">¥0</span></div>
+              <div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px"><span style="color:var(--text3);font-size:15px">税込合計：</span><span style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--accent)" id="total-amount">¥0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+          <button class="btn btn-ghost" onclick="showPage('sales',null)">キャンセル</button>
+          <button class="btn btn-primary" onclick="saveSalesSlip()">💾 伝票を保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 顧客一覧 ═══ -->
+    <div id="page-customers" class="page">
+      <div class="search-bar">
+        <input type="text" placeholder="名前・フリガナ・電話番号で検索..." id="cust-list-q" oninput="filterCustomers()">
+        <select id="cust-rank-f" onchange="filterCustomers()">
+          <option value="">全ランク</option>
+          <option>プレミアム</option><option>ゴールド</option><option>シルバー</option><option>一般</option>
+        </select>
+        <button id="show-withdrawn-btn" class="btn btn-ghost" onclick="toggleWithdrawn()" style="gap:6px">
+          <span id="show-withdrawn-icon">☐</span> 退会者を表示
+        </button>
+        <button class="btn btn-primary" onclick="showPage('new-customer',null)">＋ 新規登録</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>顧客一覧</h3>
+          <span style="font-size:14px;color:var(--text3)" id="cust-count"></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th>顧客番号</th><th>名前</th><th>フリガナ</th><th>電話番号</th><th>ランク</th><th>担当</th><th>操作</th>
+          </tr></thead>
+          <tbody id="cust-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ 新規顧客 ═══ -->
+    <div id="page-new-customer" class="page">
+      <div style="max-width:640px">
+        <div class="table-wrap">
+          <div class="table-head"><h3>顧客情報登録</h3></div>
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group"><label>顧客番号</label><input type="text" id="nc-no" readonly style="background:var(--bg3);color:var(--text3)"></div>
+              <div class="form-group"><label>顧客ランク</label><select id="nc-rank"><option>一般</option><option>シルバー</option><option>ゴールド</option><option>プレミアム</option></select></div>
+              <div class="form-group"><label>名前 ＊</label><input type="text" id="nc-name" placeholder="山田 花子"></div>
+              <div class="form-group"><label>フリガナ</label><input type="text" id="nc-kana" placeholder="ヤマダ ハナコ"></div>
+              <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" placeholder="0544-xx-xxxx"></div>
+              <div class="form-group"><label>携帯電話</label><input type="text" id="nc-mobile"></div>
+              <div class="form-group"><label>生年月日</label><input type="text" id="nc-birth" placeholder="1980-01-01"></div>
+              <div class="form-group"><label>担当スタッフ</label><select id="nc-staff"><option>田中</option><option>鈴木</option><option>佐藤</option></select></div>
+              <div class="form-group full"><label>住所</label><input type="text" id="nc-addr"></div>
+              <div class="form-group full"><label>メールアドレス</label><input type="text" id="nc-email"></div>
+              <div class="form-group full"><label>備考</label><input type="text" id="nc-note"></div>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:22px">
+              <button class="btn btn-ghost" onclick="showPage('customers',null)">キャンセル</button>
+              <button class="btn btn-primary" onclick="saveCustomer()">💾 登録する</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 在庫管理 ═══ -->
+    <div id="page-inventory" class="page">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('inv','list',this)">在庫一覧</div>
+        <div class="tab" onclick="switchTab('inv','inout',this)">入出庫履歴</div>
+        <div class="tab" onclick="switchTab('inv','alert',this)">アラート</div>
+      </div>
+      <div id="inv-tab-list">
+        <div class="search-bar">
+          <input type="text" placeholder="商品名・コードで検索..." id="inv-search" oninput="filterInventory()">
+          <button class="btn btn-primary" onclick="openInoutModal('in')">＋ 入庫登録</button>
+          <button class="btn btn-ghost" onclick="openInoutModal('out')">↑ 出庫登録</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>商品コード</th><th>商品名</th><th>単価</th><th>在庫数</th><th>在庫状況</th><th>操作</th></tr></thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="inv-tab-inout" style="display:none">
+        <div class="table-wrap">
+          <div class="table-head"><h3>入出庫履歴</h3></div>
+          <table>
+            <thead><tr><th>日付</th><th>商品コード</th><th>商品名</th><th>入庫</th><th>出庫</th><th>在庫数</th></tr></thead>
+            <tbody id="inout-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="inv-tab-alert" style="display:none">
+        <div id="inv-alert-list"></div>
+      </div>
+    </div>
+
+    <!-- ═══ 商品マスタ ═══ -->
+    <div id="page-products" class="page">
+      <div class="search-bar">
+        <input type="text" placeholder="商品名・コードで検索..." id="prod-search" oninput="filterProducts()">
+        <select id="prod-genre" onchange="filterProducts()"><option value="">全ジャンル</option></select>
+        <button class="btn btn-primary" onclick="openProductModal()">＋ 商品登録</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>商品コード</th><th>商品名</th><th>ジャンル</th><th>上代価格</th><th>仕入先</th><th>状態</th><th>操作</th></tr></thead>
+          <tbody id="prod-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ 売上日計表 ═══ -->
+    <div id="page-daily" class="page">
+      <div class="search-bar">
+        <label style="font-size:14px;color:var(--text2);flex-shrink:0;font-weight:600">期間：</label>
+        <input type="date" id="daily-from">
+        <span style="color:var(--text3)">〜</span>
+        <input type="date" id="daily-to">
+        <button class="btn btn-primary" onclick="renderDaily()">表示</button>
+        <button class="btn btn-ghost" onclick="setDailyCurrentMonth()">今月</button>
+        <button class="btn btn-ghost" onclick="exportDailyCSV()">📤 CSVエクスポート</button>
+      </div>
+      <div class="grid-4" id="daily-cards" style="margin-bottom:20px"></div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>売上日計表</h3>
+          <span style="font-size:14px;color:var(--text3)" id="daily-period-label"></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th>日付</th>
+            <th style="text-align:center">伝票数</th>
+            <th style="text-align:right">売上合計（税抜）</th>
+            <th style="text-align:right">消費税（10%）</th>
+            <th style="text-align:right">合計（税込）</th>
+          </tr></thead>
+          <tbody id="daily-tbody"></tbody>
+          <tfoot id="daily-tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ 今月未来店顧客 ═══ -->
+    <div id="page-unvisited" class="page">
+      <div id="unvisited-info" style="margin-bottom:16px"></div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3 id="unvisited-title">今月未来店顧客</h3>
+          <span style="font-size:14px;color:var(--text3)" id="unvisited-count"></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th>顧客番号</th><th>名前</th><th>フリガナ</th><th>電話番号</th><th>ランク</th><th>担当</th><th>最終購入日</th>
+          </tr></thead>
+          <tbody id="unvisited-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ エステ来店入力 ═══ -->
+    <div id="page-este-visit" class="page">
+      <div style="max-width:680px">
+        <div class="table-wrap" style="margin-bottom:20px">
+          <div class="table-head"><h3>エステ来店入力</h3></div>
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>来店ID</label>
+                <input type="text" id="ev-id" readonly style="background:var(--bg3);color:var(--text3)">
+              </div>
+              <div class="form-group">
+                <label>来店日</label>
+                <input type="date" id="ev-date">
+              </div>
+              <div class="form-group full">
+                <label>顧客（番号または名前で検索）</label>
+                <div class="suggest-wrap" id="ev-cust-sw">
+                  <input type="text" id="ev-cust-q" placeholder="例: 594　または　山田"
+                    autocomplete="off" oninput="suggestCustEste()" onfocus="suggestCustEste()">
+                  <div class="suggest-list" id="ev-cust-sug" style="display:none"></div>
+                </div>
+                <div id="ev-cust-info" style="font-size:13px;color:var(--accent);margin-top:4px;min-height:18px"></div>
+                <input type="hidden" id="ev-cust-no">
+              </div>
+              <div class="form-group">
+                <label>コース名</label>
+                <select id="ev-menu" style="width:100%" onchange="onEsteMenuChange()">
+                  <option value="">-- コースを選択 --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>担当スタッフ</label>
+                <select id="ev-staff" style="width:100%">
+                  <option>田中</option><option>鈴木</option><option>佐藤</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>金額（税抜）</label>
+                <input type="number" id="ev-price" min="0" style="width:100%" oninput="calcEsteTotal()">
+              </div>
+              <div class="form-group">
+                <label>税率</label>
+                <select id="ev-tax" style="width:100%" onchange="calcEsteTotal()">
+                  <option value="10">10%</option>
+                  <option value="8">8%</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>次回予約日（任意）</label>
+                <input type="date" id="ev-next-visit">
+              </div>
+              <div class="form-group">
+                <label>備考</label>
+                <input type="text" id="ev-note">
+              </div>
+            </div>
+            <div style="margin-top:16px;padding:14px 16px;background:var(--bg3);border-radius:8px;text-align:right">
+              <span style="color:var(--text3);font-size:14px">消費税：</span>
+              <span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--text2)" id="ev-tax-amt">¥0</span>
+              <span style="color:var(--text3);font-size:15px;margin-left:16px">税込合計：</span>
+              <span style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--accent)" id="ev-total">¥0</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+          <button class="btn btn-ghost" onclick="showPage('este-list',null)">キャンセル</button>
+          <button class="btn btn-primary" onclick="saveEsteVisit()">💾 来店登録</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ エステ来店一覧・集計 ═══ -->
+    <div id="page-este-list" class="page">
+      <div class="search-bar">
+        <input type="date" id="el-from">
+        <span style="color:var(--text3)">〜</span>
+        <input type="date" id="el-to">
+        <input type="text" placeholder="顧客名で検索..." id="el-cust-q" style="min-width:130px" oninput="renderEsteList()">
+        <select id="el-menu-f" onchange="renderEsteList()"><option value="">全コース</option></select>
+        <button class="btn btn-ghost" onclick="renderEsteList()">表示</button>
+        <button class="btn btn-ghost" onclick="setEsteCurrentMonth()">今月</button>
+        <button class="btn btn-primary" onclick="showPage('este-visit',null)">＋ 来店登録</button>
+      </div>
+      <div class="grid-4" id="este-cards" style="margin-bottom:20px"></div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>エステ来店一覧</h3>
+          <span style="font-size:14px;color:var(--text3)" id="el-count"></span>
+        </div>
+        <table>
+          <thead><tr>
+            <th>来店日</th><th>顧客名</th><th>コース名</th><th>担当</th><th>金額（税込）</th><th>次回予約</th><th>備考</th>
+          </tr></thead>
+          <tbody id="el-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ キープ商品・回数券 ═══ -->
+    <div id="page-keep-items" class="page">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div class="table-wrap">
+            <div class="table-head"><h3>キープ商品・回数券 登録</h3></div>
+            <div class="modal-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>日付</label>
+                  <input type="date" id="ki-date" style="width:100%">
+                </div>
+                <div class="form-group full">
+                  <label>顧客（番号または名前で検索）</label>
+                  <div class="suggest-wrap">
+                    <input type="text" id="ki-cust-q" placeholder="例: 594　または　山田"
+                      autocomplete="off" oninput="suggestCustKeep()" onfocus="suggestCustKeep()">
+                    <div class="suggest-list" id="ki-cust-sug" style="display:none"></div>
+                  </div>
+                  <div id="ki-cust-info" style="font-size:13px;color:var(--accent);margin-top:4px;min-height:18px"></div>
+                  <input type="hidden" id="ki-cust-no">
+                </div>
+                <div class="form-group full">
+                  <label>商品名</label>
+                  <input type="text" id="ki-menu-name" placeholder="例: ホームケアセット・10回券">
+                </div>
+                <div class="form-group">
+                  <label>数量</label>
+                  <input type="number" id="ki-qty" value="1" min="1" style="width:100%">
+                </div>
+                <div class="form-group">
+                  <label>回数</label>
+                  <input type="number" id="ki-count" value="1" min="1" style="width:100%" placeholder="回数券">
+                </div>
+                <div class="form-group full">
+                  <label>金額（税込）</label>
+                  <input type="number" id="ki-price" min="0" style="width:100%">
+                </div>
+                <div class="form-group full">
+                  <label>備考</label>
+                  <input type="text" id="ki-note">
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-primary" onclick="saveKeepItem()">💾 登録</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="table-wrap">
+            <div class="table-head">
+              <h3>登録履歴</h3>
+              <span style="font-size:14px;color:var(--text3)" id="ki-count-label"></span>
+            </div>
+            <table>
+              <thead><tr><th>日付</th><th>顧客名</th><th>商品名</th><th>数量×回数</th><th>金額</th></tr></thead>
+              <tbody id="ki-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+</div>
+
+<!-- ═══ エステコースマスタ ═══ -->
+<div id="page-este-menus" class="page">
+  <div style="max-width:860px">
+    <div class="table-wrap">
+      <div class="table-head">
+        <h3>エステコースマスタ</h3>
+        <button class="btn btn-primary" onclick="addEsteMenu()">＋ コースを追加</button>
+      </div>
+      <table>
+        <thead><tr>
+          <th>コードID</th><th>コース名</th><th style="text-align:right">価格（税抜）</th><th>税率</th><th>状態</th><th>操作</th>
+        </tr></thead>
+        <tbody id="este-menus-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 誕生日DM ═══ -->
+<div id="page-birthday" class="page">
+  <div class="search-bar">
+    <label style="font-size:14px;color:var(--text2);font-weight:600;flex-shrink:0">誕生月：</label>
+    <select id="bd-month" style="min-width:90px">
+      <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+      <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+      <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+      <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+    </select>
+    <button class="btn btn-primary" onclick="renderBirthdayList()">対象者を表示</button>
+    <button class="btn btn-ghost" id="bd-export-btn" onclick="exportBirthdayCSV()" style="display:none">📤 CSVダウンロード</button>
+  </div>
+  <div id="bd-count-info" style="padding:4px 0 12px"></div>
+  <div class="table-wrap">
+    <div class="table-head"><h3 id="bd-title">誕生日DM対象顧客</h3></div>
+    <table>
+      <thead><tr>
+        <th>顧客番号</th><th>名前</th><th>フリガナ</th><th>誕生日</th>
+        <th>電話番号</th><th>携帯電話</th><th>住所</th><th>ランク</th><th>担当</th>
+      </tr></thead>
+      <tbody id="bd-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ 月次レポート ═══ -->
+<div id="page-monthly" class="page">
+  <div class="search-bar">
+    <label style="font-size:14px;color:var(--text2);font-weight:600;flex-shrink:0">年：</label>
+    <select id="mr-year" style="min-width:100px" onchange="renderMonthly()"></select>
+    <button class="btn btn-ghost" onclick="renderMonthly()">更新</button>
+  </div>
+  <div class="grid-4" id="mr-cards" style="margin-bottom:20px"></div>
+  <div class="table-wrap" style="margin-bottom:20px">
+    <div class="table-head">
+      <h3>月別売上グラフ</h3>
+      <div style="display:flex;gap:14px;font-size:13px;align-items:center">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;background:var(--accent);border-radius:2px;display:inline-block"></span>商品売上</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;background:#22c55e;border-radius:2px;display:inline-block"></span>エステ売上</span>
+      </div>
+    </div>
+    <div id="mr-chart" style="padding:20px 16px 8px"></div>
+  </div>
+  <div class="table-wrap">
+    <div class="table-head"><h3>月別統計</h3></div>
+    <table>
+      <thead><tr>
+        <th>月</th>
+        <th style="text-align:right">商品売上（税込）</th>
+        <th style="text-align:center">エステ件数</th>
+        <th style="text-align:right">エステ売上（税込）</th>
+        <th style="text-align:right">合計</th>
+      </tr></thead>
+      <tbody id="mr-tbody"></tbody>
+      <tfoot id="mr-tfoot"></tfoot>
+    </table>
+  </div>
+</div>
+
+  </div><!-- /.content -->
+</div><!-- /.main -->
+
+<!-- 入出庫モーダル -->
+<div class="modal-overlay" id="inout-modal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="inout-modal-title">入庫登録</h3><button class="modal-close" onclick="closeModal('inout-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>商品</label><select id="inout-product" style="width:100%"></select></div>
+        <div class="form-group"><label>数量</label><input type="number" id="inout-qty" min="1"></div>
+        <div class="form-group full"><label>備考</label><input type="text" id="inout-note"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('inout-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveInout()">登録</button>
+    </div>
+  </div>
+</div>
+
+<!-- 商品登録モーダル -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-header"><h3>商品登録</h3><button class="modal-close" onclick="closeModal('product-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>商品コード</label><input type="text" id="pm-code"></div>
+        <div class="form-group"><label>ジャンル</label><select id="pm-genre" style="width:100%"><option>コスメ</option><option>スキンケア</option><option>ボディケア</option><option>サプリ</option><option>その他</option></select></div>
+        <div class="form-group full"><label>商品名</label><input type="text" id="pm-name"></div>
+        <div class="form-group"><label>上代価格（税抜）</label><input type="number" id="pm-price"></div>
+        <div class="form-group"><label>仕入先</label><select id="pm-supplier" style="width:100%"><option>仕入先A</option><option>仕入先B</option><option>仕入先C</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('product-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveProduct()">登録</button>
+    </div>
+  </div>
+</div>
+
+<!-- 顧客詳細モーダル -->
+<div class="modal-overlay" id="cust-detail-modal">
+  <div class="modal" style="width:640px">
+    <div class="modal-header"><h3 id="cust-detail-name"></h3><button class="modal-close" onclick="closeModal('cust-detail-modal')">✕</button></div>
+    <div class="modal-body" id="cust-detail-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('cust-detail-modal')">閉じる</button></div>
+  </div>
+</div>
+
+<!-- CSVインポートモーダル -->
+<div class="modal-overlay" id="csv-import-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📥 CSVインポート</h3>
+      <button class="modal-close" onclick="closeModal('csv-import-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:14px">
+        <label>インポート種類</label>
+        <select id="csv-type" style="width:100%" onchange="clearCsvPreview()">
+          <option value="customer">顧客マスタ</option>
+          <option value="product">商品マスタ</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>文字コード</label>
+        <select id="csv-encoding" style="width:100%" onchange="previewCSV()">
+          <option value="shift-jis">Shift-JIS（一般的な日本語CSV）</option>
+          <option value="utf-8">UTF-8</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>CSVファイルを選択</label>
+        <input type="file" id="csv-file" accept=".csv" onchange="previewCSV()"
+          style="width:100%;margin-top:4px;padding:8px 0;font-size:14px;border:none;background:none">
+      </div>
+      <div class="csv-preview-box" id="csv-preview"></div>
+      <div style="margin-top:14px;font-size:13px;color:var(--text3)">
+        ※ 既存データと同じ番号/コードのレコードは上書き更新されます。
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('csv-import-modal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="importCSV()">インポート実行</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// Firebase 設定
+// ══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyDZtuZa4RvofqIB375zbmPb9X-UwOUTMC0",
+  authDomain: "asagiri-sale.firebaseapp.com",
+  databaseURL: "https://asagiri-sale-default-rtdb.firebaseio.com",
+  projectId: "asagiri-sale",
+  storageBucket: "asagiri-sale.firebasestorage.app",
+  messagingSenderId: "800075177148",
+  appId: "1:800075177148:web:f343f8daaf31bcc301c4b9"
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+const fbDb   = firebase.database();
+
+const ALLOWED_EMAILS = [
+  'katsuhiko.arie@gmail.com',
+  'ya.asagiriten@gmail.com'
+];
+
+// ══════════════════════════════════════════
+// 8%対象商品コード（自動判定）
+// ══════════════════════════════════════════
+const TAX8_RAW = [
+  '0329','0330','0670','1659','2646','3025','3304',
+  '6224','6225','6226','6228','6250','6251','6252','6253','6254',
+  '6278','6282','6288','6289','6291','6292',
+  '6303','6304','6305','6306','6307','6308','630u',
+  '6311','6312','6313','6314','6315','6316','6317','631u',
+  '6323','6325','6329','6335','6336','6337','6515',
+  '7628','7629','7630',
+  'Y001','Y002','Y007','Y008','Y059','Y067','Y068','Y085',
+  'Y628','Y629','Y633','Y635','Y636',
+  'Z025','Z601','z101','z102','ｚ101','ｚ102'
+];
+function normalizeCode(code) {
+  return String(code || '').trim()
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .toUpperCase();
+}
+const TAX8_CODES = new Set(TAX8_RAW.map(normalizeCode));
+const is8pct = code => TAX8_CODES.has(normalizeCode(code));
+
+// ══════════════════════════════════════════
+// データマッピング（Firebase形式 → v3形式）
+// ══════════════════════════════════════════
+function mapCustomer(c) {
+  if (!c) return null;
+  const no = parseInt(c.id || c.no) || 0;
+  if (!no) return null;
+  return {
+    no, name: c.name || '', kana: c.kana || '',
+    tel: c.tel || '', mobile: c.mobile || '',
+    email: c.email || '',
+    addr: c.addr || ((c.zip ? c.zip + ' ' : '') + (c.addr2 || '')),
+    birth: c.bday || c.birth || '',
+    rank: c.rank || '一般',
+    staff: c.staff || '', note: c.note || ''
+  };
+}
+function mapProduct(p) {
+  if (!p || !p.code) return null;
+  return {
+    code: p.code, name: p.name || '',
+    price: parseInt(p.price) || 0,
+    genre: p.genre || 'その他',
+    active: p.disc ? false : (p.active !== false),
+    supplier: p.supplier || ''
+  };
+}
+function mapInventory(i) {
+  if (!i || !i.code) return null;
+  return { code: i.code, name: i.name || '', price: parseInt(i.price) || 0, qty: parseInt(i.qty) || 0 };
+}
+function mapSale(s) {
+  if (!s) return null;
+  // 新形式（v3）はそのまま使用
+  if (s.no && s.details) return s;
+  // 旧形式（MDBインポート）→ v3形式へ変換
+  const no = s.id || '';
+  if (!no) return null;
+  const details = (s.items || []).map(it => ({
+    code: it.c || '', qty: parseInt(it.q) || 1, kake: 1.0,
+    tax: is8pct(it.c || '') ? 0.08 : 0.1
+  }));
+  return {
+    no, orderDate: s.d || '', delivDate: s.d || '',
+    custNo: parseInt(s.cid) || 0, details,
+    _origTotal: s.total // 元の合計を参照用に保持
+  };
+}
+
+// ══════════════════════════════════════════
+// デフォルトデータ（Firebaseが空の場合のフォールバック）
+// ══════════════════════════════════════════
+const DEFAULT_DATA = {
+  customers: [
+    {no:1,name:'山田 花子',kana:'ヤマダ ハナコ',tel:'0544-25-1234',mobile:'090-1234-5678',email:'yamada@example.com',addr:'静岡県富士宮市朝霧1-2-3',birth:'1975-05-12',rank:'ゴールド',staff:'田中',note:''},
+    {no:2,name:'鈴木 美佳',kana:'スズキ ミカ',tel:'0544-25-5678',mobile:'080-2345-6789',email:'suzuki@example.com',addr:'静岡県富士宮市大宮町4-5-6',birth:'1985-08-22',rank:'プレミアム',staff:'鈴木',note:'VIP顧客'},
+    {no:3,name:'佐藤 良子',kana:'サトウ ヨシコ',tel:'0544-25-9012',mobile:'070-3456-7890',email:'sato@example.com',addr:'静岡県富士宮市北山1-1-1',birth:'1990-02-14',rank:'シルバー',staff:'佐藤',note:''},
+    {no:4,name:'田中 幸子',kana:'タナカ サチコ',tel:'0544-26-1111',mobile:'090-4567-8901',email:'',addr:'静岡県富士宮市上条5-6',birth:'1968-11-30',rank:'一般',staff:'田中',note:''},
+    {no:5,name:'渡辺 明美',kana:'ワタナベ アケミ',tel:'0544-26-2222',mobile:'080-5678-9012',email:'watanabe@example.com',addr:'静岡県富士宮市猪之頭2-3',birth:'1982-07-07',rank:'ゴールド',staff:'鈴木',note:''},
+  ],
+  products: [
+    {code:'A001',name:'ローズヒップオイル',genre:'スキンケア',price:6800,supplier:'仕入先A',active:true},
+    {code:'A002',name:'モイスチャーローション',genre:'スキンケア',price:4500,supplier:'仕入先A',active:true},
+    {code:'B001',name:'アロマボディクリーム',genre:'ボディケア',price:3800,supplier:'仕入先B',active:true},
+    {code:'B002',name:'ホワイトニングセラム',genre:'コスメ',price:9800,supplier:'仕入先B',active:true},
+    {code:'C001',name:'コラーゲンサプリ',genre:'サプリ',price:2980,supplier:'仕入先C',active:true},
+    {code:'C002',name:'ビタミンCクリーム',genre:'スキンケア',price:5500,supplier:'仕入先C',active:false},
+  ],
+  inventory: [
+    {code:'A001',name:'ローズヒップオイル',price:6800,qty:3},
+    {code:'A002',name:'モイスチャーローション',price:4500,qty:18},
+    {code:'B001',name:'アロマボディクリーム',price:3800,qty:2},
+    {code:'B002',name:'ホワイトニングセラム',price:9800,qty:24},
+    {code:'C001',name:'コラーゲンサプリ',price:2980,qty:1},
+    {code:'C002',name:'ビタミンCクリーム',price:5500,qty:11},
+  ],
+  sales: [], inout: []
+};
+
+// ══════════════════════════════════════════
+// ストア（メモリ上のデータ）
+// ══════════════════════════════════════════
+const store = { customers: [], products: [], inventory: [], sales: [], inout: [], estemenus: [], estevisits: [], keepitems: [] };
+
+// ══════════════════════════════════════════
+// Firebase 認証
+// ══════════════════════════════════════════
+function doLogin() {
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = '認証中...';
+  const provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(err => {
+    document.getElementById('login-error').textContent = 'ログインに失敗しました: ' + err.message;
+    btn.disabled = false;
+    btn.innerHTML = 'Googleでログイン';
+  });
+}
+function doSignOut() {
+  if (confirm('ログアウトしますか？')) fbAuth.signOut();
+}
+
+fbAuth.onAuthStateChanged(async user => {
+  if (!user) {
+    document.getElementById('login-overlay').style.display = 'flex';
+    document.getElementById('app-loading').style.display = 'none';
+    return;
+  }
+  if (!ALLOWED_EMAILS.includes(user.email)) {
+    fbAuth.signOut();
+    document.getElementById('login-error').textContent = user.email + ' はアクセス権限がありません。';
+    return;
+  }
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('firebase-user').textContent = user.displayName || user.email;
+  await loadAllData();
+  document.getElementById('current-date').textContent =
+    new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  showPage('home', null);
+});
+
+// ══════════════════════════════════════════
+// Firebase データ読み込み
+// ══════════════════════════════════════════
+function showLoading(msg) {
+  document.getElementById('app-loading').style.display = 'flex';
+  if (msg) document.getElementById('loading-msg').textContent = msg;
+}
+function hideLoading() { document.getElementById('app-loading').style.display = 'none'; }
+
+async function loadAllData() {
+  showLoading('データを読み込み中...');
+  try {
+    const [custSnap, prodSnap, stockSnap, salesSnap, inoutSnap, emenSnap, evisSnap, keepSnap] = await Promise.all([
+      fbDb.ref('customers').get(),
+      fbDb.ref('products').get(),
+      fbDb.ref('stock').get(),
+      fbDb.ref('sales').get(),
+      fbDb.ref('inout').get(),
+      fbDb.ref('estemenus').get(),
+      fbDb.ref('estevisits').get(),
+      fbDb.ref('keepitems').get(),
+    ]);
+    store.customers = custSnap.val()
+      ? Object.values(custSnap.val()).map(mapCustomer).filter(Boolean).sort((a,b) => a.no - b.no)
+      : DEFAULT_DATA.customers;
+    store.products = prodSnap.val()
+      ? Object.values(prodSnap.val()).map(mapProduct).filter(Boolean)
+      : DEFAULT_DATA.products;
+    store.inventory = stockSnap.val()
+      ? Object.values(stockSnap.val()).map(mapInventory).filter(Boolean)
+      : DEFAULT_DATA.inventory;
+    store.sales = salesSnap.val()
+      ? Object.values(salesSnap.val()).map(mapSale).filter(Boolean).sort((a,b) => (b.orderDate||'').localeCompare(a.orderDate||''))
+      : DEFAULT_DATA.sales;
+    store.inout = inoutSnap.val()
+      ? (Array.isArray(inoutSnap.val()) ? inoutSnap.val() : Object.values(inoutSnap.val())).filter(Boolean)
+      : [];
+    // エステメニュー
+    if (emenSnap.val()) {
+      store.estemenus = Object.values(emenSnap.val()).filter(Boolean);
+    } else {
+      // 初期コースを投入（Firebase未登録の場合）
+      store.estemenus = [
+        { id: 'M001', name: 'フェイシャルベーシック',  price: 8000,  tax: 10, active: true },
+        { id: 'M002', name: 'フェイシャルプレミアム',  price: 12000, tax: 10, active: true },
+        { id: 'M003', name: 'ボディトリートメント',    price: 10000, tax: 10, active: true },
+        { id: 'M004', name: 'ヘッドスパ',             price: 6000,  tax: 10, active: true },
+        { id: 'M005', name: 'アロマリラックス',        price: 9000,  tax: 10, active: true },
+      ];
+      const obj = {};
+      store.estemenus.forEach(m => { obj[m.id] = m; });
+      try { await fbDb.ref('estemenus').set(obj); } catch(e) { console.error('estemenus seed失敗:', e); }
+    }
+    store.estevisits = evisSnap.val()
+      ? Object.values(evisSnap.val()).filter(Boolean).sort((a,b) => (b.date||'').localeCompare(a.date||''))
+      : [];
+    store.keepitems = keepSnap.val()
+      ? Object.values(keepSnap.val()).filter(Boolean).sort((a,b) => (b.date||'').localeCompare(a.date||''))
+      : [];
+  } catch (err) {
+    console.error('Firebase読み込みエラー:', err);
+    alert('データの読み込みに失敗しました:\n' + err.message);
+  } finally {
+    hideLoading();
+  }
+}
+
+// オフライン検知
+fbDb.ref('.info/connected').on('value', snap => {
+  document.getElementById('offline-banner').style.display = snap.val() ? 'none' : '';
+});
+
+// ══════════════════════════════════════════
+// Firebase 書き込み関数
+// ══════════════════════════════════════════
+async function saveCustomers_FB() {
+  const obj = {};
+  store.customers.forEach(c => { if (c?.no) obj[c.no] = c; });
+  return fbDb.ref('customers').set(obj);
+}
+async function saveProducts_FB() {
+  const obj = {};
+  store.products.forEach(p => { if (p?.code) obj[p.code] = p; });
+  return fbDb.ref('products').set(obj);
+}
+async function saveInventory_FB() {
+  const obj = {};
+  store.inventory.forEach(i => { if (i?.code) obj[i.code] = i; });
+  return fbDb.ref('stock').set(obj);
+}
+async function updateStock_FB(code, qty) {
+  return fbDb.ref('stock/' + code).update({ qty });
+}
+async function saveSale_FB(slip) {
+  const key = slip.no.replace(/[.#$[\]/]/g, '_');
+  const calc = calcSlip(slip);
+  const cust = getCust(slip.custNo);
+  const fbObj = {
+    ...slip, id: slip.no,
+    d: slip.orderDate, ym: (slip.orderDate || '').slice(0, 7),
+    cid: String(slip.custNo), cn: cust?.name || '',
+    total: calc.total
+  };
+  return fbDb.ref('sales/' + key).set(fbObj);
+}
+// 後方互換: saveStore() は顧客・商品・在庫を保存（売上は saveSale_FB を使う）
+function saveStore() {
+  return Promise.all([
+    saveCustomers_FB().catch(console.error),
+    saveProducts_FB().catch(console.error),
+    saveInventory_FB().catch(console.error)
+  ]);
+}
+
+function confirmResetStore() {
+  if (confirm('サンプルデータにリセットします。\nFirebase上のデータも上書きされます。よろしいですか？')) {
+    const d = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    store.customers = d.customers;
+    store.products  = d.products;
+    store.inventory = d.inventory;
+    store.sales     = [];
+    store.inout     = [];
+    saveStore().then(() => location.reload());
+  }
+}
+
+// ══ データ ══（store はすでに上で定義済み）
+let ioType = 'in';
+let rows = [];
+
+// ── ユーティリティ ──
+const getCust = no => store.customers.find(c => c.no === no);
+const getProd = code => store.products.find(p => p.code === code);
+const fmtM = n => '¥' + Math.round(n).toLocaleString();
+const fmtD = s => s ? s.replace(/-/g, '/') : '—';
+function calcSlip(s) {
+  let sub10 = 0, sub8 = 0;
+  (s.details || []).forEach(d => {
+    const p = getProd(d.code);
+    if (!p) return;
+    const shitane = Math.floor(p.price * d.kake) * d.qty;
+    if (parseFloat(d.tax || 0.1) === 0.08) sub8 += shitane;
+    else sub10 += shitane;
+  });
+  const tax10 = Math.floor(sub10 * 0.1);
+  const tax8  = Math.floor(sub8  * 0.08);
+  return { sub10, sub8, tax10, tax8, total: sub10 + tax10 + sub8 + tax8 };
+}
+const slipTotal = s => calcSlip(s).total;
+
+// ── ページ遷移 ──
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+function showPage(name, navEl) {
+  if (window.innerWidth <= 768) closeSidebar();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('active');
+  if (navEl) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    navEl.classList.add('active');
+  }
+  const titles = {
+    home: '朝霧店管理メインメニュー',
+    sales: '売上伝票一覧',
+    'new-sales': '売上伝票の入力',
+    customers: '顧客一覧',
+    'new-customer': '顧客マスタの登録',
+    inventory: '在庫管理',
+    products: '商品マスタの登録',
+    daily: '売上日計表',
+    unvisited: '今月未来店顧客',
+    'este-visit': 'エステ来店入力',
+    'este-list': 'エステ来店一覧・集計',
+    'keep-items': 'キープ商品・回数券',
+    'este-menus': 'エステコースマスタ',
+    'birthday': '誕生日DM',
+    'monthly': '月次レポート'
+  };
+  document.getElementById('page-title').textContent = titles[name] || '';
+  if (name === 'sales')        renderSales();
+  if (name === 'customers')    renderCustomers();
+  if (name === 'inventory')    renderInventory();
+  if (name === 'products')     renderProducts();
+  if (name === 'new-sales')    initNewSales();
+  if (name === 'new-customer') initNewCust();
+  if (name === 'daily')        setDailyCurrentMonth();
+  if (name === 'unvisited')    renderUnvisited();
+  if (name === 'este-visit')   initEsteVisit();
+  if (name === 'este-list')    { setEsteCurrentMonth(); renderEsteList(); }
+  if (name === 'keep-items')   initKeepItems();
+  if (name === 'este-menus')   initEsteMenus();
+  if (name === 'birthday')     initBirthday();
+  if (name === 'monthly')      initMonthly();
+}
+
+function goCustSearch() {
+  showPage('customers', null);
+  setTimeout(() => document.getElementById('cust-list-q').focus(), 80);
+}
+
+function switchTab(prefix, tab, el) {
+  document.querySelectorAll('[id^=' + prefix + '-tab-]').forEach(t => t.style.display = 'none');
+  document.getElementById(prefix + '-tab-' + tab).style.display = '';
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (tab === 'inout') renderInout();
+  if (tab === 'alert') renderInvAlert();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ══ 売上伝票 ══
+function renderSales(list) {
+  list = list || store.sales;
+  document.getElementById('sales-count').textContent = list.length + '件';
+  // PC: テーブル
+  document.getElementById('sales-tbody').innerHTML = list.map(s => {
+    const c = getCust(s.custNo);
+    return `<tr>
+      <td class="mono">${s.no}</td><td class="mono">${fmtD(s.orderDate)}</td><td class="mono">${fmtD(s.delivDate)}</td>
+      <td><strong>${c ? c.name : '—'}</strong></td>
+      <td style="text-align:center">${s.details.length}</td>
+      <td class="amount" style="font-weight:700;color:var(--accent)">${fmtM(slipTotal(s))}</td>
+      <td>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="viewSlip('${s.no}')">詳細</button>
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:13px;margin-left:6px" onclick="printSlip('${s.no}')">🖨️ 印刷</button>
+      </td>
+    </tr>`;
+  }).join('');
+  // モバイル: カード
+  document.getElementById('sales-card-list').innerHTML = list.map(s => {
+    const c = getCust(s.custNo);
+    return `<div class="sales-card">
+      <div class="sales-card-top">
+        <span class="sales-card-date">${fmtD(s.orderDate)}</span>
+        <span class="sales-card-name">${c ? c.name : '—'}</span>
+      </div>
+      <div class="sales-card-amount">${fmtM(slipTotal(s))}<span>（税込）</span></div>
+      <div class="sales-card-actions">
+        <button class="btn btn-ghost" style="padding:8px 16px;font-size:14px" onclick="viewSlip('${s.no}')">詳細</button>
+        <button class="btn btn-ghost" style="padding:8px 14px;font-size:14px" onclick="printSlip('${s.no}')">🖨️ 印刷</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterSales() {
+  const q = (document.getElementById('sales-search').value || '').toLowerCase();
+  renderSales(store.sales.filter(s => {
+    const c = getCust(s.custNo);
+    return !q || s.no.toLowerCase().includes(q) || (c && c.name.includes(q));
+  }));
+}
+
+function viewSlip(no) {
+  const s = store.sales.find(x => x.no === no); if (!s) return;
+  const c = getCust(s.custNo);
+  const slip = calcSlip(s);
+  alert(`【伝票詳細】\n伝票番号: ${s.no}\n顧客: ${c ? c.name : '不明'}\n受付日: ${s.orderDate}  納品日: ${s.delivDate}\n\n【明細】\n` +
+    s.details.map(d => { const p = getProd(d.code); return `  ${p ? p.name : d.code} × ${d.qty}  ${fmtM(Math.floor((p ? p.price : 0) * d.kake) * d.qty)}`; }).join('\n') +
+    `\n\n税込合計: ${fmtM(slip.total)}`);
+}
+
+function printSlip(no) {
+  const s = store.sales.find(x => x.no === no); if (!s) return;
+  const c = getCust(s.custNo);
+  const slip = calcSlip(s);
+  const detailRows = s.details.map(d => {
+    const p = getProd(d.code);
+    if (!p) return '';
+    const shitane = Math.floor(p.price * d.kake);
+    const kinjo = shitane * d.qty;
+    const taxLabel = parseFloat(d.tax || 0.1) === 0.08 ? '8%' : '10%';
+    const kakeLabel = Math.round(d.kake * 100) + '%';
+    return `<tr>
+      <td>${p.name}</td>
+      <td style="text-align:center">${d.qty}</td>
+      <td style="text-align:right">¥${p.price.toLocaleString()}</td>
+      <td style="text-align:center">${kakeLabel}</td>
+      <td style="text-align:right">¥${shitane.toLocaleString()}</td>
+      <td style="text-align:center">${taxLabel}</td>
+      <td style="text-align:right">¥${kinjo.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+  const html = `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>売上伝票 ${s.no}</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Noto Sans JP',sans-serif;margin:30px;font-size:14px;color:#222}
+  .store-name{text-align:center;font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:.08em}
+  .slip-title{text-align:center;font-size:17px;margin-bottom:20px;color:#444}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;border:1px solid #ccc;padding:12px 16px;border-radius:6px}
+  .info-item label{font-size:12px;color:#666;display:block;margin-bottom:2px}
+  .info-item span{font-size:15px;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px}
+  th{background:#f2f4f7;padding:8px 10px;border:1px solid #ccc;font-size:13px;text-align:left}
+  td{padding:8px 10px;border:1px solid #ddd;font-size:13px}
+  .total-box{margin-left:auto;width:320px;border:1px solid #ccc;border-radius:6px;overflow:hidden}
+  .total-row{display:flex;justify-content:space-between;padding:7px 14px;border-bottom:1px solid #eee;font-size:14px}
+  .total-row:last-child{border-bottom:none}
+  .grand-total{font-size:17px;font-weight:700;background:#f2f4f7}
+  .print-btn{margin-top:24px;text-align:center}
+  button{padding:10px 24px;font-size:15px;cursor:pointer;border-radius:6px;border:1px solid #ccc;margin:0 6px}
+  button.primary{background:#2563b0;color:#fff;border-color:#1a4f9a}
+  @media print{button{display:none!important}.print-btn{display:none}}
+</style></head><body>
+<div class="store-name">朝霧店</div>
+<div class="slip-title">売上伝票</div>
+<div class="info-grid">
+  <div class="info-item"><label>伝票番号</label><span>${s.no}</span></div>
+  <div class="info-item"><label>顧客名</label><span>${c ? c.name + '　様' : '—'}</span></div>
+  <div class="info-item"><label>受付日</label><span>${s.orderDate || '—'}</span></div>
+  <div class="info-item"><label>納品日</label><span>${s.delivDate || '—'}</span></div>
+</div>
+<table>
+  <thead><tr><th>商品名</th><th>数量</th><th>上代</th><th>掛率</th><th>下代</th><th>税率</th><th>金額</th></tr></thead>
+  <tbody>${detailRows}</tbody>
+</table>
+<div class="total-box">
+  <div class="total-row"><span>10%対象 下代小計</span><span>¥${slip.sub10.toLocaleString()}</span></div>
+  <div class="total-row"><span>消費税（10%）</span><span>¥${slip.tax10.toLocaleString()}</span></div>
+  <div class="total-row"><span>8%対象 下代小計</span><span>¥${slip.sub8.toLocaleString()}</span></div>
+  <div class="total-row"><span>消費税（8%）</span><span>¥${slip.tax8.toLocaleString()}</span></div>
+  <div class="total-row grand-total"><span>税込合計</span><span>¥${slip.total.toLocaleString()}</span></div>
+</div>
+<div class="print-btn">
+  <button class="primary" onclick="window.print()">🖨️ 印刷する</button>
+  <button onclick="window.close()">閉じる</button>
+</div>
+<script>window.onload=function(){window.print()}<\/script>
+</body></html>`;
+  const win = window.open('', '_blank', 'width=820,height=750,scrollbars=yes');
+  if (win) { win.document.write(html); win.document.close(); }
+  else alert('ポップアップがブロックされました。ブラウザの設定を確認してください。');
+}
+
+// ══ 新規伝票 ══
+function initNewSales() {
+  const t = new Date().toISOString().slice(0, 10);
+  document.getElementById('new-slip-no').value = 'SL-' + Date.now().toString().slice(-7);
+  document.getElementById('new-order-date').value = t;
+  document.getElementById('new-delivery-date').value = t;
+  document.getElementById('cust-q').value = '';
+  document.getElementById('cust-selected-no').value = '';
+  document.getElementById('cust-selected-info').textContent = '';
+  rows = []; renderRows(); addRow();
+  document.addEventListener('click', hideAllSug, { once: false });
+}
+
+// 顧客サジェスト
+function suggestCust() {
+  const q = document.getElementById('cust-q').value.trim();
+  const box = document.getElementById('cust-sug');
+  if (!q) { box.style.display = 'none'; return; }
+  const hits = store.customers.filter(c =>
+    String(c.no).includes(q) || c.name.includes(q) || c.kana.includes(q) || (c.tel || '').includes(q)
+  ).slice(0, 10);
+  if (!hits.length) { box.style.display = 'none'; return; }
+  box.innerHTML = hits.map(c => `
+    <div class="suggest-item" onmousedown="selectCust(${c.no})">
+      <strong>${c.name}</strong>
+      <span style="margin-left:10px;font-size:13px;color:var(--text3)">No.${String(c.no).padStart(3, '0')}</span>
+      <div class="sub">${c.kana}　${c.tel || c.mobile || ''}　<span class="chip ${c.rank === 'ゴールド' || c.rank === 'プレミアム' ? 'gold' : ''}" style="font-size:11px">${c.rank}</span></div>
+    </div>`).join('');
+  box.style.display = '';
+}
+
+function selectCust(no) {
+  const c = getCust(no); if (!c) return;
+  document.getElementById('cust-q').value = c.name;
+  document.getElementById('cust-selected-no').value = no;
+  document.getElementById('cust-selected-info').innerHTML =
+    `✓ No.${String(c.no).padStart(3, '0')}　${c.kana}　<span class="chip ${c.rank === 'ゴールド' || c.rank === 'プレミアム' ? 'gold' : ''}" style="font-size:12px">${c.rank}</span>`;
+  document.getElementById('cust-sug').style.display = 'none';
+}
+
+function hideAllSug(e) {
+  if (!e.target.closest('.suggest-wrap'))
+    document.querySelectorAll('.suggest-list').forEach(el => el.style.display = 'none');
+}
+
+// 明細行
+function addRow() { rows.push({ id: Date.now() + Math.random(), code: '', qty: 1, kake: 1.0, tax: 0.1 }); renderRows(); }
+
+function renderRows() {
+  document.getElementById('detail-tbody').innerHTML = rows.map((r, i) => {
+    const p = getProd(r.code);
+    const jodai = p ? p.price : 0;
+    const shitane = p ? Math.floor(jodai * r.kake) : 0;
+    const kinjo = shitane * r.qty;
+    const taxVal = r.tax || 0.1;
+    const kakeOpts = [[1.0,'100%'],[0.9,'90%'],[0.8,'80%'],[0.75,'75%'],[0.7,'70%'],[0.65,'65%'],[0.6,'60%']];
+    const kakeHtml = kakeOpts.map(([v,l]) => `<option value="${v}" ${r.kake==v?'selected':''}>${l}</option>`).join('');
+    const taxHtml  = `<option value="0.1" ${taxVal==0.1?'selected':''}>10%</option><option value="0.08" ${taxVal==0.08?'selected':''}>8%</option>`;
+    if (window.innerWidth <= 768) {
+      return `<tr><td colspan="8" style="padding:0;border:none">
+        <div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--bg2)">
+          <div class="suggest-wrap" style="position:relative;margin-bottom:8px">
+            <input type="text" value="${r.code ? (getProd(r.code)?.name || r.code) : ''}"
+              placeholder="商品コードまたは商品名..."
+              autocomplete="off"
+              oninput="suggestProd(${i},this.value)" onfocus="suggestProd(${i},this.value)"
+              style="width:100%;font-size:16px;padding:10px 12px;min-height:44px">
+            <div class="suggest-list" id="ps-${i}" style="display:none"></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:8px">
+            <div style="flex:1"><div style="font-size:12px;color:var(--text3);font-weight:600;margin-bottom:4px">数量</div>
+              <input type="number" value="${r.qty}" min="1" style="width:100%;font-size:16px;padding:10px;min-height:44px"
+                onchange="updateRow(${i},'qty',this.value)"></div>
+            <div style="flex:1"><div style="font-size:12px;color:var(--text3);font-weight:600;margin-bottom:4px">掛率</div>
+              <select style="width:100%;font-size:16px;padding:10px;min-height:44px" onchange="updateRow(${i},'kake',this.value)">${kakeHtml}</select></div>
+            <div style="flex:1"><div style="font-size:12px;color:var(--text3);font-weight:600;margin-bottom:4px">税率</div>
+              <select style="width:100%;font-size:16px;padding:10px;min-height:44px" onchange="updateRow(${i},'tax',this.value)">${taxHtml}</select></div>
+          </div>
+          <div style="background:var(--bg3);border-radius:6px;padding:8px 12px;font-size:14px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:8px">
+            上代: ${r.code?fmtM(jodai):'—'}　下代: ${r.code?fmtM(shitane):'—'}　税率: ${Math.round(taxVal*100)}%
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><span style="font-size:13px;color:var(--text3)">金額：</span>
+              <strong style="font-size:18px;color:var(--accent);font-family:'DM Mono',monospace">${r.code?fmtM(kinjo):'—'}</strong></div>
+            <button class="btn btn-danger" style="min-height:44px;padding:8px 14px" onclick="removeRow(${i})">✕ 削除</button>
+          </div>
+        </div>
+      </td></tr>`;
+    }
+    return `<tr>
+      <td>
+        <div class="suggest-wrap" style="position:relative">
+          <input type="text" value="${r.code ? (getProd(r.code)?.name || r.code) : ''}"
+            placeholder="商品コードまたは商品名..."
+            autocomplete="off"
+            oninput="suggestProd(${i},this.value)" onfocus="suggestProd(${i},this.value)"
+            style="width:100%;font-size:14px;padding:7px 10px">
+          <div class="suggest-list" id="ps-${i}" style="display:none"></div>
+        </div>
+      </td>
+      <td><input type="number" value="${r.qty}" min="1" style="width:56px;font-size:14px;padding:7px 6px"
+        onchange="updateRow(${i},'qty',this.value)"></td>
+      <td class="mono" style="font-size:13px;text-align:right">${r.code ? fmtM(jodai) : '—'}</td>
+      <td><select style="font-size:13px;padding:5px 6px" onchange="updateRow(${i},'kake',this.value)">${kakeHtml}</select></td>
+      <td class="mono" style="font-size:13px;text-align:right">${r.code ? fmtM(shitane) : '—'}</td>
+      <td><select style="font-size:13px;padding:5px 6px" onchange="updateRow(${i},'tax',this.value)">${taxHtml}</select></td>
+      <td class="amount" style="font-size:13px;font-weight:600">${r.code ? fmtM(kinjo) : '—'}</td>
+      <td><button class="btn btn-danger" style="padding:4px 8px;font-size:13px" onclick="removeRow(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+  calcTotal();
+}
+
+function suggestProd(ri, q) {
+  const box = document.getElementById('ps-' + ri);
+  if (!q) { box.style.display = 'none'; return; }
+  const hits = store.products.filter(p => p.code.toLowerCase().includes(q.toLowerCase()) || p.name.includes(q)).slice(0, 8);
+  if (!hits.length) { box.style.display = 'none'; return; }
+  box.innerHTML = hits.map(p => `
+    <div class="suggest-item" onmousedown="pickProd(${ri},'${p.code}')">
+      <strong>${p.name}</strong>
+      <span style="margin-left:8px;font-size:13px;color:var(--text3)">${p.code}</span>
+      <div class="sub">${fmtM(p.price)}　${p.genre}　${p.active ? '販売中' : '終息'}</div>
+    </div>`).join('');
+  box.style.display = '';
+}
+
+function pickProd(ri, code) {
+  rows[ri].code = code;
+  rows[ri].tax  = is8pct(code) ? 0.08 : 0.1;
+  document.getElementById('ps-' + ri).style.display = 'none';
+  renderRows();
+}
+
+function updateRow(i, field, val) {
+  if (field === 'qty')  rows[i].qty  = parseInt(val) || 1;
+  else if (field === 'kake') rows[i].kake = parseFloat(val);
+  else if (field === 'tax')  rows[i].tax  = parseFloat(val);
+  else rows[i][field] = val;
+  renderRows();
+}
+function removeRow(i) { rows.splice(i, 1); renderRows(); }
+
+function calcTotal() {
+  let sub10 = 0, sub8 = 0;
+  rows.forEach(r => {
+    const p = getProd(r.code);
+    if (!p) return;
+    const shitane = Math.floor(p.price * r.kake) * r.qty;
+    if (parseFloat(r.tax || 0.1) === 0.08) sub8 += shitane;
+    else sub10 += shitane;
+  });
+  const tax10 = Math.floor(sub10 * 0.1);
+  const tax8  = Math.floor(sub8  * 0.08);
+  document.getElementById('sub10').textContent  = fmtM(sub10);
+  document.getElementById('tax10').textContent  = fmtM(tax10);
+  document.getElementById('sub8').textContent   = fmtM(sub8);
+  document.getElementById('tax8').textContent   = fmtM(tax8);
+  document.getElementById('total-amount').textContent = fmtM(sub10 + tax10 + sub8 + tax8);
+}
+
+function saveSalesSlip() {
+  const custNo = parseInt(document.getElementById('cust-selected-no').value);
+  if (!custNo) { alert('顧客を選択してください'); return; }
+  const valid = rows.filter(r => r.code).map(r => ({
+    code: r.code, qty: r.qty, kake: r.kake, tax: r.tax || 0.1
+  }));
+  if (!valid.length) { alert('明細を1件以上入力してください'); return; }
+  const slip = {
+    no: document.getElementById('new-slip-no').value,
+    orderDate: document.getElementById('new-order-date').value,
+    delivDate: document.getElementById('new-delivery-date').value,
+    custNo, details: valid
+  };
+  store.sales.unshift(slip);
+  saveSale_FB(slip).then(() => {
+    alert(`保存しました\n${slip.no}　${getCust(custNo)?.name}　合計 ${fmtM(slipTotal(slip))}`);
+    showPage('sales', null);
+  }).catch(err => {
+    alert('保存に失敗しました:\n' + err.message);
+    store.sales.shift();
+  });
+}
+
+// ══ 顧客 ══
+let showWithdrawn = false;
+
+function toggleWithdrawn() {
+  showWithdrawn = !showWithdrawn;
+  const btn  = document.getElementById('show-withdrawn-btn');
+  const icon = document.getElementById('show-withdrawn-icon');
+  icon.textContent = showWithdrawn ? '☑' : '☐';
+  btn.style.borderColor   = showWithdrawn ? 'var(--accent)' : '';
+  btn.style.color         = showWithdrawn ? 'var(--accent)' : '';
+  filterCustomers();
+}
+
+function renderCustomers(list) {
+  document.getElementById('cust-count').textContent = list.length + '名';
+  document.getElementById('cust-tbody').innerHTML = list.map(c => {
+    const withdrawn = c.active === false;
+    return `<tr style="${withdrawn ? 'opacity:.65;background:var(--bg3)' : ''}">
+      <td class="mono">${String(c.no).padStart(3, '0')}</td>
+      <td><strong>${c.name}</strong>${withdrawn ? ' <span class="status low" style="font-size:11px;padding:1px 6px;margin-left:4px">退会済</span>' : ''}</td>
+      <td class="mono" style="font-size:13px">${c.kana}</td>
+      <td class="mono">${c.tel || c.mobile || '—'}</td>
+      <td><span class="chip ${c.rank === 'プレミアム' || c.rank === 'ゴールド' ? 'gold' : ''}">${c.rank}</span></td>
+      <td>${c.staff}</td>
+      <td>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="showCustDetail(${c.no})">詳細</button>
+        ${withdrawn
+          ? `<button class="btn btn-ghost" style="padding:5px 10px;font-size:13px;margin-left:6px;border-color:var(--green);color:var(--green)" onclick="restoreCust(${c.no})">復元</button>`
+          : `<button class="btn btn-danger" style="padding:5px 10px;font-size:13px;margin-left:6px" onclick="withdrawCust(${c.no})">退会</button>`
+        }
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterCustomers() {
+  const q    = document.getElementById('cust-list-q').value;
+  const rank = document.getElementById('cust-rank-f').value;
+  renderCustomers(store.customers.filter(c =>
+    (showWithdrawn || c.active !== false) &&
+    (!q || c.name.includes(q) || c.kana.includes(q) || (c.tel || '').includes(q) || (c.mobile || '').includes(q)) &&
+    (!rank || c.rank === rank)
+  ));
+}
+
+function withdrawCust(no) {
+  const c = getCust(no); if (!c) return;
+  if (!confirm(`${c.name} さんを退会にしますか？\n（データは保持されます）`)) return;
+  c.active = false;
+  fbDb.ref('customers/' + no).update({ active: false })
+    .then(() => filterCustomers())
+    .catch(err => { alert('更新に失敗しました:\n' + err.message); c.active = undefined; });
+}
+
+function restoreCust(no) {
+  const c = getCust(no); if (!c) return;
+  if (!confirm(`${c.name} さんを復元しますか？`)) return;
+  c.active = true;
+  fbDb.ref('customers/' + no).update({ active: true })
+    .then(() => filterCustomers())
+    .catch(err => { alert('更新に失敗しました:\n' + err.message); c.active = false; });
+}
+
+function initNewCust() {
+  const n = Math.max(...store.customers.map(c => c.no), 0) + 1;
+  document.getElementById('nc-no').value = String(n).padStart(3, '0');
+  ['nc-name', 'nc-kana', 'nc-tel', 'nc-mobile', 'nc-email', 'nc-addr', 'nc-birth', 'nc-note']
+    .forEach(id => document.getElementById(id).value = '');
+}
+
+function saveCustomer() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) { alert('名前を入力してください'); return; }
+  const n = Math.max(...store.customers.map(c => c.no), 0) + 1;
+  store.customers.push({
+    no: n, name, kana: document.getElementById('nc-kana').value,
+    tel: document.getElementById('nc-tel').value, mobile: document.getElementById('nc-mobile').value,
+    email: document.getElementById('nc-email').value, addr: document.getElementById('nc-addr').value,
+    birth: document.getElementById('nc-birth').value, rank: document.getElementById('nc-rank').value,
+    staff: document.getElementById('nc-staff').value, note: document.getElementById('nc-note').value
+  });
+  saveCustomers_FB().catch(console.error);
+  alert(name + ' を登録しました（No.' + String(n).padStart(3, '0') + '）');
+  showPage('customers', null);
+}
+
+function showCustDetail(no) {
+  const c = getCust(no); if (!c) return;
+  document.getElementById('cust-detail-name').textContent = c.name + '　様';
+  const slips = store.sales.filter(s => s.custNo === no);
+  const total = slips.reduce((s, sl) => s + slipTotal(sl), 0);
+  const esteVisits = store.estevisits.filter(v => v.custNo === no).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const esteTotal = esteVisits.reduce((s, v) => s + (v.total||0), 0);
+  const esteSection = esteVisits.length ? `
+    <div class="divider"></div>
+    <div class="flex-between" style="margin-bottom:6px">
+      <span style="color:var(--text3)">エステ来店累計（税込）</span>
+      <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:#22c55e">${fmtM(esteTotal)}</span>
+    </div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:8px">来店 ${esteVisits.length} 件</div>
+    <table style="width:100%;font-size:13px;border-collapse:collapse">
+      <thead><tr style="color:var(--text3)">
+        <th style="text-align:left;font-weight:400;padding:3px 4px">来店日</th>
+        <th style="text-align:left;font-weight:400;padding:3px 4px">コース名</th>
+        <th style="text-align:right;font-weight:400;padding:3px 4px">金額（税込）</th>
+      </tr></thead>
+      <tbody>${esteVisits.slice(0,5).map(v => `<tr>
+        <td class="mono" style="padding:3px 4px">${fmtD(v.date)}</td>
+        <td style="padding:3px 4px">${v.menuName||''}</td>
+        <td class="amount" style="color:#22c55e;padding:3px 4px">${fmtM(v.total)}</td>
+      </tr>`).join('')}
+      ${esteVisits.length > 5 ? `<tr><td colspan="3" style="color:var(--text3);padding:4px 4px">… 他${esteVisits.length-5}件</td></tr>` : ''}
+      </tbody>
+    </table>
+  ` : '';
+  document.getElementById('cust-detail-body').innerHTML = `
+    <div class="form-grid" style="gap:14px">
+      <div><div class="card-title">顧客番号</div><div style="font-family:'DM Mono',monospace;font-size:17px">${String(c.no).padStart(3, '0')}</div></div>
+      <div><div class="card-title">ランク</div><span class="chip ${c.rank === 'プレミアム' || c.rank === 'ゴールド' ? 'gold' : ''}" style="font-size:15px">${c.rank}</span></div>
+      <div><div class="card-title">フリガナ</div><div>${c.kana || '—'}</div></div>
+      <div><div class="card-title">担当</div><div>${c.staff}</div></div>
+      <div><div class="card-title">電話番号</div><div class="mono">${c.tel || '—'}</div></div>
+      <div><div class="card-title">携帯電話</div><div class="mono">${c.mobile || '—'}</div></div>
+      <div class="full"><div class="card-title">住所</div><div>${c.addr || '—'}</div></div>
+      <div><div class="card-title">生年月日</div><div>${c.birth || '—'}</div></div>
+      <div><div class="card-title">メール</div><div style="font-size:14px">${c.email || '—'}</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="flex-between">
+      <span style="color:var(--text3)">購入累計（税込）</span>
+      <span style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--accent)">${fmtM(total)}</span>
+    </div>
+    <div style="font-size:14px;color:var(--text3);margin-top:4px">伝票 ${slips.length} 件</div>
+    ${esteSection}
+    ${c.note ? `<div class="alert alert-info" style="margin-top:14px">📝 ${c.note}</div>` : ''}
+  `;
+  document.getElementById('cust-detail-modal').classList.add('open');
+}
+
+function deleteCust(no) {
+  const c = getCust(no); if (!c) return;
+  if (confirm(c.name + ' を削除しますか？')) {
+    store.customers.splice(store.customers.findIndex(x => x.no === no), 1);
+    saveCustomers_FB().catch(console.error);
+    renderCustomers();
+  }
+}
+
+// ══ 在庫 ══
+function renderInventory(list) {
+  list = list || store.inventory;
+  document.getElementById('inv-tbody').innerHTML = list.map(i => {
+    const pct = Math.min(i.qty / 20 * 100, 100);
+    const col = i.qty <= 2 ? 'var(--red)' : i.qty <= 5 ? 'var(--yellow)' : 'var(--green)';
+    const txt = i.qty === 0 ? '在庫なし' : i.qty <= 2 ? '要補充' : i.qty <= 5 ? '少ない' : '良好';
+    const cls = i.qty <= 2 ? 'low' : i.qty <= 5 ? 'pending' : 'done';
+    return `<tr>
+      <td class="mono">${i.code}</td><td><strong>${i.name}</strong></td>
+      <td class="amount">${fmtM(i.price)}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:700;font-size:18px;color:${col}">${i.qty}</td>
+      <td style="width:180px">
+        <span class="status ${cls}">${txt}</span>
+        <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${col}"></div></div>
+      </td>
+      <td>
+        <button class="btn btn-ghost" style="padding:5px 11px;font-size:13px" onclick="openInoutModal('in','${i.code}')">入庫</button>
+        <button class="btn btn-ghost" style="padding:5px 11px;font-size:13px;margin-left:6px" onclick="openInoutModal('out','${i.code}')">出庫</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterInventory() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  renderInventory(store.inventory.filter(i => i.code.toLowerCase().includes(q) || i.name.includes(q)));
+}
+
+function renderInout() {
+  document.getElementById('inout-tbody').innerHTML = store.inout.map(r => `<tr>
+    <td class="mono">${fmtD(r.date)}</td><td class="mono">${r.code}</td><td>${r.name}</td>
+    <td style="color:var(--green);font-weight:700">${r.in > 0 ? '+' + r.in : '—'}</td>
+    <td style="color:var(--red);font-weight:700">${r.out > 0 ? '-' + r.out : '—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-weight:700">${r.stock}</td>
+  </tr>`).join('');
+}
+
+function renderInvAlert() {
+  const a = store.inventory.filter(i => i.qty <= 5);
+  document.getElementById('inv-alert-list').innerHTML = a.length
+    ? a.map(i => `<div class="alert ${i.qty <= 2 ? 'alert-danger' : 'alert-warn'}">⚠ <div><strong>${i.name}</strong>（${i.code}）— 現在庫 <strong>${i.qty}</strong> 個${i.qty === 0 ? ' — 在庫切れ！' : i.qty <= 2 ? ' — 至急補充' : ' — 残り少'}</div></div>`).join('')
+    : '<div style="color:var(--green);padding:12px;font-size:16px">✓ すべての商品が適正在庫です</div>';
+}
+
+function openInoutModal(type, code) {
+  ioType = type;
+  document.getElementById('inout-modal-title').textContent = type === 'in' ? '入庫登録' : '出庫登録';
+  document.getElementById('inout-product').innerHTML = store.inventory.map(i =>
+    `<option value="${i.code}" ${i.code === code ? 'selected' : ''}>${i.name}（残${i.qty}）</option>`).join('');
+  document.getElementById('inout-qty').value = '';
+  document.getElementById('inout-note').value = '';
+  document.getElementById('inout-modal').classList.add('open');
+}
+
+function saveInout() {
+  const code = document.getElementById('inout-product').value;
+  const qty = parseInt(document.getElementById('inout-qty').value) || 0;
+  if (!qty) { alert('数量を入力してください'); return; }
+  const inv = store.inventory.find(i => i.code === code); if (!inv) return;
+  if (ioType === 'in') inv.qty += qty;
+  else { if (inv.qty < qty) { alert('在庫が不足しています'); return; } inv.qty -= qty; }
+  store.inout.push({
+    date: new Date().toISOString().slice(0, 10), code, name: inv.name,
+    in: ioType === 'in' ? qty : 0, out: ioType === 'out' ? qty : 0, stock: inv.qty
+  });
+  updateStock_FB(code, inv.qty).catch(console.error);
+  closeModal('inout-modal'); renderInventory();
+}
+
+// ══ 商品マスタ ══
+function renderProducts(list) {
+  list = list || store.products;
+  const genres = [...new Set(store.products.map(p => p.genre))];
+  const sel = document.getElementById('prod-genre');
+  if (sel.options.length <= 1) genres.forEach(g => sel.appendChild(new Option(g, g)));
+  document.getElementById('prod-tbody').innerHTML = list.map(p => `<tr>
+    <td class="mono">${p.code}</td><td><strong>${p.name}</strong></td>
+    <td><span class="chip">${p.genre}</span></td>
+    <td class="amount">${fmtM(p.price)}</td>
+    <td style="font-size:14px;color:var(--text3)">${p.supplier}</td>
+    <td><span class="status ${p.active ? 'done' : 'low'}">${p.active ? '販売中' : '終息'}</span></td>
+    <td><button class="btn btn-ghost" style="padding:5px 12px;font-size:13px" onclick="toggleProd('${p.code}')">${p.active ? '終息にする' : '再開'}</button></td>
+  </tr>`).join('');
+}
+
+function filterProducts() {
+  const q = document.getElementById('prod-search').value.toLowerCase();
+  const g = document.getElementById('prod-genre').value;
+  renderProducts(store.products.filter(p =>
+    (!q || p.code.toLowerCase().includes(q) || p.name.includes(q)) && (!g || p.genre === g)
+  ));
+}
+
+function openProductModal() { document.getElementById('product-modal').classList.add('open'); }
+
+function saveProduct() {
+  const code = document.getElementById('pm-code').value.trim();
+  const name = document.getElementById('pm-name').value.trim();
+  const price = parseInt(document.getElementById('pm-price').value) || 0;
+  if (!code || !name) { alert('コードと商品名は必須です'); return; }
+  store.products.push({ code, name, genre: document.getElementById('pm-genre').value, price, supplier: document.getElementById('pm-supplier').value, active: true });
+  store.inventory.push({ code, name, price, qty: 0 });
+  Promise.all([saveProducts_FB(), saveInventory_FB()]).catch(console.error);
+  closeModal('product-modal'); renderProducts();
+}
+
+function toggleProd(code) {
+  const p = store.products.find(x => x.code === code);
+  if (p) { p.active = !p.active; saveProducts_FB().catch(console.error); }
+  renderProducts();
+}
+
+// ══════════════════════════════════════════
+// 【新機能】売上日計表
+// ══════════════════════════════════════════
+function setDailyCurrentMonth() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+  document.getElementById('daily-from').value = `${y}-${m}-01`;
+  document.getElementById('daily-to').value = `${y}-${m}-${String(lastDay).padStart(2, '0')}`;
+  renderDaily();
+}
+
+function renderDaily() {
+  const from = document.getElementById('daily-from').value;
+  const to   = document.getElementById('daily-to').value;
+
+  let filtered = store.sales;
+  if (from) filtered = filtered.filter(s => s.orderDate >= from);
+  if (to)   filtered = filtered.filter(s => s.orderDate <= to);
+
+  const byDate = {};
+  filtered.forEach(s => {
+    if (!byDate[s.orderDate]) byDate[s.orderDate] = [];
+    byDate[s.orderDate].push(s);
+  });
+  const dates = Object.keys(byDate).sort();
+
+  let grandSub = 0, grandTax = 0, grandTotal = 0;
+  const rowsHtml = dates.map(d => {
+    const slips = byDate[d];
+    let daySub = 0, dayTax = 0, dayTotal = 0;
+    slips.forEach(s => {
+      const c = calcSlip(s);
+      daySub   += c.sub10 + c.sub8;
+      dayTax   += c.tax10 + c.tax8;
+      dayTotal += c.total;
+    });
+    grandSub   += daySub;
+    grandTax   += dayTax;
+    grandTotal += dayTotal;
+    return `<tr>
+      <td class="mono">${fmtD(d)}</td>
+      <td style="text-align:center;font-weight:600">${slips.length}</td>
+      <td class="amount">${fmtM(daySub)}</td>
+      <td class="amount">${fmtM(dayTax)}</td>
+      <td class="amount" style="font-weight:700;color:var(--accent)">${fmtM(dayTotal)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('daily-tbody').innerHTML = rowsHtml.length
+    ? rowsHtml.join('')
+    : '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">該当する売上データがありません</td></tr>';
+
+  document.getElementById('daily-tfoot').innerHTML = `<tr>
+    <td>合計</td>
+    <td style="text-align:center">${filtered.length} 件</td>
+    <td style="text-align:right">${fmtM(grandSub)}</td>
+    <td style="text-align:right">${fmtM(grandTax)}</td>
+    <td style="text-align:right;color:var(--accent)">${fmtM(grandTotal)}</td>
+  </tr>`;
+
+  document.getElementById('daily-cards').innerHTML = `
+    <div class="card">
+      <div class="card-title">期間内 伝票数</div>
+      <div class="card-value">${filtered.length}<span>件</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">下代合計（税抜）</div>
+      <div class="card-value" style="font-size:24px">${fmtM(grandSub)}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">消費税合計</div>
+      <div class="card-value" style="font-size:24px">${fmtM(grandTax)}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">合計（税込）</div>
+      <div class="card-value" style="font-size:24px;color:var(--accent)">${fmtM(grandTotal)}</div>
+    </div>`;
+
+  if (from || to)
+    document.getElementById('daily-period-label').textContent =
+      `${from ? fmtD(from) : '—'} 〜 ${to ? fmtD(to) : '—'}`;
+}
+
+function exportDailyCSV() {
+  const from = document.getElementById('daily-from').value;
+  const to   = document.getElementById('daily-to').value;
+  let filtered = store.sales;
+  if (from) filtered = filtered.filter(s => s.orderDate >= from);
+  if (to)   filtered = filtered.filter(s => s.orderDate <= to);
+
+  const byDate = {};
+  filtered.forEach(s => {
+    if (!byDate[s.orderDate]) byDate[s.orderDate] = [];
+    byDate[s.orderDate].push(s);
+  });
+  const dates = Object.keys(byDate).sort();
+
+  const headers = ['日付', '伝票数', '下代合計（税抜）', '消費税', '合計（税込）'];
+  const csvRows = dates.map(d => {
+    const slips = byDate[d];
+    let daySub = 0, dayTax = 0, dayTotal = 0;
+    slips.forEach(s => { const c = calcSlip(s); daySub += c.sub10 + c.sub8; dayTax += c.tax10 + c.tax8; dayTotal += c.total; });
+    return [d, slips.length, daySub, dayTax, dayTotal]
+      .map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+  });
+  downloadCSV('\uFEFF' + [headers.map(h => `"${h}"`).join(','), ...csvRows].join('\r\n'),
+    `売上日計表_${from||'all'}_${to||'all'}.csv`);
+}
+
+// ══════════════════════════════════════════
+// 【新機能】今月未来店顧客
+// ══════════════════════════════════════════
+function renderUnvisited() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+  const monthStart = `${y}-${m}-01`;
+  const monthEnd   = `${y}-${m}-${String(lastDay).padStart(2, '0')}`;
+  const monthLabel = `${y}年${parseInt(m)}月`;
+
+  // 今月来店済みの顧客番号セット
+  const visitedNos = new Set(
+    store.sales
+      .filter(s => s.orderDate >= monthStart && s.orderDate <= monthEnd)
+      .map(s => s.custNo)
+  );
+
+  // 顧客ごとの最終購入日
+  const lastPurchase = {};
+  store.sales.forEach(s => {
+    if (!lastPurchase[s.custNo] || s.orderDate > lastPurchase[s.custNo])
+      lastPurchase[s.custNo] = s.orderDate;
+  });
+
+  const unvisited = store.customers.filter(c => !visitedNos.has(c.no));
+
+  document.getElementById('unvisited-title').textContent = `${monthLabel} 未来店顧客`;
+  document.getElementById('unvisited-count').textContent = unvisited.length + '名';
+  document.getElementById('unvisited-info').innerHTML = `
+    <div class="alert alert-info">
+      📅 <strong>${monthLabel}</strong> に売上伝票のない顧客の一覧です（全顧客 ${store.customers.length}名 中 <strong>${unvisited.length}名</strong> が未来店）
+    </div>`;
+
+  document.getElementById('unvisited-tbody').innerHTML = unvisited.length
+    ? unvisited.map(c => {
+        const last = lastPurchase[c.no];
+        const daysSince = last
+          ? Math.floor((now - new Date(last)) / 86400000)
+          : null;
+        return `<tr>
+          <td class="mono">${String(c.no).padStart(3, '0')}</td>
+          <td><strong>${c.name}</strong></td>
+          <td class="mono" style="font-size:13px">${c.kana}</td>
+          <td class="mono">${c.tel || c.mobile || '—'}</td>
+          <td><span class="chip ${c.rank === 'プレミアム' || c.rank === 'ゴールド' ? 'gold' : ''}">${c.rank}</span></td>
+          <td>${c.staff}</td>
+          <td class="mono" style="color:${last ? (daysSince > 90 ? 'var(--red)' : 'var(--text2)') : 'var(--red)'}">
+            ${last ? fmtD(last) + (daysSince !== null ? `<span style="font-size:12px;margin-left:6px;color:var(--text3)">(${daysSince}日前)</span>` : '') : '購入履歴なし'}
+          </td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--green);font-weight:600">✓ 今月は全顧客が来店済みです</td></tr>';
+}
+
+// ══════════════════════════════════════════
+// 【新機能】CSVエクスポート（売上伝票）
+// ══════════════════════════════════════════
+function exportSalesCSV() {
+  const headers = ['伝票番号', '受付日', '納品日', '顧客番号', '顧客名', '商品数', '下代合計（税抜）', '消費税', '合計（税込）'];
+  const csvRows = store.sales.map(s => {
+    const c = getCust(s.custNo);
+    const slip = calcSlip(s);
+    return [
+      s.no, s.orderDate, s.delivDate,
+      String(s.custNo).padStart(3, '0'),
+      c ? c.name : '不明',
+      s.details.length,
+      slip.sub10 + slip.sub8,
+      slip.tax10 + slip.tax8,
+      slip.total
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+  });
+  downloadCSV('\uFEFF' + [headers.map(h => `"${h}"`).join(','), ...csvRows].join('\r\n'),
+    `売上伝票_${new Date().toISOString().slice(0, 10)}.csv`);
+}
+
+function downloadCSV(csvText, filename) {
+  const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════
+// 【新機能】CSVインポート
+// ══════════════════════════════════════════
+function openCSVImport() {
+  document.getElementById('csv-file').value = '';
+  document.getElementById('csv-preview').style.display = 'none';
+  document.getElementById('csv-import-modal').classList.add('open');
+}
+
+function clearCsvPreview() {
+  document.getElementById('csv-file').value = '';
+  document.getElementById('csv-preview').style.display = 'none';
+}
+
+// シンプルなCSVパーサー（ダブルクォート対応）
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/);
+  const result = [];
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const fields = [];
+    let field = '';
+    let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i + 1] === '"') { field += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        fields.push(field.trim()); field = '';
+      } else {
+        field += ch;
+      }
+    }
+    fields.push(field.trim());
+    result.push(fields);
+  }
+  return result;
+}
+
+// 顧客ランクIDの変換（ランク名が直接入っている場合はそのまま使用）
+function mapRankId(val) {
+  val = String(val).trim();
+  const names = ['一般', 'シルバー', 'ゴールド', 'プレミアム'];
+  if (names.includes(val)) return val;
+  const map = { '0': '一般', '1': '一般', '2': 'シルバー', '3': 'ゴールド', '4': 'プレミアム' };
+  return map[val] || '一般';
+}
+
+function readFileAsText(file, encoding) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = e => {
+      try { resolve(new TextDecoder(encoding).decode(e.target.result)); }
+      catch(err) { resolve(new TextDecoder('utf-8').decode(e.target.result)); }
+    };
+    reader.onerror = reject;
+  });
+}
+
+async function previewCSV() {
+  const file = document.getElementById('csv-file').files[0];
+  const preview = document.getElementById('csv-preview');
+  if (!file) { preview.style.display = 'none'; return; }
+
+  const encoding = document.getElementById('csv-encoding').value;
+  const text = await readFileAsText(file, encoding);
+  const rows = parseCSV(text);
+  const total = Math.max(0, rows.length - 1);
+
+  const previewRows = rows.slice(0, Math.min(4, rows.length));
+  preview.style.display = 'block';
+  preview.innerHTML = `<strong>プレビュー（ヘッダー除く ${total} 件）</strong><br><br>` +
+    previewRows.map((r, i) => {
+      const cols = r.slice(0, 5).join('　│　') + (r.length > 5 ? '　...' : '');
+      return `<span style="color:${i === 0 ? 'var(--accent)' : 'var(--text2)'};font-size:13px">${i === 0 ? '【列名】' : `【${i}行目】`} ${cols}</span>`;
+    }).join('<br>');
+}
+
+async function importCSV() {
+  const file = document.getElementById('csv-file').files[0];
+  if (!file) { alert('ファイルを選択してください'); return; }
+
+  const type     = document.getElementById('csv-type').value;
+  const encoding = document.getElementById('csv-encoding').value;
+  const text     = await readFileAsText(file, encoding);
+  const rows     = parseCSV(text);
+
+  if (rows.length < 2) {
+    alert('データが見つかりません（ヘッダー行を含む2行以上必要です）');
+    return;
+  }
+
+  const dataRows = rows.slice(1); // ヘッダー行をスキップ
+  let added = 0, updated = 0;
+
+  if (type === 'customer') {
+    // 列: お客様番号(0), 名前(1), フリガナ(2), 郵便番号(3), 住所(4), 電話番号(5),
+    //     携帯電話番号(6), メールアドレス(7), 生年月日(8), 営業担当コード(9),
+    //     顧客ランクID(10), 印刷チェック(11), ホームケア購入(12), キープ商品購入(13), 備考(14)
+    dataRows.forEach(r => {
+      const no = parseInt(r[0]);
+      if (!no || isNaN(no)) return;
+      const obj = {
+        no,
+        name:   r[1]  || '',
+        kana:   r[2]  || '',
+        addr:   r[4]  || '',
+        tel:    r[5]  || '',
+        mobile: r[6]  || '',
+        email:  r[7]  || '',
+        birth:  r[8]  || '',
+        staff:  r[9]  || '',
+        rank:   mapRankId(r[10] || ''),
+        note:   r[14] || ''
+      };
+      const idx = store.customers.findIndex(c => c.no === no);
+      if (idx >= 0) { store.customers[idx] = { ...store.customers[idx], ...obj }; updated++; }
+      else          { store.customers.push(obj); added++; }
+    });
+
+  } else {
+    // 列: 商品コード(0), 商品名(1), 上代価格(2), ジャンルコード(3),
+    //     終息(4)  ※1=終息 / 0=現役, 仕入先コード(5), 仕入率ID(6)
+    dataRows.forEach(r => {
+      const code = (r[0] || '').trim();
+      if (!code) return;
+      const active = String(r[4]).trim() !== '1'; // 終息フラグ
+      const obj = {
+        code,
+        name:     r[1] || '',
+        price:    parseInt(r[2]) || 0,
+        genre:    r[3] || 'その他',
+        active,
+        supplier: r[5] || ''
+      };
+      const idx = store.products.findIndex(p => p.code === code);
+      if (idx >= 0) {
+        store.products[idx] = { ...store.products[idx], ...obj };
+        // 在庫の商品名・価格も同期
+        const inv = store.inventory.find(i => i.code === code);
+        if (inv) { inv.name = obj.name; inv.price = obj.price; }
+        updated++;
+      } else {
+        store.products.push(obj);
+        // 在庫テーブルに追加（初期在庫0）
+        if (!store.inventory.find(i => i.code === code))
+          store.inventory.push({ code, name: obj.name, price: obj.price, qty: 0 });
+        added++;
+      }
+    });
+  }
+
+  if (type === 'customer') {
+    saveCustomers_FB().catch(console.error);
+  } else {
+    Promise.all([saveProducts_FB(), saveInventory_FB()]).catch(console.error);
+  }
+  closeModal('csv-import-modal');
+
+  const typeName = type === 'customer' ? '顧客' : '商品';
+  alert(`${typeName}マスタをインポートしました\n新規追加: ${added}件　更新: ${updated}件`);
+
+  if (type === 'customer') { showPage('customers', null); }
+  else { document.getElementById('prod-genre').innerHTML = '<option value="">全ジャンル</option>'; renderProducts(); }
+}
+
+// ══ エステ来店管理 ══
+
+function initEsteVisit() {
+  // 来店日を今日に
+  document.getElementById('ev-date').value = new Date().toISOString().slice(0, 10);
+  // 来店IDを自動採番
+  const nextId = 'EV' + String(store.estevisits.length + 1).padStart(4, '0');
+  document.getElementById('ev-id').value = nextId;
+  // 顧客フィールドをリセット
+  document.getElementById('ev-cust-q').value = '';
+  document.getElementById('ev-cust-no').value = '';
+  document.getElementById('ev-cust-info').textContent = '';
+  // コース選択をリセット＆再構築
+  const sel = document.getElementById('ev-menu');
+  sel.innerHTML = '<option value="">-- コースを選択 --</option>';
+  store.estemenus.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = m.name + '　¥' + m.price.toLocaleString();
+    opt.dataset.price = m.price;
+    sel.appendChild(opt);
+  });
+  document.getElementById('ev-price').value = '';
+  document.getElementById('ev-next-visit').value = '';
+  document.getElementById('ev-note').value = '';
+  calcEsteTotal();
+}
+
+function suggestCustEste() {
+  const q = document.getElementById('ev-cust-q').value.trim();
+  const sug = document.getElementById('ev-cust-sug');
+  if (!q) { sug.style.display = 'none'; return; }
+  const hits = store.customers.filter(c => c.active !== false && (
+    String(c.no).includes(q) || (c.name||'').includes(q) || (c.kana||'').includes(q)
+  )).slice(0, 8);
+  if (!hits.length) { sug.style.display = 'none'; return; }
+  sug.innerHTML = hits.map(c =>
+    `<div class="suggest-item" onclick="selectCustEste(${c.no},'${(c.name||'').replace(/'/g,"\\'")}')">
+      ${c.no}　${c.name}
+    </div>`
+  ).join('');
+  sug.style.display = '';
+}
+
+function selectCustEste(no, name) {
+  document.getElementById('ev-cust-no').value = no;
+  document.getElementById('ev-cust-q').value = no + '　' + name;
+  document.getElementById('ev-cust-info').textContent = name + ' 様';
+  document.getElementById('ev-cust-sug').style.display = 'none';
+}
+
+function onEsteMenuChange() {
+  const sel = document.getElementById('ev-menu');
+  const opt = sel.options[sel.selectedIndex];
+  if (opt && opt.dataset.price) {
+    document.getElementById('ev-price').value = opt.dataset.price;
+  }
+  calcEsteTotal();
+}
+
+function calcEsteTotal() {
+  const price = parseFloat(document.getElementById('ev-price').value) || 0;
+  const taxRate = parseFloat(document.getElementById('ev-tax').value) / 100;
+  const tax = Math.floor(price * taxRate);
+  const total = price + tax;
+  document.getElementById('ev-tax-amt').textContent = '¥' + tax.toLocaleString();
+  document.getElementById('ev-total').textContent = '¥' + total.toLocaleString();
+}
+
+async function saveEsteVisit() {
+  const custNo = document.getElementById('ev-cust-no').value;
+  const date = document.getElementById('ev-date').value;
+  const menuId = document.getElementById('ev-menu').value;
+  const price = parseFloat(document.getElementById('ev-price').value) || 0;
+  const taxRate = parseFloat(document.getElementById('ev-tax').value);
+  if (!custNo) { alert('顧客を選択してください'); return; }
+  if (!date)   { alert('来店日を入力してください'); return; }
+  if (!menuId) { alert('コースを選択してください'); return; }
+  if (!price)  { alert('金額を入力してください'); return; }
+
+  const cust = getCust(Number(custNo));
+  const menu = store.estemenus.find(m => m.id === menuId);
+  const tax = Math.floor(price * taxRate / 100);
+  const visit = {
+    id: document.getElementById('ev-id').value,
+    date,
+    custNo: Number(custNo),
+    custName: cust ? cust.name : '',
+    menuId,
+    menuName: menu ? menu.name : '',
+    staff: document.getElementById('ev-staff').value,
+    price,
+    taxRate,
+    tax,
+    total: price + tax,
+    nextVisit: document.getElementById('ev-next-visit').value,
+    note: document.getElementById('ev-note').value,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await fbDb.ref('estevisits/' + visit.id).set(visit);
+    store.estevisits.unshift(visit);
+    alert('来店を登録しました');
+    showPage('este-list', null);
+  } catch(e) {
+    alert('登録に失敗しました: ' + e.message);
+  }
+}
+
+function setEsteCurrentMonth() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth() + 1;
+  const from = `${y}-${String(m).padStart(2,'0')}-01`;
+  const last = new Date(y, m, 0).getDate();
+  const to = `${y}-${String(m).padStart(2,'0')}-${String(last).padStart(2,'0')}`;
+  document.getElementById('el-from').value = from;
+  document.getElementById('el-to').value = to;
+  // フィルタ用メニュー選択肢を更新
+  const mf = document.getElementById('el-menu-f');
+  mf.innerHTML = '<option value="">全コース</option>';
+  store.estemenus.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = m.name;
+    mf.appendChild(opt);
+  });
+}
+
+function renderEsteList() {
+  const from = document.getElementById('el-from').value;
+  const to   = document.getElementById('el-to').value;
+  const q    = document.getElementById('el-cust-q').value.trim();
+  const mf   = document.getElementById('el-menu-f').value;
+
+  let list = store.estevisits;
+  if (from) list = list.filter(v => v.date >= from);
+  if (to)   list = list.filter(v => v.date <= to);
+  if (q)    list = list.filter(v => (v.custName||'').includes(q));
+  if (mf)   list = list.filter(v => v.menuId === mf);
+
+  // KPIカード
+  const totalAmt = list.reduce((s, v) => s + (v.total||0), 0);
+  const uniqueCust = new Set(list.map(v => v.custNo)).size;
+  const menuCount = {};
+  list.forEach(v => { menuCount[v.menuName] = (menuCount[v.menuName]||0) + 1; });
+  const topMenu = Object.entries(menuCount).sort((a,b) => b[1]-a[1])[0];
+  document.getElementById('este-cards').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">来店件数</div><div class="kpi-value">${list.length}<span style="font-size:16px">件</span></div></div>
+    <div class="kpi-card"><div class="kpi-label">売上合計（税込）</div><div class="kpi-value">${fmtM(totalAmt)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">来店顧客数</div><div class="kpi-value">${uniqueCust}<span style="font-size:16px">名</span></div></div>
+    <div class="kpi-card"><div class="kpi-label">人気コース</div><div class="kpi-value" style="font-size:16px">${topMenu ? topMenu[0] : '—'}</div></div>
+  `;
+
+  document.getElementById('el-count').textContent = list.length + '件';
+  document.getElementById('el-tbody').innerHTML = list.map(v => `<tr>
+    <td class="mono">${fmtD(v.date)}</td>
+    <td>${v.custName}</td>
+    <td>${v.menuName}</td>
+    <td>${v.staff||''}</td>
+    <td class="amount">${fmtM(v.total)}</td>
+    <td class="mono">${v.nextVisit ? fmtD(v.nextVisit) : '—'}</td>
+    <td style="color:var(--text3)">${v.note||''}</td>
+  </tr>`).join('');
+}
+
+// ══ キープ商品・回数券 ══
+
+function initKeepItems() {
+  document.getElementById('ki-date').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('ki-cust-q').value = '';
+  document.getElementById('ki-cust-no').value = '';
+  document.getElementById('ki-cust-info').textContent = '';
+  document.getElementById('ki-menu-name').value = '';
+  document.getElementById('ki-qty').value = '1';
+  document.getElementById('ki-count').value = '1';
+  document.getElementById('ki-price').value = '';
+  document.getElementById('ki-note').value = '';
+  renderKeepItems();
+}
+
+function suggestCustKeep() {
+  const q = document.getElementById('ki-cust-q').value.trim();
+  const sug = document.getElementById('ki-cust-sug');
+  if (!q) { sug.style.display = 'none'; return; }
+  const hits = store.customers.filter(c => c.active !== false && (
+    String(c.no).includes(q) || (c.name||'').includes(q) || (c.kana||'').includes(q)
+  )).slice(0, 8);
+  if (!hits.length) { sug.style.display = 'none'; return; }
+  sug.innerHTML = hits.map(c =>
+    `<div class="suggest-item" onclick="selectCustKeep(${c.no},'${(c.name||'').replace(/'/g,"\\'")}')">
+      ${c.no}　${c.name}
+    </div>`
+  ).join('');
+  sug.style.display = '';
+}
+
+function selectCustKeep(no, name) {
+  document.getElementById('ki-cust-no').value = no;
+  document.getElementById('ki-cust-q').value = no + '　' + name;
+  document.getElementById('ki-cust-info').textContent = name + ' 様';
+  document.getElementById('ki-cust-sug').style.display = 'none';
+}
+
+async function saveKeepItem() {
+  const custNo = document.getElementById('ki-cust-no').value;
+  const date = document.getElementById('ki-date').value;
+  const menuName = document.getElementById('ki-menu-name').value.trim();
+  const qty = parseInt(document.getElementById('ki-qty').value) || 1;
+  const count = parseInt(document.getElementById('ki-count').value) || 1;
+  const price = parseFloat(document.getElementById('ki-price').value) || 0;
+  if (!custNo)   { alert('顧客を選択してください'); return; }
+  if (!date)     { alert('日付を入力してください'); return; }
+  if (!menuName) { alert('商品名を入力してください'); return; }
+
+  const cust = getCust(Number(custNo));
+  const id = 'KI' + Date.now();
+  const item = {
+    id, date,
+    custNo: Number(custNo),
+    custName: cust ? cust.name : '',
+    menuName, qty, count, price,
+    note: document.getElementById('ki-note').value,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await fbDb.ref('keepitems/' + id).set(item);
+    store.keepitems.unshift(item);
+    renderKeepItems();
+    // フォームリセット
+    document.getElementById('ki-menu-name').value = '';
+    document.getElementById('ki-qty').value = '1';
+    document.getElementById('ki-count').value = '1';
+    document.getElementById('ki-price').value = '';
+    document.getElementById('ki-note').value = '';
+    alert('登録しました');
+  } catch(e) {
+    alert('登録に失敗しました: ' + e.message);
+  }
+}
+
+function renderKeepItems() {
+  const list = store.keepitems;
+  document.getElementById('ki-count-label').textContent = list.length + '件';
+  document.getElementById('ki-tbody').innerHTML = list.map(k => `<tr>
+    <td class="mono">${fmtD(k.date)}</td>
+    <td>${k.custName}</td>
+    <td>${k.menuName}</td>
+    <td style="text-align:center">${k.qty}個 × ${k.count}回</td>
+    <td class="amount">${k.price ? fmtM(k.price) : '—'}</td>
+  </tr>`).join('');
+}
+
+// ══ エステコースマスタ ══
+
+async function initEsteMenus() {
+  try {
+    const snap = await fbDb.ref('estemenus').get();
+    if (snap.val()) {
+      store.estemenus = Object.values(snap.val()).filter(Boolean);
+    } else if (store.estemenus.length === 0) {
+      store.estemenus = [
+        { id: 'M001', name: 'フェイシャルベーシック',  price: 8000,  tax: 10, active: true },
+        { id: 'M002', name: 'フェイシャルプレミアム',  price: 12000, tax: 10, active: true },
+        { id: 'M003', name: 'ボディトリートメント',    price: 10000, tax: 10, active: true },
+        { id: 'M004', name: 'ヘッドスパ',             price: 6000,  tax: 10, active: true },
+        { id: 'M005', name: 'アロマリラックス',        price: 9000,  tax: 10, active: true },
+      ];
+      const obj = {};
+      store.estemenus.forEach(m => { obj[m.id] = m; });
+      await fbDb.ref('estemenus').set(obj);
+    }
+  } catch(e) {
+    console.error('コースマスタ読み込みエラー:', e);
+  }
+  renderEsteMenus();
+}
+
+function renderEsteMenus() {
+  document.getElementById('este-menus-tbody').innerHTML = store.estemenus.map(m => `
+    <tr id="emrow-${m.id}">
+      <td class="mono">${m.id}</td>
+      <td>${m.name}</td>
+      <td class="amount">${fmtM(m.price)}</td>
+      <td>${m.tax !== undefined ? m.tax : 10}%</td>
+      <td><span class="status ${m.active === false ? 'low' : 'done'}">${m.active === false ? '終息' : '有効'}</span></td>
+      <td>
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:13px" onclick="editEsteMenu('${m.id}')">編集</button>
+        ${m.active === false
+          ? `<button class="btn btn-ghost" style="padding:5px 10px;font-size:13px;margin-left:4px" onclick="restoreEsteMenu('${m.id}')">復活</button>`
+          : `<button class="btn btn-ghost" style="padding:5px 10px;font-size:13px;margin-left:4px;color:var(--red)" onclick="discontinueEsteMenu('${m.id}')">終息</button>`}
+      </td>
+    </tr>`).join('');
+}
+
+function editEsteMenu(id) {
+  const m = store.estemenus.find(x => x.id === id); if (!m) return;
+  document.getElementById('emrow-' + id).innerHTML = `
+    <td class="mono">${m.id}</td>
+    <td><input type="text" id="em-name-${id}" value="${m.name.replace(/"/g,'&quot;')}" style="width:100%;padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text1)"></td>
+    <td><input type="number" id="em-price-${id}" value="${m.price}" min="0" style="width:110px;padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text1)"></td>
+    <td><select id="em-tax-${id}" style="padding:4px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text1)">
+      <option value="10" ${(m.tax||10)==10?'selected':''}>10%</option>
+      <option value="8" ${m.tax==8?'selected':''}>8%</option>
+    </select></td>
+    <td><span class="status ${m.active===false?'low':'done'}">${m.active===false?'終息':'有効'}</span></td>
+    <td>
+      <button class="btn btn-primary" style="padding:5px 10px;font-size:13px" onclick="saveEsteMenuEdit('${id}')">保存</button>
+      <button class="btn btn-ghost" style="padding:5px 10px;font-size:13px;margin-left:4px" onclick="renderEsteMenus()">取消</button>
+    </td>`;
+}
+
+async function saveEsteMenuEdit(id) {
+  const m = store.estemenus.find(x => x.id === id); if (!m) return;
+  const name = document.getElementById('em-name-' + id).value.trim();
+  const price = parseInt(document.getElementById('em-price-' + id).value) || 0;
+  const tax = parseInt(document.getElementById('em-tax-' + id).value);
+  if (!name) { alert('コース名を入力してください'); return; }
+  m.name = name; m.price = price; m.tax = tax;
+  try {
+    await fbDb.ref('estemenus/' + id).update({ name, price, tax });
+    renderEsteMenus();
+  } catch(e) { alert('保存に失敗しました: ' + e.message); }
+}
+
+async function addEsteMenu() {
+  const name = prompt('コース名を入力してください:');
+  if (!name || !name.trim()) return;
+  const priceStr = prompt('価格（税抜）を入力してください:');
+  const price = parseInt(priceStr) || 0;
+  const nums = store.estemenus.map(m => parseInt((m.id||'').replace(/\D/g,'')) || 0);
+  const nextNum = Math.max(0, ...nums) + 1;
+  const id = 'M' + String(nextNum).padStart(3, '0');
+  const newMenu = { id, name: name.trim(), price, tax: 10, active: true };
+  store.estemenus.push(newMenu);
+  try {
+    await fbDb.ref('estemenus/' + id).set(newMenu);
+    renderEsteMenus();
+  } catch(e) {
+    store.estemenus.pop();
+    alert('追加に失敗しました: ' + e.message);
+  }
+}
+
+async function discontinueEsteMenu(id) {
+  if (!confirm('このコースを終息にしますか？（データは削除されません）')) return;
+  const m = store.estemenus.find(x => x.id === id); if (!m) return;
+  m.active = false;
+  try {
+    await fbDb.ref('estemenus/' + id).update({ active: false });
+    renderEsteMenus();
+  } catch(e) { alert('更新に失敗しました: ' + e.message); }
+}
+
+async function restoreEsteMenu(id) {
+  const m = store.estemenus.find(x => x.id === id); if (!m) return;
+  m.active = true;
+  try {
+    await fbDb.ref('estemenus/' + id).update({ active: true });
+    renderEsteMenus();
+  } catch(e) { alert('更新に失敗しました: ' + e.message); }
+}
+
+// ══ 誕生日DM ══
+
+function initBirthday() {
+  const m = new Date().getMonth() + 1;
+  document.getElementById('bd-month').value = m;
+  renderBirthdayList();
+}
+
+function renderBirthdayList() {
+  const m = parseInt(document.getElementById('bd-month').value);
+  const mm = String(m).padStart(2, '0');
+  const list = store.customers.filter(c => {
+    if (c.active === false) return false;
+    if (!c.birth) return false;
+    return c.birth.slice(5, 7) === mm;
+  }).sort((a, b) => (a.birth||'').slice(5).localeCompare((b.birth||'').slice(5)));
+
+  document.getElementById('bd-title').textContent = `誕生日DM対象顧客（${m}月）`;
+  document.getElementById('bd-count-info').innerHTML =
+    `<span style="color:var(--text3);font-size:14px">${m}月生まれの顧客：<strong style="color:var(--text1)">${list.length}名</strong></span>`;
+  document.getElementById('bd-export-btn').style.display = list.length ? '' : 'none';
+  document.getElementById('bd-tbody').innerHTML = list.map(c => `<tr>
+    <td class="mono">${String(c.no).padStart(3,'0')}</td>
+    <td><strong>${c.name}</strong></td>
+    <td>${c.kana||'—'}</td>
+    <td class="mono">${c.birth||'—'}</td>
+    <td class="mono">${c.tel||'—'}</td>
+    <td class="mono">${c.mobile||'—'}</td>
+    <td style="font-size:13px">${c.addr||'—'}</td>
+    <td><span class="chip ${c.rank==='プレミアム'||c.rank==='ゴールド'?'gold':''}">${c.rank}</span></td>
+    <td>${c.staff||'—'}</td>
+  </tr>`).join('');
+  window._bdList = list;
+}
+
+function exportBirthdayCSV() {
+  const list = window._bdList || [];
+  if (!list.length) { alert('対象者がいません'); return; }
+  const m = document.getElementById('bd-month').value;
+  const header = ['顧客番号','名前','フリガナ','誕生日','電話番号','携帯電話','住所','ランク','担当'];
+  const rows = list.map(c => [
+    String(c.no).padStart(3,'0'), c.name||'', c.kana||'', c.birth||'',
+    c.tel||'', c.mobile||'', c.addr||'', c.rank||'', c.staff||''
+  ].map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
+  const csv = '\uFEFF' + [header.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `誕生日DM_${m}月.csv`;
+  a.click();
+}
+
+// ══ 月次レポート ══
+
+function initMonthly() {
+  const years = new Set();
+  store.sales.forEach(s => { if (s.orderDate) years.add(s.orderDate.slice(0,4)); });
+  store.estevisits.forEach(v => { if (v.date) years.add(v.date.slice(0,4)); });
+  const cur = String(new Date().getFullYear());
+  years.add(cur);
+  const sel = document.getElementById('mr-year');
+  sel.innerHTML = [...years].sort().reverse().map(y =>
+    `<option value="${y}" ${y===cur?'selected':''}>${y}年</option>`
+  ).join('');
+  renderMonthly();
+}
+
+function renderMonthly() {
+  const year = document.getElementById('mr-year').value;
+  const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  // 商品売上（月別）
+  const prodAmt = Array(12).fill(0);
+  store.sales.forEach(s => {
+    if (!s.orderDate || !s.orderDate.startsWith(year)) return;
+    const mi = parseInt(s.orderDate.slice(5,7)) - 1;
+    prodAmt[mi] += slipTotal(s);
+  });
+
+  // エステ売上（月別）
+  const esteAmt = Array(12).fill(0);
+  const esteCnt = Array(12).fill(0);
+  store.estevisits.forEach(v => {
+    if (!v.date || !v.date.startsWith(year)) return;
+    const mi = parseInt(v.date.slice(5,7)) - 1;
+    esteAmt[mi] += v.total || 0;
+    esteCnt[mi]++;
+  });
+
+  const totalProd = prodAmt.reduce((a,b) => a+b, 0);
+  const totalEste = esteAmt.reduce((a,b) => a+b, 0);
+  const totalAll  = totalProd + totalEste;
+  const salesCnt  = store.sales.filter(s => s.orderDate && s.orderDate.startsWith(year)).length;
+  const esteTotalCnt = esteCnt.reduce((a,b) => a+b, 0);
+
+  // KPIカード
+  document.getElementById('mr-cards').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">年間商品売上</div><div class="kpi-value">${fmtM(totalProd)}</div><div style="font-size:12px;color:var(--text3);margin-top:4px">伝票 ${salesCnt} 件</div></div>
+    <div class="kpi-card"><div class="kpi-label">年間エステ売上</div><div class="kpi-value" style="color:#22c55e">${fmtM(totalEste)}</div><div style="font-size:12px;color:var(--text3);margin-top:4px">来店 ${esteTotalCnt} 件</div></div>
+    <div class="kpi-card"><div class="kpi-label">年間合計</div><div class="kpi-value">${fmtM(totalAll)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">エステ構成比</div><div class="kpi-value">${totalAll ? Math.round(totalEste/totalAll*100) : 0}<span style="font-size:16px">%</span></div></div>
+  `;
+
+  // グラフ（グループ棒グラフ）
+  const maxVal = Math.max(...prodAmt, ...esteAmt, 1);
+  document.getElementById('mr-chart').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:6px;height:180px">
+      ${MONTHS.map((mn, i) => {
+        const h1 = Math.round(prodAmt[i] / maxVal * 155);
+        const h2 = Math.round(esteAmt[i] / maxVal * 155);
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <div style="display:flex;align-items:flex-end;gap:2px;height:160px">
+            <div title="商品 ${fmtM(prodAmt[i])}" style="width:14px;height:${h1||1}px;background:var(--accent);border-radius:3px 3px 0 0;opacity:${prodAmt[i]?1:0.15}"></div>
+            <div title="エステ ${fmtM(esteAmt[i])}" style="width:14px;height:${h2||1}px;background:#22c55e;border-radius:3px 3px 0 0;opacity:${esteAmt[i]?1:0.15}"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;white-space:nowrap">${mn}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  // 月別テーブル
+  let tProd = 0, tEste = 0, tCnt = 0;
+  document.getElementById('mr-tbody').innerHTML = MONTHS.map((mn, i) => {
+    tProd += prodAmt[i]; tEste += esteAmt[i]; tCnt += esteCnt[i];
+    const rowTotal = prodAmt[i] + esteAmt[i];
+    return `<tr>
+      <td style="font-weight:600">${mn}</td>
+      <td class="amount">${prodAmt[i] ? fmtM(prodAmt[i]) : '—'}</td>
+      <td style="text-align:center">${esteCnt[i] ? esteCnt[i]+'件' : '—'}</td>
+      <td class="amount" style="color:#22c55e">${esteAmt[i] ? fmtM(esteAmt[i]) : '—'}</td>
+      <td class="amount" style="font-weight:700">${rowTotal ? fmtM(rowTotal) : '—'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('mr-tfoot').innerHTML = `<tr style="background:var(--bg3);font-weight:700">
+    <td>合計</td>
+    <td class="amount">${fmtM(tProd)}</td>
+    <td style="text-align:center">${tCnt}件</td>
+    <td class="amount" style="color:#22c55e">${fmtM(tEste)}</td>
+    <td class="amount">${fmtM(tProd+tEste)}</td>
+  </tr>`;
+}
+
+// ══ 初期化 ══ Firebase認証後に自動実行される（fbAuth.onAuthStateChanged内）
+</script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ｜ヤマノエステ教室 朝霧教室</title>
+  <meta name="description" content="ヤマノエステ教室朝霧教室へのお問い合わせ。フォーム・電話・メールでお気軽にご連絡ください。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .contact-direct h3 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.1rem;
+      color: var(--brown-dark);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--beige-dark);
+    }
+
+    .direct-item {
+      margin-bottom: 1.2rem;
+      padding: 1.2rem;
+      background-color: var(--beige);
+      border-radius: 4px;
+      border: 1px solid var(--beige-dark);
+    }
+
+    .direct-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.73rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .direct-value {
+      font-size: 1.05rem;
+      color: var(--brown-dark);
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    .direct-value a { color: inherit; text-decoration: none; }
+    .direct-value a:hover { color: var(--accent); }
+    .direct-note { font-size: 0.78rem; color: var(--text-light); }
+
+    .contact-form-box h3 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.1rem;
+      color: var(--brown-dark);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--beige-dark);
+    }
+
+    .form-group { margin-bottom: 1.4rem; }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-label .required { color: var(--accent); font-size: 0.73rem; margin-left: 0.4rem; }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--beige-dark);
+      border-radius: 4px;
+      background-color: var(--cream);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(176,125,78,0.1);
+      background-color: var(--white);
+    }
+
+    .form-textarea { height: 150px; resize: vertical; line-height: 1.8; }
+    .form-select { cursor: pointer; }
+
+    .form-submit {
+      width: 100%;
+      padding: 1rem;
+      background-color: var(--accent);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.25s;
+      letter-spacing: 0.08em;
+    }
+
+    .form-submit:hover { background-color: var(--brown-dark); }
+
+    .form-note { font-size: 0.78rem; color: var(--text-light); margin-top: 1rem; line-height: 1.9; }
+
+    .success-msg {
+      display: none;
+      background-color: #f0f9f4;
+      border: 1px solid #a8d5b8;
+      border-radius: 4px;
+      padding: 1.5rem;
+      text-align: center;
+      color: #2d6a4f;
+      font-size: 0.9rem;
+      line-height: 2;
+    }
+
+    @media (max-width: 768px) {
+      .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      ヤマノエステ教室 朝霧教室
+      <span>Yamano Esthetics School Asagiri</span>
+    </a>
+    <nav id="main-nav">
+      <a href="index.html">ホーム</a>
+      <a href="course.html">コース案内</a>
+      <a href="strength.html">5つの強み</a>
+      <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+      <a href="access.html">アクセス</a>
+      <a href="contact.html" class="nav-cta">お問い合わせ</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="page-hero">
+    <span class="section-label">Contact</span>
+    <h1>お問い合わせ</h1>
+  </div>
+
+  <section class="section" style="background-color: var(--white);">
+    <div class="section-inner">
+      <p class="section-lead">「どのコースから始めれば良いか」「開業まで実際どのくらいかかるか」など、どんなご質問もお気軽にどうぞ。担当の有江が丁寧にお答えします。</p>
+
+      <div class="contact-grid">
+        <div class="contact-direct">
+          <h3>お電話・メール</h3>
+
+          <div class="direct-item">
+            <div class="direct-label">Tel</div>
+            <div class="direct-value"><a href="tel:0789180585">078-918-0585</a></div>
+            <div class="direct-note">担当：有江啓子</div>
+          </div>
+
+          <div class="direct-item">
+            <div class="direct-label">Mobile</div>
+            <div class="direct-value"><a href="tel:09016773387">090-1677-3387</a></div>
+            <div class="direct-note">担当：有江啓子</div>
+          </div>
+
+          <div class="direct-item">
+            <div class="direct-label">Email</div>
+            <div class="direct-value" style="font-size:0.9rem;"><a href="mailto:ya.asagiriten@gmail.com">ya.asagiriten@gmail.com</a></div>
+            <div class="direct-note">2〜3営業日以内にご返信します</div>
+          </div>
+        </div>
+
+        <div class="contact-form-box">
+          <h3>お問い合わせフォーム</h3>
+
+          <div id="contact-form">
+            <div class="form-group">
+              <label class="form-label" for="name">お名前<span class="required">必須</span></label>
+              <input class="form-input" type="text" id="name" placeholder="山田 花子" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">電話番号</label>
+              <input class="form-input" type="tel" id="phone" placeholder="090-0000-0000">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">メールアドレス<span class="required">必須</span></label>
+              <input class="form-input" type="email" id="email" placeholder="example@email.com" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="interest">ご興味のある内容</label>
+              <select class="form-select" id="interest">
+                <option value="">選択してください</option>
+                <option value="フェイシャル初級コース">フェイシャル初級コース</option>
+                <option value="フェイシャル中級コース">フェイシャル中級コース</option>
+                <option value="初級＋中級セット">初級＋中級セット</option>
+                <option value="開業・代理店について">開業・代理店について</option>
+                <option value="まずは相談したい">まずは相談したい</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="message">メッセージ<span class="required">必須</span></label>
+              <textarea class="form-textarea" id="message" placeholder="ご質問・ご相談内容をご記入ください。&#10;&#10;例：エステは未経験ですが、将来自宅でサロンを開きたいと思っています。どのコースから始めれば良いか教えてください。" required></textarea>
+            </div>
+
+            <button type="button" class="form-submit" onclick="handleSubmit()">送信する</button>
+
+            <p class="form-note">
+              ※ いただいたお問い合わせには2〜3営業日以内にご返信します。<br>
+              ※ お急ぎの場合はお電話（078-918-0585）でご連絡ください。
+            </p>
+          </div>
+
+          <div class="success-msg" id="success-msg">
+            <p>✓ お問い合わせを受け付けました。</p>
+            <p style="margin-top: 0.5rem;">2〜3営業日以内にご連絡します。<br>お急ぎの場合はお電話（078-918-0585）へご連絡ください。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div style="margin-bottom:2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;">
+    <img src="line_qr.jpg" alt="LINE QRコード" style="width:100px;height:100px;border-radius:4px;background:#fff;padding:6px;">
+    <div style="text-align:left;">
+      <div style="font-family:Noto Serif JP,serif;font-size:0.95rem;color:var(--white);margin-bottom:0.5rem;">LINEでお気軽にご相談ください</div>
+      <a href="https://lin.ee/Zldv5ze" target="_blank" rel="noopener"
+         style="display:inline-block;background:#06C755;color:#fff;font-size:0.9rem;padding:0.6rem 1.5rem;border-radius:4px;text-decoration:none;font-weight:500;">
+        💬 友だち追加・LINE相談
+      </a>
+    </div>
+  </div>
+  <div class="footer-logo">ヤマノエステ教室 朝霧教室</div>
+  <div class="footer-sub">Yamano Esthetics School Asagiri</div>
+  <nav>
+    <a href="index.html">ホーム</a>
+    <a href="course.html">コース案内</a>
+    <a href="strength.html">5つの強み</a>
+    <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+    <a href="access.html">アクセス</a>
+    <a href="contact.html">お問い合わせ</a>
+  </nav>
+  <div class="footer-contact">
+    TEL：<a href="tel:0789180585">078-918-0585</a>　携帯：<a href="tel:09016773387">090-1677-3387</a>（担当：有江啓子）<br>
+    MAIL：<a href="mailto:ya.asagiriten@gmail.com">ya.asagiriten@gmail.com</a>
+  </div>
+  <div style="margin-bottom:1.5rem;padding:1rem;background:rgba(255,255,255,0.05);border-radius:4px;font-size:0.82rem;">
+    エステ施術・化粧品のご購入は →
+    <a href="https://asagiriyamano.jp/" target="_blank" style="color:var(--accent-light);text-decoration:underline;">山野愛子どろんこ美容 朝霧店</a>
+  </div>
+  <div class="copyright">© ヤマノエステ教室 朝霧教室 / 有限会社まゆ企画</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('main-nav');
+  hamburger.addEventListener('click', () => nav.classList.toggle('open'));
+
+  function handleSubmit() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const interest = document.getElementById('interest').value;
+
+    if (!name || !email || !message) {
+      alert('お名前・メールアドレス・メッセージは必須です。');
+      return;
+    }
+
+    const subject = encodeURIComponent('【ヤマノエステ教室 朝霧教室】お問い合わせ：' + (interest || 'ご相談'));
+    const body = encodeURIComponent(
+      'お名前：' + name + '\n' +
+      '電話番号：' + (phone || '未記入') + '\n' +
+      'メールアドレス：' + email + '\n' +
+      'ご興味の内容：' + (interest || '未選択') + '\n\n' +
+      'メッセージ：\n' + message
+    );
+
+    window.location.href = 'mailto:ya.asagiriten@gmail.com?subject=' + subject + '&body=' + body;
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+[2026/05/30  9:30:01.99] START 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ヤマノ注文履歴取込スクリプト
+  実行日時: 2026/5/30 9:30:02
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+既存注文番号をサーバーから取得中...
+✓ 既存注文数: 22件
+
+ヤマノサイトにログイン中...
+✓ ログイン完了 → https://yamano-order.shop/
+
+✓ 購入履歴ページ → https://yamano-order.shop/Form/OrderHistory/OrderHistoryList.aspx
+
+注文一覧を収集中...
+✓ 注文番号収集: 20件
+
+新規取込対象: 4件
+
+  取得中: Y2026052900014 ... スキップ（詳細取得不可）
+  取得中: Y2026052900013 ... ✗ page.goto: Page crashed
+Call log:
+[2m  - navigating to "https://yamano-order.shop/Form/OrderHistory/OrderHistoryList.aspx", waiting until "load"[22m
+
+  取得中: Y2026052000008 ... ✗ page.goto: Page crashed
+Call log:
+[2m  - navigating to "https://yamano-order.shop/Form/OrderHistory/OrderHistoryList.aspx", waiting until "load"[22m
+
+  取得中: Y2026052000007 ... ✗ page.goto: Page crashed
+Call log:
+[2m  - navigating to "https://yamano-order.shop/Form/OrderHistory/OrderHistoryList.aspx", waiting until "load"[22m
+
+
+取得完了: 0件収集 / 4件失敗
+
+送信データなし。終了します。

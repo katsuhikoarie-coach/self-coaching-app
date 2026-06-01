@@ -1,0 +1,10 @@
+# 20260407_pass.txt への外部アクセスを拒否（多重防御）
+
+# 【第1層】RewriteRule による拒否（FastCGI環境でも有効）
+RewriteEngine On
+RewriteRule ^20260407_pass\.txt$ - [F,L]
+
+# 【第2層】Apacheモジュールによる拒否（Apache 2.4+）
+<Files "20260407_pass.txt">
+    Require all denied
+</Files>

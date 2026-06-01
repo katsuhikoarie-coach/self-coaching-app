@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>毎日の振り返りアプリ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; background: #f7f5f0; color: #222; min-height: 100vh; }
+.app { max-width: 560px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+h1 { font-size: 18px; font-weight: 500; text-align: center; padding: 1.25rem 0 0.5rem; color: #333; letter-spacing: 0.05em; }
+.subtitle { text-align: center; font-size: 12px; color: #999; margin-bottom: 1.5rem; }
+.section { background: #fff; border: 0.5px solid #e0ddd8; border-radius: 14px; padding: 1.25rem; margin-bottom: 0.875rem; }
+.label { font-size: 12px; color: #999; margin-bottom: 6px; }
+.q-label { font-size: 15px; font-weight: 500; color: #333; margin-bottom: 6px; }
+.q-sub { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+textarea { width: 100%; min-height: 80px; resize: vertical; font-size: 14px; font-family: inherit; padding: 10px; border: 0.5px solid #ddd; border-radius: 10px; background: #faf9f7; color: #333; line-height: 1.7; }
+textarea:focus { outline: none; border-color: #bbb; background: #fff; }
+input[type="text"] { width: 100%; font-size: 14px; font-family: inherit; padding: 9px 12px; border: 0.5px solid #ddd; border-radius: 10px; background: #faf9f7; color: #333; }
+input[type="text"]:focus { outline: none; border-color: #bbb; background: #fff; }
+.btn { display: block; width: 100%; padding: 13px; border: none; border-radius: 12px; font-size: 15px; font-family: inherit; cursor: pointer; transition: all 0.15s; font-weight: 500; letter-spacing: 0.03em; }
+.btn-pink { background: #e8789a; color: white; }
+.btn-pink:hover { background: #d4608a; }
+.btn-blue { background: #5a9fd4; color: white; }
+.btn-blue:hover { background: #4488c0; }
+.btn-ghost { background: transparent; border: 0.5px solid #ddd; color: #666; font-size: 13px; padding: 9px; }
+.btn-ghost:hover { background: #f5f3ef; }
+.gender-btns { display: flex; gap: 12px; }
+.gender-btn { flex: 1; padding: 14px 8px; border: 0.5px solid #e0ddd8; border-radius: 12px; background: #faf9f7; cursor: pointer; text-align: center; font-size: 14px; font-family: inherit; color: #555; transition: all 0.15s; }
+.gender-btn:hover { background: #fff; }
+.gender-btn.sel-pink { border: 2px solid #e8789a; background: #fff0f5; color: #c0507a; font-weight: 500; }
+.gender-btn.sel-blue { border: 2px solid #5a9fd4; background: #f0f6ff; color: #3a7ab0; font-weight: 500; }
+.tab-bar { display: flex; gap: 6px; margin-bottom: 1rem; }
+.tab { flex: 1; padding: 9px; border: 0.5px solid #e0ddd8; border-radius: 10px; font-size: 13px; font-family: inherit; cursor: pointer; background: #fff; color: #999; transition: all 0.15s; }
+.tab.active { background: #fff; color: #333; border-color: #bbb; font-weight: 500; }
+.reward-row { display: flex; align-items: center; gap: 8px; }
+.reward-text { font-size: 14px; color: #444; flex: 1; }
+.edit-link { font-size: 12px; color: #aaa; cursor: pointer; text-decoration: underline; white-space: nowrap; }
+.success-wrap { text-align: center; padding: 2rem 1rem; }
+.hanko-big { font-size: 80px; display: block; margin-bottom: 12px; animation: stamp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes stamp { 0% { transform: scale(2.5) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+.success-msg { font-size: 17px; font-weight: 500; color: #333; margin-bottom: 6px; }
+.reward-remind { font-size: 13px; color: #888; margin-bottom: 6px; }
+.streak { font-size: 13px; color: #aaa; }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-nav-btn { background: none; border: none; cursor: pointer; color: #aaa; font-size: 22px; padding: 4px 10px; line-height: 1; }
+.cal-nav-btn:hover { color: #555; }
+.cal-title { font-size: 15px; font-weight: 500; color: #333; }
+.cal-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 4px; }
+.cal-day-label { text-align: center; font-size: 11px; color: #bbb; padding: 2px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-cell { aspect-ratio: 1; border-radius: 8px; background: #f5f3ef; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #bbb; position: relative; }
+.cal-cell.today { border: 1.5px solid #ccc; color: #444; font-weight: 500; background: #fff; }
+.cal-cell.done { background: transparent; }
+.hanko-sm { font-size: 24px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.empty-cell { aspect-ratio: 1; }
+.cal-count { margin-top: 10px; text-align: center; font-size: 12px; color: #aaa; }
+.divider { height: 0.5px; background: #eee; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>毎日の振り返り</h1>
+  <p class="subtitle">在りさんの臨場感コーチング　振り返りノート</p>
+
+  <div id="setup-screen">
+    <div class="section">
+      <div class="label" style="margin-bottom:12px">はじめに — どちらですか？</div>
+      <div class="gender-btns">
+        <button class="gender-btn" id="btn-female" onclick="selectGender('female')">🌸 女性<br><span style="font-size:11px;color:#ccc">ピンク花丸</span></button>
+        <button class="gender-btn" id="btn-male" onclick="selectGender('male')">💙 男性<br><span style="font-size:11px;color:#ccc">青花丸</span></button>
+      </div>
+    </div>
+    <div class="section">
+      <div class="label" style="margin-bottom:8px">今日のご褒美を設定してください</div>
+      <input type="text" id="reward-setup" placeholder="例：好きなコーヒーを飲む、15分昼寝する…" />
+      <div style="margin-top:8px;font-size:11px;color:#ccc">あとからいつでも変えられます</div>
+    </div>
+    <button class="btn" id="start-btn" onclick="startApp()" style="opacity:0.4;cursor:default">はじめる</button>
+  </div>
+
+  <div id="main-screen" style="display:none">
+    <div class="tab-bar">
+      <button class="tab active" onclick="showTab('write',this)">今日の振り返り</button>
+      <button class="tab" onclick="showTab('calendar',this)">カレンダー</button>
+    </div>
+
+    <div id="tab-write">
+      <div class="section" style="margin-bottom:0.75rem">
+        <div class="label">今日のご褒美</div>
+        <div class="reward-row">
+          <span class="reward-text" id="reward-display"></span>
+          <span class="edit-link" onclick="toggleRewardEdit()">変更</span>
+        </div>
+        <div id="reward-edit-area" style="display:none;margin-top:10px">
+          <input type="text" id="reward-input" placeholder="新しいご褒美を入力…" />
+          <button class="btn btn-ghost" style="margin-top:6px" onclick="saveReward()">保存する</button>
+        </div>
+      </div>
+
+      <div id="form-area">
+        <div class="section">
+          <div class="q-label">問一　何が起きた？</div>
+          <div class="q-sub">今日の出来事をざっくり書いてください</div>
+          <textarea id="q1" placeholder="今日起きたことを…"></textarea>
+        </div>
+        <div class="section">
+          <div class="q-label">問二　出来たこと・良かったことは？</div>
+          <div class="q-sub">箇条書きでOK、小さなことでも</div>
+          <textarea id="q2" placeholder="・&#10;・&#10;・"></textarea>
+        </div>
+        <div class="section">
+          <div class="q-label">問三　改善点は？</div>
+          <div class="q-sub">内面（思考・感情）と外面（環境・人間関係）、両方の視点で</div>
+          <textarea id="q3" placeholder="内面：&#10;外面："></textarea>
+        </div>
+        <div class="section">
+          <div class="q-label">問四　次にどうしたい？</div>
+          <div class="q-sub">小さな一歩でいい</div>
+          <textarea id="q4" placeholder="明日の一歩…"></textarea>
+        </div>
+        <button class="btn" id="submit-btn" onclick="submitEntry()">今日の振り返りを記録する</button>
+      </div>
+
+      <div id="done-area" style="display:none" class="section">
+        <div class="success-wrap">
+          <span class="hanko-big" id="hanko-display"></span>
+          <div class="success-msg">よくできました！</div>
+          <div class="reward-remind" id="reward-reminder"></div>
+          <div class="streak" id="streak-display"></div>
+          <button class="btn btn-ghost" style="margin-top:16px;max-width:200px;margin-left:auto;margin-right:auto" onclick="showNewEntry()">別の日を記録する</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-calendar" style="display:none">
+      <div class="section">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <span class="cal-title" id="cal-title"></span>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-header">
+          <div class="cal-day-label">日</div><div class="cal-day-label">月</div><div class="cal-day-label">火</div>
+          <div class="cal-day-label">水</div><div class="cal-day-label">木</div><div class="cal-day-label">金</div><div class="cal-day-label">土</div>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-count" id="cal-count"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let gender = null;
+let calYear, calMonth;
+const now = new Date();
+calYear = now.getFullYear();
+calMonth = now.getMonth();
+
+function getHanko() { return gender === 'female' ? '🌸' : '💙'; }
+
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; }
+}
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+
+function selectGender(g) {
+  gender = g;
+  document.getElementById('btn-female').className = 'gender-btn' + (g==='female' ? ' sel-pink' : '');
+  document.getElementById('btn-male').className = 'gender-btn' + (g==='male' ? ' sel-blue' : '');
+  const btn = document.getElementById('start-btn');
+  btn.className = 'btn ' + (g==='female' ? 'btn-pink' : 'btn-blue');
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+}
+
+function startApp() {
+  if (!gender) { alert('どちらかを選んでください'); return; }
+  const reward = document.getElementById('reward-setup').value.trim();
+  save('gender', gender);
+  save('reward', reward || 'ご褒美を設定してください');
+  showMain();
+}
+
+function showMain() {
+  gender = load('gender', null);
+  if (!gender) return;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'block';
+  document.getElementById('reward-display').textContent = load('reward', '');
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.className = 'btn ' + (gender==='female' ? 'btn-pink' : 'btn-blue');
+  checkTodayDone();
+}
+
+function checkTodayDone() {
+  const entries = load('entries', {});
+  const today = todayKey();
+  if (entries[today]) {
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('done-area').style.display = 'block';
+    document.getElementById('hanko-display').textContent = getHanko();
+    document.getElementById('reward-reminder').textContent = '今日のご褒美：' + load('reward','');
+    updateStreak();
+  }
+}
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function submitEntry() {
+  const q1 = document.getElementById('q1').value.trim();
+  const q2 = document.getElementById('q2').value.trim();
+  const q3 = document.getElementById('q3').value.trim();
+  const q4 = document.getElementById('q4').value.trim();
+  if (!q1 && !q2 && !q3 && !q4) { alert('少し書いてから記録してください'); return; }
+  const entries = load('entries', {});
+  entries[todayKey()] = { q1, q2, q3, q4, ts: Date.now() };
+  save('entries', entries);
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('done-area').style.display = 'block';
+  document.getElementById('hanko-display').textContent = getHanko();
+  document.getElementById('reward-reminder').textContent = '今日のご褒美：' + load('reward','');
+  updateStreak();
+}
+
+function updateStreak() {
+  const entries = load('entries', {});
+  let streak = 0;
+  const d = new Date();
+  while(true) {
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (entries[key]) { streak++; d.setDate(d.getDate()-1); } else break;
+  }
+  document.getElementById('streak-display').textContent = streak > 1 ? streak + '日連続！すごい🎉' : '今日からスタート！';
+}
+
+function showNewEntry() {
+  document.getElementById('form-area').style.display = 'block';
+  document.getElementById('done-area').style.display = 'none';
+  ['q1','q2','q3','q4'].forEach(id => document.getElementById(id).value = '');
+}
+
+function toggleRewardEdit() {
+  const area = document.getElementById('reward-edit-area');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+  if (area.style.display === 'block') document.getElementById('reward-input').value = load('reward','');
+}
+
+function saveReward() {
+  const val = document.getElementById('reward-input').value.trim();
+  if (val) { save('reward', val); document.getElementById('reward-display').textContent = val; }
+  document.getElementById('reward-edit-area').style.display = 'none';
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-write').style.display = tab==='write' ? 'block' : 'none';
+  document.getElementById('tab-calendar').style.display = tab==='calendar' ? 'block' : 'none';
+  if (tab==='calendar') renderCalendar();
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const entries = load('entries', {});
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('cal-title').textContent = calYear + '年 ' + months[calMonth];
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const todayStr = todayKey();
+  for (let i=0; i<firstDay; i++) {
+    const e = document.createElement('div'); e.className='empty-cell'; grid.appendChild(e);
+  }
+  let count = 0;
+  for (let d=1; d<=daysInMonth; d++) {
+    const key = calYear + '-' + String(calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell' + (key===todayStr ? ' today' : '');
+    if (entries[key]) {
+      cell.classList.add('done');
+      const h = document.createElement('span');
+      h.className = 'hanko-sm';
+      h.textContent = getHanko();
+      cell.appendChild(h);
+      count++;
+    } else {
+      cell.textContent = d;
+    }
+    grid.appendChild(cell);
+  }
+  document.getElementById('cal-count').textContent = '今月の記録：' + count + '日';
+}
+
+window.onload = function() {
+  const saved = load('gender', null);
+  if (saved) { gender = saved; showMain(); }
+};
+</script>
+</body>
+</html>

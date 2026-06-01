@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STATECOACH | 臨場感コーチング 有江健彦</title>
+<meta name="description" content="アドラー心理学をベースにした臨場感コーチング。プロコーチ歴15年の有江健彦が、あなたの中の答えを一緒に見つけます。体験セッション受付中。">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --ink: #1a1a1a;
+  --ink-light: #4a4a4a;
+  --ink-muted: #888;
+  --paper: #f8f5f0;
+  --paper-dark: #1c1a17;
+  --accent: #2c4a3e;
+  --accent-light: #4a7c6b;
+  --gold: #a08040;
+  --border: #d4cfc7;
+}
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.8;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.2rem 3rem;
+  background: rgba(248,245,240,0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a {
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 8rem 3rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 45%; height: 100%;
+  background: var(--accent);
+  opacity: 0.06;
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+}
+.hero-inner { max-width: 680px; }
+.hero-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+.hero-headline {
+  font-family: 'Noto Serif JP', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.6;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+.hero-headline em {
+  font-style: normal;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+}
+.hero-sub {
+  font-size: 1rem;
+  color: var(--ink-light);
+  line-height: 2;
+  margin-bottom: 3rem;
+  max-width: 520px;
+}
+.hero-cta {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.hero-cta:hover { background: var(--accent-light); transform: translateY(-2px); }
+.hero-note {
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 0 3rem;
+}
+.about {
+  padding: 6rem 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 4rem;
+  align-items: start;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.about-photo {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  margin-bottom: 1.5rem;
+}
+.section-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+.about-name {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.6rem;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.about-title {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 2rem;
+}
+.about-stats { display: flex; flex-direction: column; gap: 1rem; }
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.stat-number {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2rem;
+  color: var(--accent);
+}
+.stat-label { font-size: 0.8rem; color: var(--ink-muted); }
+.about-text {
+  font-size: 0.95rem;
+  color: var(--ink-light);
+  line-height: 2.2;
+}
+.about-keywords {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.keyword {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.services {
+  background: var(--paper-dark);
+  color: #f0ede8;
+  padding: 6rem 3rem;
+}
+.services-header { max-width: 900px; margin: 0 auto 3rem; }
+.services-header .section-label { color: var(--gold); }
+.services-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.6rem;
+  color: #f0ede8;
+}
+.services-grid {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+.service-card {
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 2rem;
+  transition: border-color 0.2s;
+}
+.service-card:hover { border-color: var(--gold); }
+.service-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+.service-name {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.05rem;
+  color: #f0ede8;
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+.service-price {
+  font-size: 1.3rem;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+.service-desc {
+  font-size: 0.8rem;
+  color: rgba(240,237,232,0.55);
+  line-height: 1.8;
+}
+.zoom-coaching {
+  padding: 6rem 3rem;
+  background: var(--paper);
+}
+.zoom-inner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.zoom-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.6rem;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+.zoom-desc {
+  font-size: 0.95rem;
+  color: var(--ink-light);
+  line-height: 2.2;
+  margin-bottom: 2.5rem;
+}
+.zoom-stats {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 2.5rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.zoom-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.zoom-stat-number {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2.2rem;
+  color: var(--accent);
+}
+.zoom-stat-label {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+.zoom-btn {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.zoom-btn:hover { background: var(--accent); color: #fff; }
+@media (max-width: 640px) {
+  .zoom-coaching { padding: 4rem 1.5rem; }
+  .zoom-stats { flex-direction: column; gap: 1.5rem; }
+}
+
+  padding: 6rem 3rem;
+  text-align: center;
+  background: var(--accent);
+}
+.philosophy-quote {
+  font-family: 'Noto Serif JP', serif;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 2;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  color: #fff;
+}
+.philosophy-author {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.6);
+}
+.contact {
+  padding: 6rem 3rem;
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+.contact-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+.contact-sub {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  line-height: 2;
+  margin-bottom: 2.5rem;
+}
+.contact-btn {
+  display: inline-block;
+  padding: 1.1rem 3rem;
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.contact-btn:hover { background: var(--accent); color: #fff; }
+.contact-info {
+  margin-top: 2.5rem;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  line-height: 2.2;
+}
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-eyebrow { animation: fadeUp 0.6s ease both; }
+.hero-headline { animation: fadeUp 0.7s 0.1s ease both; }
+.hero-sub { animation: fadeUp 0.7s 0.2s ease both; }
+.hero-cta { animation: fadeUp 0.7s 0.3s ease both; }
+@media (max-width: 640px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { gap: 1rem; }
+  .hero { padding: 7rem 1.5rem 3rem; }
+  .about { grid-template-columns: 1fr; gap: 2.5rem; padding: 4rem 1.5rem; }
+  .services { padding: 4rem 1.5rem; }
+  .contact { padding: 4rem 1.5rem; }
+  footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">STATECOACH</div>
+  <div class="nav-links">
+    <a href="#about">コーチについて</a>
+    <a href="#services">サービス</a>
+    <a href="#zoom">公開コーチング</a>
+    <a href="#contact">お問い合わせ</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Adlerian Coaching / 臨場感コーチング</p>
+    <h1 class="hero-headline">
+      勇気は、もらうものじゃない。<br>
+      <em>自分の中から</em>湧き出るものだ。
+    </h1>
+    <p class="hero-sub">
+      あなたはすでに、その力を持っている。<br>
+      ただ、まだ気づいていないだけかもしれない。<br>
+      臨場感コーチングで、あなたの中の答えを一緒に見つけましょう。
+    </p>
+    <a href="https://www.reservestock.jp/inquiry/2267" class="hero-cta">体験セッションを申し込む</a>
+    <p class="hero-note">体験セッション 60分 ¥10,000（ZOOM・スカイプ・電話対応）</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="about" id="about">
+  <div>
+    <img src="photo.jpg" alt="有江健彦" class="about-photo">
+    <p class="section-label">About</p>
+    <h2 class="about-name">有江　健彦</h2>
+    <p class="about-title">プロコーチ / アドラー心理学</p>
+    <div class="about-stats">
+      <div class="stat">
+        <span class="stat-number">15</span>
+        <span class="stat-label">年のコーチング実績</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">1,780</span>
+        <span class="stat-label">回以上のStand.fm配信</span>
+      </div>
+    </div>
+  </div>
+  <div>
+    <p class="about-text">
+      2011年1月よりプロのメンタルコーチとして活動。アドラー心理学をベースにした「臨場感コーチング」を独自に開発し、個人・経営者・コーチ向けのセッションを行っています。<br><br>
+      ライフミッションは「勇気循環する社会を創る」。頭でわかるだけでなく、体で感じ、行動が変わるコーチングを大切にしています。<br><br>
+      有限会社まゆ企画　代表取締役。山野愛子どろんこ美容朝霧店と連携し、兵庫県明石市を拠点に活動中。
+    </p>
+    <div class="about-keywords">
+      <span class="keyword">臨場感コーチング</span>
+      <span class="keyword">勇気循環</span>
+      <span class="keyword">アドラー心理学</span>
+      <span class="keyword">共同体感覚</span>
+      <span class="keyword">課題の分離</span>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="services" id="services">
+  <div class="services-header">
+    <p class="section-label">Services</p>
+    <h2 class="services-title">サービスメニュー</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <p class="service-tag">体験</p>
+      <h3 class="service-name">体験セッション</h3>
+      <p class="service-price">¥10,000</p>
+      <p class="service-desc">60分 / ZOOM・スカイプ・電話<br>はじめての方はこちらから</p>
+    </div>
+    <div class="service-card">
+      <p class="service-tag">単発</p>
+      <h3 class="service-name">1回ごとのセッション</h3>
+      <p class="service-price">¥15,000〜</p>
+      <p class="service-desc">30分 ¥15,000 / 60分 ¥25,000<br>ZOOM・スカイプ・電話</p>
+    </div>
+    <div class="service-card">
+      <p class="service-tag">継続</p>
+      <h3 class="service-name">回数券（6回）</h3>
+      <p class="service-price">¥120,000</p>
+      <p class="service-desc">90分×6回<br>FBメッセージ相談つき</p>
+    </div>
+    <div class="service-card">
+      <p class="service-tag">3ヶ月プラン</p>
+      <h3 class="service-name">マラソン完走サポート</h3>
+      <p class="service-price">¥60,000〜</p>
+      <p class="service-desc">3ヶ月間の継続プラン<br>メンテナンス〜加速まで3コース</p>
+    </div>
+    <div class="service-card">
+      <p class="service-tag">コーチ向け</p>
+      <h3 class="service-name">個別スーパービジョン</h3>
+      <p class="service-price">¥15,000〜</p>
+      <p class="service-desc">初回面談無料<br>3回セット ¥30,000</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<section class="zoom-coaching" id="zoom">
+  <div class="zoom-inner">
+    <p class="section-label">Monthly Event</p>
+    <h2 class="zoom-title">ZOOM公開コーチング</h2>
+    <p class="zoom-desc">
+      2013年12月27日に第1回を開催して以来、毎月休まず続けてきた公開コーチング。<br>
+      2026年3月24日に150回目を迎えました。<br>
+      参加者の目の前で行うライブセッションで、コーチングのリアルを体感してください。
+    </p>
+    <div class="zoom-stats">
+      <div class="zoom-stat">
+        <span class="zoom-stat-number">151</span>
+        <span class="zoom-stat-label">回目　2026年4月23日（予定）</span>
+      </div>
+      <div class="zoom-stat">
+        <span class="zoom-stat-number">2013</span>
+        <span class="zoom-stat-label">年12月　第1回開催</span>
+      </div>
+    </div>
+    <a href="https://www.reservestock.jp/page/event_calendar/2056" target="_blank" rel="noopener" class="zoom-btn">イベントカレンダーを見る</a>
+  </div>
+</section>
+
+<section class="philosophy">
+  <p class="philosophy-quote">
+    「勇気循環する社会を創る」<br>
+    それが、私のライフミッションです。
+  </p>
+  <p class="philosophy-author">有江　健彦 / STATECOACH</p>
+</section>
+
+<section class="contact" id="contact">
+  <p class="section-label">Contact</p>
+  <h2 class="contact-title">まず、話してみませんか。</h2>
+  <p class="contact-sub">
+    体験セッションは60分 ¥10,000。<br>
+    ZOOM・スカイプ・電話でお気軽にどうぞ。<br>
+    あなたの状況に合わせたプランもご提案します。
+  </p>
+  <a href="https://www.reservestock.jp/inquiry/2267" class="contact-btn">お問い合わせはこちら</a>
+  <div class="contact-info">
+    <p>メール：katsuhiko.arie@gmail.com</p>
+    <p>電話：090-4760-5851</p>
+    <p>有限会社まゆ企画 / <a href="https://asagiriyamano.jp/" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">山野愛子どろんこ美容朝霧店</a></p>
+    <p style="margin-top:1rem;">
+      <a href="https://stand.fm/channels/603f486385b142d0d8ba3fc0" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none; margin-right:1.5rem;">Stand.fm</a>
+      <a href="https://note.com/statecoach" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">note</a>
+    </p>
+  </div>
+</section>
+
+<footer>
+  <span>© 2025 STATECOACH / 有江健彦</span>
+  <div style="display:flex; gap:1.5rem; align-items:center;">
+    <a href="https://stand.fm/channels/603f486385b142d0d8ba3fc0" target="_blank" rel="noopener" style="font-size:0.75rem; color:var(--ink-muted); text-decoration:none; letter-spacing:0.05em;">Stand.fm</a>
+    <a href="https://note.com/statecoach" target="_blank" rel="noopener" style="font-size:0.75rem; color:var(--ink-muted); text-decoration:none; letter-spacing:0.05em;">note</a>
+  </div>
+  <span>有限会社まゆ企画</span>
+</footer>
+
+</body>
+</html>

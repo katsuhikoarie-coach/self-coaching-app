@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヤマノエステ教室 朝霧教室｜40年・120名の指導実績。技術から開業まで一貫サポート。</title>
+  <meta name="description" content="神戸・明石エリアのヤマノエステ教室朝霧教室。40年・120名のインストラクター指導実績。AEA資格講師による少人数制指導で、技術習得から自宅サロン開業・収益化まで徹底サポート。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* HERO */
+    .hero {
+      background-color: var(--beige);
+      background-image:
+        radial-gradient(ellipse at 85% 15%, rgba(201,168,76,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 85%, rgba(176,125,78,0.15) 0%, transparent 50%);
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      padding: 5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: 60px;
+      top: 60px;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,185,154,0.35);
+    }
+
+    .hero-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.28em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 1px;
+      background-color: var(--accent);
+    }
+
+    .hero h1 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(1.9rem, 4.5vw, 3rem);
+      font-weight: 500;
+      color: var(--brown-dark);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero h1 .hero-small {
+      font-size: 0.6em;
+      font-weight: 300;
+      color: var(--text-light);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-lead {
+      font-size: 0.95rem;
+      color: var(--text-light);
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+      line-height: 2.1;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      text-align: left;
+    }
+
+    .hero-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .hero-stat-num sup {
+      font-size: 1.2rem;
+    }
+
+    .hero-stat-label {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      letter-spacing: 0.05em;
+    }
+
+    .hero-sep {
+      width: 1px;
+      background-color: var(--beige-dark);
+      align-self: stretch;
+      min-height: 50px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat-highlight {
+      position: relative;
+      padding: 0.8rem 1.2rem;
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 4px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(176,125,78,0.05) 100%);
+    }
+
+    .hero-stat-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .hero-stat-num-gold {
+      color: var(--gold) !important;
+      font-size: 3.2rem !important;
+    }
+
+    /* NUMBERS BAND 100年強調 */
+    .num-item-featured {
+      border-right: none !important;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%);
+      position: relative;
+      padding: 1.5rem 1rem !important;
+    }
+
+    .num-item-featured::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
+
+    .num-featured-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .num-val-featured {
+      font-size: 3rem !important;
+      color: var(--gold) !important;
+    }
+
+    /* 100年ブランド帯 */
+    .yamano-brand-band {
+      background: linear-gradient(135deg, #3d2416 0%, var(--brown-dark) 50%, #3d2416 100%);
+      padding: 3.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .yamano-brand-band::before {
+      content: '百';
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 18rem;
+      font-weight: 700;
+      color: rgba(201,168,76,0.04);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .yamano-brand-band::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
+
+    .yamano-brand-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .yamano-brand-left {
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .yamano-brand-since {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .yamano-brand-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .yamano-brand-num span {
+      font-size: 2rem;
+      vertical-align: middle;
+    }
+
+    .yamano-brand-divider {
+      width: 1px;
+      height: 100px;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    .yamano-brand-right {
+      flex: 1;
+    }
+
+    .yamano-brand-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .yamano-brand-text {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 2;
+      max-width: 600px;
+    }
+
+    @media (max-width: 768px) {
+      .yamano-brand-inner { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .yamano-brand-divider { width: 60px; height: 1px; }
+      .yamano-brand-num { font-size: 4rem; }
+    }
+
+    /* NUMBERS BAND */
+    .numbers-band {
+      background-color: var(--brown-dark);
+      padding: 2.5rem 2rem;
+    }
+
+    .numbers-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .num-item {
+      padding: 1rem;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .num-item:last-child { border-right: none; }
+
+    .num-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      color: var(--accent-light);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .num-val sup { font-size: 1.1rem; }
+
+    .num-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+    }
+
+    /* STRENGTH */
+    .strength-section { background-color: var(--white); }
+
+    .strength-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .strength-grid-bottom {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .strength-card {
+      padding: 2rem;
+      border: 1px solid var(--beige-dark);
+      border-radius: 4px;
+      background-color: var(--cream);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s;
+    }
+
+    .strength-card:hover {
+      box-shadow: 0 8px 30px rgba(139,111,71,0.1);
+    }
+
+    .strength-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(to right, var(--accent), var(--accent-light));
+    }
+
+    .s-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .s-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--brown-dark);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .s-text {
+      font-size: 0.845rem;
+      color: var(--text-light);
+      line-height: 2;
+    }
+
+    .s-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+
+    .s-tag {
+      background-color: var(--beige);
+      color: var(--text-light);
+      font-size: 0.73rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      border: 1px solid var(--beige-dark);
+    }
+
+    /* FLOW PREVIEW */
+    .flow-section { background-color: var(--beige); }
+
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    .flow-steps::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--accent), transparent);
+    }
+
+    .flow-step {
+      text-align: center;
+      padding: 1rem 0.5rem 1.5rem;
+    }
+
+    .f-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      color: var(--white);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .f-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.88rem;
+      color: var(--brown-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .f-text {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      line-height: 1.8;
+    }
+
+    /* COURSE PREVIEW */
+    .course-section { background-color: var(--white); }
+
+    .course-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    .c-card {
+      border: 1px solid var(--beige-dark);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .c-head {
+      background-color: var(--brown-dark);
+      color: var(--white);
+      padding: 1.1rem 1.3rem;
+    }
+
+    .c-head h3 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    .c-tag { font-size: 0.72rem; color: var(--accent-light); }
+
+    .c-body {
+      padding: 1.3rem;
+      background-color: var(--cream);
+    }
+
+    .c-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .c-price small {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .c-desc { font-size: 0.82rem; color: var(--text-light); line-height: 1.9; }
+
+    .course-more { text-align: center; margin-top: 2rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .numbers-inner { grid-template-columns: repeat(2, 1fr); }
+      .num-item:nth-child(2) { border-right: none; }
+      .num-item:nth-child(3) { border-right: 1px solid rgba(255,255,255,0.1); }
+      .num-item:nth-child(4) { border-right: none; }
+      .strength-grid { grid-template-columns: 1fr 1fr; }
+      .strength-grid-bottom { grid-template-columns: 1fr; }
+      .flow-steps { grid-template-columns: repeat(3, 1fr); }
+      .flow-steps::before { display: none; }
+      .course-cards { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-stats { gap: 1.5rem; }
+      .hero-sep { display: none; }
+      .strength-grid { grid-template-columns: 1fr; }
+      .numbers-inner { grid-template-columns: repeat(2, 1fr); }
+      .flow-steps { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      ヤマノエステ教室 朝霧教室
+      <span>Yamano Esthetics School Asagiri</span>
+    </a>
+    <nav id="main-nav">
+      <a href="index.html">ホーム</a>
+      <a href="course.html">コース案内</a>
+      <a href="strength.html">5つの強み</a>
+      <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+      <a href="access.html">アクセス</a>
+      <a href="contact.html" class="nav-cta">お問い合わせ</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">Yamano Esthetics School Asagiri</p>
+      <h1>
+        <span class="hero-small">40年・120名の指導実績。</span>
+        技術だけじゃない。<br>
+        <em>「稼げるエステ」</em>を、<br>
+        一緒につくろう。
+      </h1>
+      <p class="hero-lead">
+        神戸・明石エリアで、AEA資格講師がプロのフェイシャル技術を指導。
+        マーケティング・集客・カウンセリングまで学べる、
+        本気でサロン開業を目指す方のための教室です。
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">40<sup>年</sup></div>
+          <div class="hero-stat-label">継続的な指導実績</div>
+        </div>
+        <div class="hero-sep"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">120<sup>名</sup></div>
+          <div class="hero-stat-label">インストラクター輩出</div>
+        </div>
+        <div class="hero-sep"></div>
+        <div class="hero-stat hero-stat-highlight">
+          <div class="hero-stat-badge">Since 1921</div>
+          <div class="hero-stat-num hero-stat-num-gold">100<sup>年</sup></div>
+          <div class="hero-stat-label">ヤマノのブランド信頼</div>
+        </div>
+      </div>
+      <div class="hero-btns">
+        <a href="strength.html" class="btn btn-primary">5つの強みを見る</a>
+        <a href="contact.html" class="btn btn-outline">無料相談・お問い合わせ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 100年ブランド帯 -->
+  <div class="yamano-brand-band">
+    <div class="yamano-brand-inner">
+      <div class="yamano-brand-left">
+        <div class="yamano-brand-since">Since 1921</div>
+        <div class="yamano-brand-num">100<span>年</span></div>
+      </div>
+      <div class="yamano-brand-divider"></div>
+      <div class="yamano-brand-right">
+        <div class="yamano-brand-title">ヤマノのブランド信頼</div>
+        <p class="yamano-brand-text">
+          山野愛子先生が1921年に創業した「ヤマノ」は、100年以上にわたって日本の美容界を牽引してきました。モンドセレクション最高金賞を受賞した化粧品、「どろんこ美容法」「琥珀美容」の確かな理論。その100年の信頼を、朝霧教室は受け継いでいます。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NUMBERS BAND -->
+  <div class="numbers-band">
+    <div class="numbers-inner">
+      <div class="num-item">
+        <div class="num-val">40<sup>年</sup></div>
+        <div class="num-label">継続する<br>指導の歴史</div>
+      </div>
+      <div class="num-item">
+        <div class="num-val">120<sup>名</sup></div>
+        <div class="num-label">輩出した<br>インストラクター数</div>
+      </div>
+      <div class="num-item">
+        <div class="num-val">AEA</div>
+        <div class="num-label">日本エステティック<br>業協会資格講師</div>
+      </div>
+      <div class="num-item num-item-featured">
+        <div class="num-featured-label">Since 1921</div>
+        <div class="num-val num-val-featured">100<sup>年</sup></div>
+        <div class="num-label">ヤマノの<br>ブランド信頼</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRENGTH OVERVIEW -->
+  <section class="section strength-section">
+    <div class="section-inner">
+      <span class="section-label">Our Strengths</span>
+      <h2 class="section-title">5つの強み</h2>
+      <p class="section-lead">朝霧教室が選ばれる理由は、技術指導だけではありません。独立・収益化まで一貫してサポートする、他にはない環境があります。</p>
+
+      <div class="strength-grid">
+        <div class="strength-card">
+          <div class="s-num">STRENGTH 01</div>
+          <h3 class="s-title">圧倒的な指導実績と<br>信頼性</h3>
+          <p class="s-text">40年の歴史、120名のインストラクター輩出実績。AEA資格を持つ現役エステティシャンが、現場で培った生きた技術を直接指導します。</p>
+          <div class="s-tags">
+            <span class="s-tag">AEA資格講師</span>
+            <span class="s-tag">どろんこ美容法</span>
+            <span class="s-tag">ヤマノ100年の信頼</span>
+          </div>
+        </div>
+        <div class="strength-card">
+          <div class="s-num">STRENGTH 02</div>
+          <h3 class="s-title">「稼げるエステ」を<br>育てるビジネス教育</h3>
+          <p class="s-text">技術だけでなく、集客・マーケティング・セールス・カウンセリングまでを学べます。もうかる仕組みをつくる力を身につけます。</p>
+          <div class="s-tags">
+            <span class="s-tag">マーケティング研修</span>
+            <span class="s-tag">セールス研修</span>
+            <span class="s-tag">カウンセリング研修</span>
+          </div>
+        </div>
+        <div class="strength-card">
+          <div class="s-num">STRENGTH 03</div>
+          <h3 class="s-title">実践的な研修と<br>独立までのステップ</h3>
+          <p class="s-text">サロンでの実地研修、レンタルサロンでの経験積み、ライセンス取得から代理店契約・オープンまで、明確なステップで進められます。</p>
+          <div class="s-tags">
+            <span class="s-tag">実地研修あり</span>
+            <span class="s-tag">レンタルサロン活用</span>
+            <span class="s-tag">段階的ステップ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="strength-grid-bottom">
+        <div class="strength-card">
+          <div class="s-num">STRENGTH 04</div>
+          <h3 class="s-title">本音を引き出す<br>コミュニケーション力</h3>
+          <p class="s-text">施術だけでなく、顧客の本音を引き出すコミュニケーション能力を養います。長く安心して付き合える顧客関係を、自分で築けるようになります。</p>
+          <div class="s-tags">
+            <span class="s-tag">カウンセリングスキル</span>
+            <span class="s-tag">顧客選択の自由</span>
+            <span class="s-tag">長期関係構築</span>
+          </div>
+        </div>
+        <div class="strength-card">
+          <div class="s-num">STRENGTH 05</div>
+          <h3 class="s-title">手厚いアフターフォローと<br>柔軟な働き方</h3>
+          <p class="s-text">独立後も継続的なサポートを受けられるので、一人で悩まずにサロン運営を続けられます。ライフスタイルに合わせた「家で働く」を実現します。</p>
+          <div class="s-tags">
+            <span class="s-tag">独立後フォロー</span>
+            <span class="s-tag">自宅で開業OK</span>
+            <span class="s-tag">副業・本業どちらも可</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top: 2.5rem;">
+        <a href="strength.html" class="btn btn-outline">強みの詳細を見る →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section class="section flow-section">
+    <div class="section-inner">
+      <span class="section-label">Step to Independence</span>
+      <h2 class="section-title">学んで、開いて、稼ぐ。</h2>
+      <div class="divider"></div>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="f-circle">01</div>
+          <div class="f-title">相談・入学</div>
+          <p class="f-text">随時開講。まずは気軽にご相談を。</p>
+        </div>
+        <div class="flow-step">
+          <div class="f-circle">02</div>
+          <div class="f-title">技術・知識習得</div>
+          <p class="f-text">フェイシャル技術＋ビジネス研修</p>
+        </div>
+        <div class="flow-step">
+          <div class="f-circle">03</div>
+          <div class="f-title">実地研修</div>
+          <p class="f-text">サロン・レンタルサロンで経験を積む</p>
+        </div>
+        <div class="flow-step">
+          <div class="f-circle">04</div>
+          <div class="f-title">代理店契約</div>
+          <p class="f-text">化粧品の安定した仕入れルート確保</p>
+        </div>
+        <div class="flow-step">
+          <div class="f-circle">05</div>
+          <div class="f-title">自宅サロン開業</div>
+          <p class="f-text">独立後も継続フォローあり</p>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top: 2.5rem;">
+        <a href="flow.html" class="btn btn-outline">開業までの流れを詳しく →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSE PREVIEW -->
+  <section class="section course-section">
+    <div class="section-inner">
+      <span class="section-label">Course</span>
+      <h2 class="section-title">フェイシャル専科</h2>
+      <p class="section-lead">2時間×12教程で、サロンで通用するフェイシャル技術を確実に習得。全日本エステ健康美容指導育成協会の認定コースです。</p>
+
+      <div class="course-cards">
+        <div class="c-card">
+          <div class="c-head">
+            <h3>フェイシャル初級コース</h3>
+            <div class="c-tag">2時間 × 12教程</div>
+          </div>
+          <div class="c-body">
+            <div class="c-price">¥55,000<small>（税込）</small></div>
+            <p class="c-desc">経験ゼロからスタートできる基礎コース。フェイシャルエステの基本技術と美容知識を習得します。</p>
+          </div>
+        </div>
+        <div class="c-card">
+          <div class="c-head">
+            <h3>フェイシャル中級コース</h3>
+            <div class="c-tag">2時間 × 12教程</div>
+          </div>
+          <div class="c-body">
+            <div class="c-price">¥96,800<small>（税込）</small></div>
+            <p class="c-desc">サロン開業レベルの高度な技術を習得。独立を具体的に目指す方のためのコースです。</p>
+          </div>
+        </div>
+        <div class="c-card">
+          <div class="c-head" style="background: linear-gradient(135deg, #5c4430, #3d2416);">
+            <h3>初級＋中級 セット</h3>
+            <div class="c-tag">おすすめ</div>
+          </div>
+          <div class="c-body">
+            <div class="c-price">¥151,800<small>（税込）</small></div>
+            <p class="c-desc">まとめて受講することでよりスムーズに技術習得。開業を目指す方に最適なセット。</p>
+          </div>
+        </div>
+      </div>
+      <div class="course-more">
+        <a href="course.html" class="btn btn-outline">コース詳細・料金を見る →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <span class="section-label">Contact</span>
+    <h2 class="section-title">まずは、気軽にご相談ください。</h2>
+    <p class="cta-lead">
+      「どのコースから始めれば良いか」「開業まで実際どのくらいかかるか」<br>
+      どんな疑問もお気軽にどうぞ。担当の有江が丁寧にお答えします。
+    </p>
+    <div class="cta-btns">
+      <a href="contact.html" class="btn btn-white">お問い合わせフォーム</a>
+      <a href="tel:0789180585" class="btn btn-outline-white">📞 078-918-0585</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div style="margin-bottom:2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;">
+    <img src="line_qr.jpg" alt="LINE QRコード" style="width:100px;height:100px;border-radius:4px;background:#fff;padding:6px;">
+    <div style="text-align:left;">
+      <div style="font-family:Noto Serif JP,serif;font-size:0.95rem;color:var(--white);margin-bottom:0.5rem;">LINEでお気軽にご相談ください</div>
+      <a href="https://lin.ee/Zldv5ze" target="_blank" rel="noopener"
+         style="display:inline-block;background:#06C755;color:#fff;font-size:0.9rem;padding:0.6rem 1.5rem;border-radius:4px;text-decoration:none;font-weight:500;">
+        💬 友だち追加・LINE相談
+      </a>
+    </div>
+  </div>
+  <div class="footer-logo">ヤマノエステ教室 朝霧教室</div>
+  <div class="footer-sub">Yamano Esthetics School Asagiri</div>
+  <nav>
+    <a href="index.html">ホーム</a>
+    <a href="course.html">コース案内</a>
+    <a href="strength.html">5つの強み</a>
+    <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+    <a href="access.html">アクセス</a>
+    <a href="contact.html">お問い合わせ</a>
+  </nav>
+  <div class="footer-contact">
+    TEL：<a href="tel:0789180585">078-918-0585</a>　携帯：<a href="tel:09016773387">090-1677-3387</a>（担当：有江啓子）<br>
+    MAIL：<a href="mailto:ya.asagiriten@gmail.com">ya.asagiriten@gmail.com</a>
+  </div>
+  <div style="margin-bottom:1.5rem;padding:1rem;background:rgba(255,255,255,0.05);border-radius:4px;font-size:0.82rem;">
+    エステ施術・化粧品のご購入は →
+    <a href="https://asagiriyamano.jp/" target="_blank" style="color:var(--accent-light);text-decoration:underline;">山野愛子どろんこ美容 朝霧店</a>
+  </div>
+  <div class="copyright">© ヤマノエステ教室 朝霧教室 / 有限会社まゆ企画</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('main-nav');
+  hamburger.addEventListener('click', () => nav.classList.toggle('open'));
+</script>
+
+</body>
+</html>

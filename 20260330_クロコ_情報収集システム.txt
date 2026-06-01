@@ -1,0 +1,29 @@
+毎朝自動で情報収集してGmailに送るシステムを作ってください。
+
+使うもの
+- Google Gemini API（無料枠）
+- GitHub Actions（毎朝9時 JST に自動実行）
+- Gmail（送信先 katsuhiko.arie@gmail.com）
+
+集める情報（毎朝この5テーマ）
+1. AIの最新情報
+2. メンタルコーチングの最新情報
+3. 山野愛子どろんこ美容・化粧品関連の情報
+4. 世界情勢の最新情報
+5. 海外での日本に関する最新情報
+
+作るファイル
+- `daily_info.py` ? Gemini APIにweb検索つきで各テーマを調査させて、日本語でまとめてGmailで送るスクリプト
+- `.github/workflows/daily.yml` ? 毎朝9時（JST = UTC 0:00）にdaily_info.pyを実行するGitHub Actions設定
+- `SETUP_GUIDE.md` ? GitHubへのアップ方法、Gemini APIキーの取得方法、GmailのApp Password設定、GitHub Secretsへの登録方法を日本語でステップごとに書いたセットアップ手順（READMEとは別ファイルで作成すること）
+
+---
+
+仕様
+- メールは日本語、件名は「【毎朝情報】YYYY年MM月DD日」
+- 各テーマごとに見出しをつけて、要点を箇条書きでまとめる
+- Gemini APIはgemini-2.0-flash（無料枠対応）を使う
+- APIキーやパスワードはすべてGitHub Secretsから環境変数で読み込む（ハードコードしない）
+- `requirements.txt` も作成する
+
+---

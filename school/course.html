@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コース案内・料金｜ヤマノエステ教室 朝霧教室</title>
+  <meta name="description" content="フェイシャル初級・中級コースの詳細と料金。2時間×12教程、全日本エステ健康美容指導育成協会認定。随時開講・少人数制。AEA資格講師が指導。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .course-block {
+      border: 1px solid var(--beige-dark);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .course-block-header {
+      background-color: var(--brown-dark);
+      color: var(--white);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .course-block-header h2 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+    }
+
+    .price-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: var(--accent-light);
+      line-height: 1;
+    }
+
+    .price-note { font-size: 0.75rem; color: rgba(255,255,255,0.55); margin-top: 0.2rem; }
+
+    .course-block-body { padding: 2rem; background-color: var(--cream); }
+
+    .course-meta {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .course-meta-item { font-size: 0.875rem; color: var(--text-light); }
+
+    .course-meta-item strong {
+      color: var(--text);
+      font-weight: 500;
+      display: block;
+      font-size: 0.78rem;
+      margin-bottom: 0.1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .course-desc {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 2;
+      border-left: 2px solid var(--sand);
+      padding-left: 1rem;
+    }
+
+    .set-block {
+      background: linear-gradient(135deg, var(--brown-dark) 0%, #3d2416 100%);
+      border-radius: 6px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      color: var(--white);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .set-label { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.15em; color: var(--accent-light); margin-bottom: 0.3rem; }
+    .set-title { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .set-desc { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+    .set-price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--accent-light); white-space: nowrap; }
+
+    .option-block {
+      background-color: var(--beige);
+      border: 1px solid var(--beige-dark);
+      border-radius: 6px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .option-label { font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.3rem; }
+    .option-title { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; color: var(--brown-dark); margin-bottom: 0.5rem; }
+    .option-desc { font-size: 0.85rem; color: var(--text-light); }
+    .option-price { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--accent); white-space: nowrap; }
+
+    .course-notes { background-color: var(--beige); border-radius: 4px; padding: 1.5rem; margin-top: 1rem; }
+    .course-notes p { font-size: 0.82rem; color: var(--text-light); line-height: 2.1; }
+
+    /* TRAINING */
+    .training-section { background-color: var(--beige); }
+
+    .training-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .training-card {
+      background-color: var(--white);
+      border-radius: 4px;
+      padding: 1.8rem;
+      text-align: center;
+    }
+
+    .training-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .training-title { font-family: 'Noto Serif JP', serif; font-size: 1rem; color: var(--brown-dark); margin-bottom: 0.75rem; }
+    .training-text { font-size: 0.845rem; color: var(--text-light); line-height: 1.9; }
+
+    @media (max-width: 768px) {
+      .course-block-header { flex-direction: column; }
+      .set-block { flex-direction: column; }
+      .option-block { flex-direction: column; }
+      .training-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      ヤマノエステ教室 朝霧教室
+      <span>Yamano Esthetics School Asagiri</span>
+    </a>
+    <nav id="main-nav">
+      <a href="index.html">ホーム</a>
+      <a href="course.html">コース案内</a>
+      <a href="strength.html">5つの強み</a>
+      <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+      <a href="access.html">アクセス</a>
+      <a href="contact.html" class="nav-cta">お問い合わせ</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="page-hero">
+    <span class="section-label">Course &amp; Price</span>
+    <h1>コース案内・料金</h1>
+  </div>
+
+  <section class="section" style="background-color: var(--white);">
+    <div class="section-inner">
+      <span class="section-label">Facial Specialist Course</span>
+      <h2 class="section-title">フェイシャル専科</h2>
+      <p class="section-lead">AEA資格を持つ現役エステティシャンが、少人数制で丁寧に指導します。2時間×12教程のカリキュラムで、サロンで通用する確かな技術を身につけましょう。</p>
+
+      <div class="course-block">
+        <div class="course-block-header">
+          <h2>フェイシャル初級コース</h2>
+          <div>
+            <div class="price-main">¥55,000</div>
+            <div class="price-note">税込 ／ 本体価格50,000円</div>
+          </div>
+        </div>
+        <div class="course-block-body">
+          <div class="course-meta">
+            <div class="course-meta-item"><strong>授業時間</strong>2時間 × 12教程</div>
+            <div class="course-meta-item"><strong>対象</strong>経験不問・初めての方歓迎</div>
+            <div class="course-meta-item"><strong>開講</strong>随時（ご都合に合わせて調整）</div>
+            <div class="course-meta-item"><strong>定員</strong>少人数制（平均2名）</div>
+          </div>
+          <p class="course-desc">フェイシャルエステの基礎から丁寧に学べるコースです。クレンジング・スキンケア・マッサージの基本手技を習得しながら、美容の知識も身につきます。「どろんこ美容法」に基づいた素肌美理論を土台に、エステの世界に初めて踏み込む方でも着実に成長できます。</p>
+        </div>
+      </div>
+
+      <div class="course-block">
+        <div class="course-block-header">
+          <h2>フェイシャル中級コース</h2>
+          <div>
+            <div class="price-main">¥96,800</div>
+            <div class="price-note">税込 ／ 本体価格88,000円</div>
+          </div>
+        </div>
+        <div class="course-block-body">
+          <div class="course-meta">
+            <div class="course-meta-item"><strong>授業時間</strong>2時間 × 12教程</div>
+            <div class="course-meta-item"><strong>対象</strong>初級修了者または同等以上</div>
+            <div class="course-meta-item"><strong>開講</strong>随時（ご都合に合わせて調整）</div>
+            <div class="course-meta-item"><strong>定員</strong>少人数制（平均2名）</div>
+          </div>
+          <p class="course-desc">より高度なフェイシャル技術を習得するコースです。サロン開業を目指す方に向けた内容で、お客様へ提供できるプロレベルの施術技術を身につけます。修了後は自宅サロンの開業、山野愛子どろんこ美容化粧品の販売代理店契約へと進むことができます。</p>
+        </div>
+      </div>
+
+      <div class="set-block">
+        <div>
+          <div class="set-label">Recommended Set</div>
+          <div class="set-title">初級＋中級 セット受講</div>
+          <div class="set-desc">まとめて受講することで技術習得がよりスムーズに。開業を目指す方に最適です。</div>
+        </div>
+        <div class="set-price">¥151,800<small style="font-family:'Noto Sans JP';font-size:0.85rem; color:rgba(255,255,255,0.5);">（税込）</small></div>
+      </div>
+
+      <div class="option-block">
+        <div>
+          <div class="option-label">Option</div>
+          <div class="option-title">デコルテ技術（オプション）</div>
+          <p class="option-desc">初級・中級コースに追加できるオプション。肩まわりのケアを加えてサービスの幅を広げましょう。</p>
+        </div>
+        <div class="option-price">¥22,000<small style="font-size:0.9rem; color:var(--text-light);">（税込）</small></div>
+      </div>
+
+      <div class="course-notes">
+        <p>
+          ※ 料金には教材費・授業料・ライセンス料が含まれています。<br>
+          ※ 「ヤマノ・エステデミサロン」の開設には、別途ご契約と開業費用が必要です。詳しくはお問い合わせください。<br>
+          ※ 全日本エステ健康美容指導育成協会の認定コースです。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 研修内容 -->
+  <section class="section training-section">
+    <div class="section-inner">
+      <span class="section-label">Training Program</span>
+      <h2 class="section-title">技術だけじゃない。<br>開業に必要なすべてを学ぶ。</h2>
+      <div class="divider"></div>
+      <div class="training-grid">
+        <div class="training-card">
+          <div class="training-icon">✦</div>
+          <h3 class="training-title">フェイシャル技術研修</h3>
+          <p class="training-text">クレンジング・マッサージ・スキンケアの基本から応用まで。AEA資格講師が現場レベルの技術を直接指導します。</p>
+        </div>
+        <div class="training-card">
+          <div class="training-icon">✦</div>
+          <h3 class="training-title">ビジネス・マーケティング研修</h3>
+          <p class="training-text">集客の仕組みづくり、マーケティング戦略、セールスの基本。「もうかる仕組み」をゼロから学べます。</p>
+        </div>
+        <div class="training-card">
+          <div class="training-icon">✦</div>
+          <h3 class="training-title">カウンセリング研修</h3>
+          <p class="training-text">お客様の本音を引き出し、信頼関係を築くコミュニケーション技術。長く続くサロンの土台をつくります。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <span class="section-label">Contact</span>
+    <h2 class="section-title">まずは気軽にご相談ください。</h2>
+    <p class="cta-lead">「どのコースが合うか迷っている」「開業までのイメージを聞きたい」など、なんでもどうぞ。</p>
+    <div class="cta-btns">
+      <a href="contact.html" class="btn btn-white">お問い合わせフォーム</a>
+      <a href="tel:0789180585" class="btn btn-outline-white">📞 078-918-0585</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div style="margin-bottom:2rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;">
+    <img src="line_qr.jpg" alt="LINE QRコード" style="width:100px;height:100px;border-radius:4px;background:#fff;padding:6px;">
+    <div style="text-align:left;">
+      <div style="font-family:Noto Serif JP,serif;font-size:0.95rem;color:var(--white);margin-bottom:0.5rem;">LINEでお気軽にご相談ください</div>
+      <a href="https://lin.ee/Zldv5ze" target="_blank" rel="noopener"
+         style="display:inline-block;background:#06C755;color:#fff;font-size:0.9rem;padding:0.6rem 1.5rem;border-radius:4px;text-decoration:none;font-weight:500;">
+        💬 友だち追加・LINE相談
+      </a>
+    </div>
+  </div>
+  <div class="footer-logo">ヤマノエステ教室 朝霧教室</div>
+  <div class="footer-sub">Yamano Esthetics School Asagiri</div>
+  <nav>
+    <a href="index.html">ホーム</a>
+    <a href="course.html">コース案内</a>
+    <a href="strength.html">5つの強み</a>
+    <a href="style.html">あなたの道</a>
+      <a href="flow.html">開業の流れ</a>
+      <a href="vision.html">ビジョン</a>
+    <a href="access.html">アクセス</a>
+    <a href="contact.html">お問い合わせ</a>
+  </nav>
+  <div class="footer-contact">
+    TEL：<a href="tel:0789180585">078-918-0585</a>　携帯：<a href="tel:09016773387">090-1677-3387</a>（担当：有江啓子）<br>
+    MAIL：<a href="mailto:ya.asagiriten@gmail.com">ya.asagiriten@gmail.com</a>
+  </div>
+  <div style="margin-bottom:1.5rem;padding:1rem;background:rgba(255,255,255,0.05);border-radius:4px;font-size:0.82rem;">
+    エステ施術・化粧品のご購入は →
+    <a href="https://asagiriyamano.jp/" target="_blank" style="color:var(--accent-light);text-decoration:underline;">山野愛子どろんこ美容 朝霧店</a>
+  </div>
+  <div class="copyright">© ヤマノエステ教室 朝霧教室 / 有限会社まゆ企画</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const nav = document.getElementById('main-nav');
+  hamburger.addEventListener('click', () => nav.classList.toggle('open'));
+</script>
+</body>
+</html>

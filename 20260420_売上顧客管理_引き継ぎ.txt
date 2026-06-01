@@ -1,0 +1,4 @@
+# ローカル作業ファイルの場所（更新版）
+
+朝霧店：C:\Users\User\Documents\claudeCode\asagiri_sales\
+WiLL：  C:\Users\User\Documents\claudeCode\asagiri_will\
